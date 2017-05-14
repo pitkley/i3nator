@@ -24,8 +24,8 @@ pub struct Config<'a> {
 pub struct General<'a> {
     #[serde(borrow)]
     pub working_directory: Option<&'a str>,
-    pub workspace: Option<u16>,
-    pub layout: Option<&'a str>,
+    pub workspace: Option<&'a str>,
+    pub layout: &'a str,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -86,5 +86,5 @@ impl<'de> Deserialize<'de> for ApplicationCommand {
 }
 
 fn default_text_return() -> bool {
-    false
+    true
 }
