@@ -25,7 +25,8 @@ pub struct General<'a> {
     #[serde(borrow)]
     pub working_directory: Option<&'a str>,
     pub workspace: Option<&'a str>,
-    pub layout: &'a str,
+    pub layout: Option<&'a str>,
+    pub layout_path: Option<&'a str>,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
