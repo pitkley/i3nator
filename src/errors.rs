@@ -6,4 +6,15 @@
 // option. This file may not be copied, modified or distributed
 // except according to those terms.
 
-error_chain! {}
+error_chain! {
+    foreign_links {
+        Utf8Error(::std::str::Utf8Error);
+    }
+
+    errors {
+        CommandSplittingFailed(t: String) {
+            description("command splitting failed")
+            display("command splitting failed: '{}'", t)
+        }
+    }
+}

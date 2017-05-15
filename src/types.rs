@@ -31,7 +31,7 @@ pub struct General<'a> {
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct Application<'a> {
-    pub command: ApplicationCommand,
+    pub command: ApplicationCommand<'a>,
     #[serde(borrow)]
     pub working_directory: Option<&'a str>,
     #[serde(borrow, default, deserialize_with="option_string_or_seq_string")]
@@ -43,12 +43,12 @@ pub struct Application<'a> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ApplicationCommand {
-    pub program: String,
-    pub args: Vec<String>,
+pub struct ApplicationCommand<'a> {
+    pub program: &'a str,
+    pub args: Vec<&'a str>,
 }
 
-impl<'de> Deserialize<'de> for ApplicationCommand {
+impl<'de: 'a, 'a> Deserialize<'de> for ApplicationCommand<'a> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
         where D: Deserializer<'de>
     {
@@ -69,12 +69,7 @@ impl<'de> Deserialize<'de> for ApplicationCommand {
                                   None => Err(empty_command),
                               }
                           }
-                          _ => {
-                              Ok((v.remove(0).to_owned(),
-                                  v.into_iter()
-                                      .map(|s| s.to_owned())
-                                      .collect::<Vec<String>>()))
-                          }
+                          _ => Ok((v.remove(0), v)),
                       })
             .map(|(program, args)| {
                      ApplicationCommand {
