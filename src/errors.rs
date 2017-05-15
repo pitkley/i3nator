@@ -6,22 +6,4 @@
 // option. This file may not be copied, modified or distributed
 // except according to those terms.
 
-#![recursion_limit = "1024"] // `error_chain!` can recurse deeply
-#![warn(missing_docs)] // TODO: increase from `warn` to `deny`
-
-#[macro_use]
-extern crate error_chain;
-extern crate serde;
-#[macro_use]
-extern crate serde_derive;
-extern crate shlex;
-
-mod deserializers;
-pub mod errors;
-pub mod types;
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {}
-}
+error_chain! {}
