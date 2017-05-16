@@ -6,4 +6,11 @@
 // option. This file may not be copied, modified or distributed
 // except according to those terms.
 
-fn main() {}
+#[macro_use]
+extern crate clap;
+
+mod cli;
+
+fn main() {
+    let matches = cli::cli().get_matches();
+}
