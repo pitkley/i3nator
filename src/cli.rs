@@ -8,17 +8,6 @@
 
 use clap::{Arg, App, AppSettings, SubCommand};
 
-// usage:
-//
-// i3nator commands # list commands
-//         copy <EXISTING> <NEW>
-//         edit|e|open|o <PROJECT>
-//         delete <PROJECT>
-//         list
-//         new <PROJECT>
-//         start|s|run|r <PROJECT>
-//         version
-
 pub fn cli() -> App<'static, 'static> {
     App::new(crate_name!())
         .version(crate_version!())
@@ -30,26 +19,32 @@ pub fn cli() -> App<'static, 'static> {
                     AppSettings::SubcommandRequiredElseHelp,
                     AppSettings::VersionlessSubcommands,])
         .subcommand(SubCommand::with_name("copy")
-                    .arg(Arg::with_name("EXISTING").required(true))
-                    .arg(Arg::with_name("NEW").required(true)))
+                        .about("copy an existing project to a new project")
+                        .arg(Arg::with_name("EXISTING").required(true))
+                        .arg(Arg::with_name("NEW").required(true)))
         .subcommand(SubCommand::with_name("delete")
-                    .arg(Arg::with_name("PROJECT").multiple(true).required(true)))
+                        .about("delete existing projects")
+                        .arg(Arg::with_name("PROJECT").multiple(true).required(true)))
         .subcommand(SubCommand::with_name("edit")
                         .alias("open")
+                        .about("open an existing project in your editor")
                         .arg(Arg::with_name("PROJECT").required(true)))
         // TODO: decide if we want to add `implode?`
-        .subcommand(SubCommand::with_name("list"))
+        .subcommand(SubCommand::with_name("list")
+                        .about("list all projects"))
         .subcommand(SubCommand::with_name("local")
-                    .arg(Arg::with_name("file")
-                         .short("f")
-                         .long("file")
-                         .value_name("FILE")
-                         .default_value("tmuxinator.yml")))
+                        .about("run a project from a local TOML-file")
+                        .arg(Arg::with_name("file")
+                             .short("f")
+                             .long("file")
+                             .value_name("FILE")
+                             .default_value("i3nator.toml")))
         .subcommand(SubCommand::with_name("new")
-                    .arg(Arg::with_name("PROJECT")
-                         .required(true)))
+                        .about("create a new project and open it in your editor")
+                        .arg(Arg::with_name("PROJECT").required(true)))
         .subcommand(SubCommand::with_name("start")
-                    .alias("run"))
+                        .alias("run")
+                        .about("start a project according to it's configuration"))
     // TODO: determine if we can implement `stop`.
     // This would probably require keeping track of PIDs and workspaces and such, so my
     // immediate thought is "no".
