@@ -12,7 +12,6 @@ toml = "^0.4"
 
 [[bin]]
 name = "i3nator"
-path = "src/bin/i3nator.rs"
 doc = false
 
 [package.metadata.release]
