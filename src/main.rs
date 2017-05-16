@@ -8,9 +8,64 @@
 
 #[macro_use]
 extern crate clap;
+#[macro_use]
+extern crate error_chain;
 
 mod cli;
-
-fn main() {
-    let matches = cli::cli().get_matches();
+mod errors {
+    error_chain!{}
 }
+
+use clap::ArgMatches;
+use errors::*;
+
+fn command_copy(_matches: &ArgMatches<'static>) -> Result<()> {
+    unimplemented!()
+}
+
+fn command_delete(_matches: &ArgMatches<'static>) -> Result<()> {
+    unimplemented!()
+}
+
+fn command_edit(_matches: &ArgMatches<'static>) -> Result<()> {
+    unimplemented!()
+}
+
+fn command_list(_matches: &ArgMatches<'static>) -> Result<()> {
+    unimplemented!()
+}
+
+fn command_local(_matches: &ArgMatches<'static>) -> Result<()> {
+    unimplemented!()
+}
+
+fn command_new(_matches: &ArgMatches<'static>) -> Result<()> {
+    unimplemented!()
+}
+
+fn command_start(_matches: &ArgMatches<'static>) -> Result<()> {
+    unimplemented!()
+}
+
+fn run() -> Result<()> {
+    let matches = cli::cli().get_matches();
+
+    match matches.subcommand() {
+        ("copy", Some(matches)) => command_copy(matches),
+        ("delete", Some(matches)) => command_delete(matches),
+        ("edit", Some(matches)) => command_edit(matches),
+        ("list", Some(matches)) => command_list(matches),
+        ("local", Some(matches)) => command_local(matches),
+        ("new", Some(matches)) => command_new(matches),
+        ("start", Some(matches)) => command_start(matches),
+        ("", None) =>
+            // No subcommand given. The clap `AppSettings` should be set to output the help by
+            // default, so this is unreachable.
+            unreachable!(),
+        _ =>
+            // All subcommands are defined above, this is unreachable.
+            unreachable!(),
+    }
+}
+
+quick_main!(run);
