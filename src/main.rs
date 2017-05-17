@@ -24,6 +24,11 @@ mod errors {
         }
 
         errors {
+            EditorNotFound {
+                description("cannot find an editor")
+                display("cannot find an editor. Please specify $VISUAL or $EDITOR")
+            }
+
             ProjectExists(t: String) {
                 description("project already exists")
                 display("project already exists: '{}'", t)
@@ -40,14 +45,23 @@ mod errors {
 use clap::ArgMatches;
 use errors::*;
 use glob::glob;
+use std::env;
+use std::ffi::OsString;
 use std::fs;
+use std::fs::File;
+use std::io::prelude::*;
 use std::path::PathBuf;
+use std::process::Command;
+
+static PROJECT_TEMPLATE: &'static [u8] = include_bytes!("../resources/project_template.toml");
+static PROJECTS_PREFIX: &'static str = "projects";
 
 lazy_static! {
     static ref XDG_DIRS: xdg::BaseDirectories =
         xdg::BaseDirectories::with_prefix(crate_name!()).expect("couldn't get XDG base directory");
     static ref PROJECTS_PATH: PathBuf =
-        XDG_DIRS.create_config_directory("projects").expect("couldn't create projects directory");
+        XDG_DIRS.create_config_directory(PROJECTS_PREFIX)
+                .expect("couldn't create projects directory");
 }
 
 fn command_copy(matches: &ArgMatches<'static>) -> Result<()> {
@@ -87,8 +101,21 @@ fn command_delete(matches: &ArgMatches<'static>) -> Result<()> {
     }
 }
 
-fn command_edit(_matches: &ArgMatches<'static>) -> Result<()> {
-    unimplemented!()
+fn command_edit(matches: &ArgMatches<'static>) -> Result<()> {
+    // `PROJECT` should not be empty, clap ensures this.
+    let project_name = matches.value_of("PROJECT").unwrap();
+    let project_path = PROJECTS_PATH.join(format!("{}.toml", project_name));
+
+    if project_path.exists() && project_path.is_file() {
+        println!("opening your editor to edit project {}", project_name);
+        Command::new(get_editor()?)
+            .arg(project_path)
+            .status()
+            .map(|_| ())
+            .map_err(|e| e.into())
+    } else {
+        Err(ErrorKind::UnknownProject(project_name.to_owned()).into())
+    }
 }
 
 fn command_list(_matches: &ArgMatches<'static>) -> Result<()> {
@@ -117,12 +144,38 @@ fn command_local(_matches: &ArgMatches<'static>) -> Result<()> {
     unimplemented!()
 }
 
-fn command_new(_matches: &ArgMatches<'static>) -> Result<()> {
-    unimplemented!()
+fn command_new(matches: &ArgMatches<'static>) -> Result<()> {
+    // `PROJECT` should not be empty, clap ensures this.
+    let project_name = matches.value_of("PROJECT").unwrap();
+    let project_path = PROJECTS_PATH.join(format!("{}.toml", project_name));
+
+    if project_path.exists() {
+        Err(ErrorKind::ProjectExists(project_name.to_owned()).into())
+    } else {
+        let path = XDG_DIRS
+            .place_config_file(&format!("{}/{}.toml", PROJECTS_PREFIX, project_name))?;
+        let mut file = File::create(path)?;
+        file.write_all(PROJECT_TEMPLATE)?;
+        file.flush()?;
+        drop(file);
+
+        println!("opening your editor to edit project {}", project_name);
+        Command::new(get_editor()?)
+            .arg(project_path)
+            .status()
+            .map(|_| ())
+            .map_err(|e| e.into())
+    }
 }
 
 fn command_start(_matches: &ArgMatches<'static>) -> Result<()> {
     unimplemented!()
+}
+
+fn get_editor() -> Result<OsString> {
+    env::var_os("VISUAL")
+        .or_else(|| env::var_os("EDITOR"))
+        .ok_or_else(|| ErrorKind::EditorNotFound.into())
 }
 
 fn run() -> Result<()> {
