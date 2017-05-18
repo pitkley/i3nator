@@ -111,32 +111,33 @@ impl Project {
 
 fn command_copy(matches: &ArgMatches<'static>) -> Result<()> {
     // `EXISTING` and `NEW` should not be empty, clap ensures this.
-    let existing_project_name = matches.value_of("EXISTING").unwrap();
-    let new_project_name = matches.value_of("NEW").unwrap();
+    let existing_project_name = matches.value_of_os("EXISTING").unwrap();
+    let new_project_name = matches.value_of_os("NEW").unwrap();
 
     let existing_project = Project::open(existing_project_name)?;
     let new_project = Project::create(new_project_name)?;
 
     fs::copy(existing_project.path, new_project.path)?;
     println!("Copied existing project '{}' to new project '{}'",
-             existing_project_name,
-             new_project_name);
+             existing_project_name.to_string_lossy(),
+             new_project_name.to_string_lossy());
     Ok(())
 }
 
 fn command_delete(matches: &ArgMatches<'static>) -> Result<()> {
     // `PROJECT` should not be empty, clap ensures this.
-    let project_name = matches.value_of("PROJECT").unwrap();
+    let project_name = matches.value_of_os("PROJECT").unwrap();
 
     Project::open(project_name)?.delete()
 }
 
 fn command_edit(matches: &ArgMatches<'static>) -> Result<()> {
     // `PROJECT` should not be empty, clap ensures this.
-    let project_name = matches.value_of("PROJECT").unwrap();
+    let project_name = matches.value_of_os("PROJECT").unwrap();
     let project = Project::open(project_name)?;
 
-    println!("opening your editor to edit project {}", project_name);
+    println!("opening your editor to edit project {}",
+             project_name.to_string_lossy());
     Command::new(get_editor()?)
         .arg(project.path)
         .status()
@@ -173,7 +174,7 @@ fn command_local(_matches: &ArgMatches<'static>) -> Result<()> {
 
 fn command_new(matches: &ArgMatches<'static>) -> Result<()> {
     // `PROJECT` should not be empty, clap ensures this.
-    let project_name = matches.value_of("PROJECT").unwrap();
+    let project_name = matches.value_of_os("PROJECT").unwrap();
     let project = Project::create(project_name)?;
 
     // Copy template into config file
@@ -183,7 +184,8 @@ fn command_new(matches: &ArgMatches<'static>) -> Result<()> {
     drop(file);
 
     // Open config file for editing
-    println!("opening your editor to edit project {}", project_name);
+    println!("opening your editor to edit project {}",
+             project_name.to_string_lossy());
     Command::new(get_editor()?)
         .arg(project.path)
         .status()
