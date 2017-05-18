@@ -11,12 +11,16 @@
 
 #[macro_use]
 extern crate error_chain;
+#[macro_use]
+extern crate lazy_static;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
+extern crate xdg;
 
 mod deserializers;
 pub mod errors;
+pub mod projects;
 mod shlex;
 pub mod types;
 

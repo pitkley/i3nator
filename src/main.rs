@@ -10,6 +10,7 @@
 extern crate clap;
 #[macro_use]
 extern crate error_chain;
+extern crate i3nator;
 #[macro_use]
 extern crate lazy_static;
 extern crate xdg;
@@ -19,6 +20,10 @@ mod errors {
     error_chain! {
         foreign_links {
             IoError(::std::io::Error);
+        }
+
+        links {
+            Lib(::i3nator::errors::Error, ::i3nator::errors::ErrorKind);
         }
 
         errors {
@@ -31,82 +36,26 @@ mod errors {
                 description("no projects exist")
                 display("no projects exist. Feel free to create one")
             }
-
-            ProjectExists(t: String) {
-                description("project already exists")
-                display("project already exists: '{}'", t)
-            }
-
-            UnknownProject(t: String) {
-                description("project is unknown")
-                display("project is unknown: '{}'", t)
-            }
         }
     }
 }
 
 use clap::ArgMatches;
 use errors::*;
+use i3nator::projects::Project;
 use std::env;
-use std::ffi::{OsStr, OsString};
+use std::ffi::OsString;
 use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
-use std::path::PathBuf;
 use std::process::Command;
 
 static PROJECT_TEMPLATE: &'static [u8] = include_bytes!("../resources/project_template.toml");
-//static PROJECTS_PREFIX: &'static str = "projects";
 
 lazy_static! {
     static ref PROJECTS_PREFIX: OsString = OsString::from("projects");
     static ref XDG_DIRS: xdg::BaseDirectories =
         xdg::BaseDirectories::with_prefix(crate_name!()).expect("couldn't get XDG base directory");
-}
-
-struct Project {
-    pub path: PathBuf,
-}
-
-impl Project {
-    pub fn create<S: AsRef<OsStr> + ?Sized>(name: &S) -> Result<Self> {
-        let mut path = OsString::new();
-        path.push(PROJECTS_PREFIX.as_os_str());
-        path.push("/");
-        path.push(name);
-        path.push(".toml");
-
-        if let Some(_) = XDG_DIRS.find_config_file(&path) {
-            Err(ErrorKind::ProjectExists(name.as_ref().to_string_lossy().into_owned()).into())
-        } else {
-            XDG_DIRS
-                .place_config_file(path)
-                .map(|path| Project { path: path })
-                .map_err(|e| e.into())
-        }
-    }
-
-    pub fn open<S: AsRef<OsStr> + ?Sized>(name: &S) -> Result<Self> {
-        let mut path = OsString::new();
-        path.push(PROJECTS_PREFIX.as_os_str());
-        path.push("/");
-        path.push(name);
-        path.push(".toml");
-
-        XDG_DIRS
-            .find_config_file(&path)
-            .map(|path| Project { path: path })
-            .ok_or_else(|| {
-                            ErrorKind::UnknownProject(name.as_ref().to_string_lossy().into_owned())
-                                .into()
-                        })
-    }
-
-    pub fn delete(&mut self) -> Result<()> {
-        fs::remove_file(&self.path)?;
-        drop(self);
-        Ok(())
-    }
 }
 
 fn command_copy(matches: &ArgMatches<'static>) -> Result<()> {
@@ -128,7 +77,9 @@ fn command_delete(matches: &ArgMatches<'static>) -> Result<()> {
     // `PROJECT` should not be empty, clap ensures this.
     let project_name = matches.value_of_os("PROJECT").unwrap();
 
-    Project::open(project_name)?.delete()
+    Project::open(project_name)?
+        .delete()
+        .map_err(|e| e.into())
 }
 
 fn command_edit(matches: &ArgMatches<'static>) -> Result<()> {
