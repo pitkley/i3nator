@@ -42,8 +42,8 @@ use errors::*;
 use i3nator::projects;
 use i3nator::projects::Project;
 use std::env;
-use std::ffi::OsString;
-use std::process::Command;
+use std::ffi::{OsStr, OsString};
+use std::process::{Command, ExitStatus};
 
 static PROJECT_TEMPLATE: &'static [u8] = include_bytes!("../resources/project_template.toml");
 
@@ -58,16 +58,25 @@ fn command_copy(matches: &ArgMatches<'static>) -> Result<()> {
     println!("Copied existing project '{}' to new project '{}'",
              existing_project.name,
              new_project.name);
-    Ok(())
+
+    // Open config file for editing
+    if !matches.is_present("no-edit") {
+        println!("Opening your editor to edit project {}", new_project.name);
+        open_editor(&new_project.path).map(|_| ())
+    } else {
+        Ok(())
+    }
 }
 
 fn command_delete(matches: &ArgMatches<'static>) -> Result<()> {
     // `PROJECT` should not be empty, clap ensures this.
     let project_name = matches.value_of_os("PROJECT").unwrap();
 
-    Project::open(project_name)?
+    let result = Project::open(project_name)?
         .delete()
-        .map_err(|e| e.into())
+        .map_err(|e| e.into());
+    println!("Deleted project '{}'", project_name.to_string_lossy());
+    result
 }
 
 fn command_edit(matches: &ArgMatches<'static>) -> Result<()> {
@@ -75,12 +84,8 @@ fn command_edit(matches: &ArgMatches<'static>) -> Result<()> {
     let project_name = matches.value_of_os("PROJECT").unwrap();
     let project = Project::open(project_name)?;
 
-    println!("opening your editor to edit project {}", project.name);
-    Command::new(get_editor()?)
-        .arg(project.path)
-        .status()
-        .map(|_| ())
-        .map_err(|e| e.into())
+    println!("Opening your editor to edit project {}", project.name);
+    open_editor(&project.path).map(|_| ())
 }
 
 fn command_list(_matches: &ArgMatches<'static>) -> Result<()> {
@@ -106,14 +111,15 @@ fn command_new(matches: &ArgMatches<'static>) -> Result<()> {
     // `PROJECT` should not be empty, clap ensures this.
     let project_name = matches.value_of_os("PROJECT").unwrap();
     let project = Project::create_from_template(project_name, PROJECT_TEMPLATE)?;
+    println!("Created project '{}'", project.name);
 
     // Open config file for editing
-    println!("opening your editor to edit project {}", project.name);
-    Command::new(get_editor()?)
-        .arg(project.path)
-        .status()
-        .map(|_| ())
-        .map_err(|e| e.into())
+    if !matches.is_present("no-edit") {
+        println!("Opening your editor to edit project {}", project.name);
+        open_editor(&project.path).map(|_| ())
+    } else {
+        Ok(())
+    }
 }
 
 fn command_start(_matches: &ArgMatches<'static>) -> Result<()> {
@@ -124,6 +130,13 @@ fn get_editor() -> Result<OsString> {
     env::var_os("VISUAL")
         .or_else(|| env::var_os("EDITOR"))
         .ok_or_else(|| ErrorKind::EditorNotFound.into())
+}
+
+fn open_editor<S: AsRef<OsStr> + ?Sized>(path: &S) -> Result<ExitStatus> {
+    Command::new(get_editor()?)
+        .arg(path)
+        .status()
+        .map_err(|e| e.into())
 }
 
 fn run() -> Result<()> {
