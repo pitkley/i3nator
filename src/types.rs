@@ -46,7 +46,7 @@ pub struct Application<'a> {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ApplicationCommand<'a> {
     pub program: &'a str,
-    pub args: Vec<&'a str>,
+    pub args: Option<Vec<&'a str>>,
 }
 
 impl<'de: 'a, 'a> Deserialize<'de> for ApplicationCommand<'a> {
@@ -75,7 +75,7 @@ impl<'de: 'a, 'a> Deserialize<'de> for ApplicationCommand<'a> {
             .map(|(program, args)| {
                      ApplicationCommand {
                          program: program,
-                         args: args,
+                         args: if args.is_empty() { None } else { Some(args) },
                      }
                  })
     }
