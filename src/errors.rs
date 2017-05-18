@@ -6,22 +6,15 @@
 // option. This file may not be copied, modified or distributed
 // except according to those terms.
 
-#![recursion_limit = "1024"] // `error_chain!` can recurse deeply
-#![warn(missing_docs)] // TODO: increase from `warn` to `deny`
+error_chain! {
+    foreign_links {
+        Utf8Error(::std::str::Utf8Error);
+    }
 
-#[macro_use]
-extern crate error_chain;
-extern crate serde;
-#[macro_use]
-extern crate serde_derive;
-
-mod deserializers;
-pub mod errors;
-mod shlex;
-pub mod types;
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {}
+    errors {
+        CommandSplittingFailed(t: String) {
+            description("command splitting failed")
+            display("command splitting failed: '{}'", t)
+        }
+    }
 }
