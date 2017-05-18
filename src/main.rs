@@ -12,14 +12,12 @@ extern crate clap;
 extern crate error_chain;
 #[macro_use]
 extern crate lazy_static;
-extern crate glob;
 extern crate xdg;
 
 mod cli;
 mod errors {
     error_chain! {
         foreign_links {
-            GlobError(::glob::PatternError);
             IoError(::std::io::Error);
         }
 
@@ -44,13 +42,11 @@ mod errors {
 
 use clap::ArgMatches;
 use errors::*;
-use glob::glob;
 use std::env;
 use std::ffi::OsString;
 use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
-use std::path::PathBuf;
 use std::process::Command;
 
 static PROJECT_TEMPLATE: &'static [u8] = include_bytes!("../resources/project_template.toml");
@@ -59,9 +55,10 @@ static PROJECTS_PREFIX: &'static str = "projects";
 lazy_static! {
     static ref XDG_DIRS: xdg::BaseDirectories =
         xdg::BaseDirectories::with_prefix(crate_name!()).expect("couldn't get XDG base directory");
-    static ref PROJECTS_PATH: PathBuf =
-        XDG_DIRS.create_config_directory(PROJECTS_PREFIX)
-                .expect("couldn't create projects directory");
+}
+
+macro_rules! project {
+    ($name:ident) => (format!("{}/{}.toml", PROJECTS_PREFIX, $name));
 }
 
 fn command_copy(matches: &ArgMatches<'static>) -> Result<()> {
@@ -69,31 +66,29 @@ fn command_copy(matches: &ArgMatches<'static>) -> Result<()> {
     let existing_project_name = matches.value_of("EXISTING").unwrap();
     let new_project_name = matches.value_of("NEW").unwrap();
 
-    let existing_project_path = PROJECTS_PATH.join(format!("{}.toml", existing_project_name));
-    let new_project_path = PROJECTS_PATH.join(format!("{}.toml", new_project_name));
+    let existing_project_path = XDG_DIRS.find_config_file(project!(existing_project_name));
+    let new_project_path = XDG_DIRS.find_config_file(project!(new_project_name));
 
-    if existing_project_path.exists() && existing_project_path.is_file() {
-        if new_project_path.exists() {
-            Err(ErrorKind::ProjectExists(new_project_name.to_owned()).into())
-        } else {
+    match (existing_project_path, new_project_path) {
+        (None, _) => Err(ErrorKind::UnknownProject(existing_project_name.to_owned()).into()),
+        (_, Some(_)) => Err(ErrorKind::ProjectExists(new_project_name.to_owned()).into()),
+        (Some(existing_project_path), None) => {
+            let new_project_path = XDG_DIRS.place_config_file(project!(new_project_name))?;
             fs::copy(existing_project_path, new_project_path)?;
             println!("Copied existing project '{}' to new project '{}'",
                      existing_project_name,
                      new_project_name);
             Ok(())
         }
-    } else {
-        Err(ErrorKind::UnknownProject(existing_project_name.to_owned()).into())
     }
 }
 
 fn command_delete(matches: &ArgMatches<'static>) -> Result<()> {
     // `PROJECT` should not be empty, clap ensures this.
     let project_name = matches.value_of("PROJECT").unwrap();
-    let project_path = PROJECTS_PATH.join(format!("{}.toml", project_name));
 
-    if project_path.exists() && project_path.is_file() {
-        fs::remove_file(project_path)?;
+    if let Some(file) = XDG_DIRS.find_config_file(project!(project_name)) {
+        fs::remove_file(file)?;
         println!("Deleted project '{}'", project_name);
         Ok(())
     } else {
@@ -104,12 +99,12 @@ fn command_delete(matches: &ArgMatches<'static>) -> Result<()> {
 fn command_edit(matches: &ArgMatches<'static>) -> Result<()> {
     // `PROJECT` should not be empty, clap ensures this.
     let project_name = matches.value_of("PROJECT").unwrap();
-    let project_path = PROJECTS_PATH.join(format!("{}.toml", project_name));
+    let project_path = XDG_DIRS.find_config_file(project!(project_name));
 
-    if project_path.exists() && project_path.is_file() {
+    if let Some(path) = project_path {
         println!("opening your editor to edit project {}", project_name);
         Command::new(get_editor()?)
-            .arg(project_path)
+            .arg(path)
             .status()
             .map(|_| ())
             .map_err(|e| e.into())
@@ -119,21 +114,13 @@ fn command_edit(matches: &ArgMatches<'static>) -> Result<()> {
 }
 
 fn command_list(_matches: &ArgMatches<'static>) -> Result<()> {
-    let project_path = PROJECTS_PATH.join("*.toml");
-    let project_path = project_path
-        .to_str()
-        .ok_or_else(|| Error::from("couldn't get projects"))?;
-
     println!("i3nator projects:");
 
-    for entry in glob(project_path)? {
-        if let Some(project) = entry
-               .ok()
-               .and_then(|pathbuf| {
-                             let stem = pathbuf.file_stem();
-                             stem.and_then(|filestem| filestem.to_str().map(|s| s.to_owned()))
-                         }) {
-            println!("  {}", project);
+    for file in XDG_DIRS.list_config_files_once(PROJECTS_PREFIX) {
+        if let Some(file_stem) = file.file_stem()
+               .and_then(|stem| stem.to_str())
+               .map(|stem| stem.to_owned()) {
+            println!("  {}", file_stem);
         }
     }
 
@@ -147,21 +134,24 @@ fn command_local(_matches: &ArgMatches<'static>) -> Result<()> {
 fn command_new(matches: &ArgMatches<'static>) -> Result<()> {
     // `PROJECT` should not be empty, clap ensures this.
     let project_name = matches.value_of("PROJECT").unwrap();
-    let project_path = PROJECTS_PATH.join(format!("{}.toml", project_name));
+    let project_path = &format!("{}/{}.toml", PROJECTS_PREFIX, project_name);
 
-    if project_path.exists() {
+    if XDG_DIRS.find_config_file(project_path).is_some() {
         Err(ErrorKind::ProjectExists(project_name.to_owned()).into())
     } else {
-        let path = XDG_DIRS
-            .place_config_file(&format!("{}/{}.toml", PROJECTS_PREFIX, project_name))?;
-        let mut file = File::create(path)?;
+        // Create config file
+        let path = XDG_DIRS.place_config_file(project_path)?;
+
+        // Copy template into config file
+        let mut file = File::create(&path)?;
         file.write_all(PROJECT_TEMPLATE)?;
         file.flush()?;
         drop(file);
 
+        // Open config file for editing
         println!("opening your editor to edit project {}", project_name);
         Command::new(get_editor()?)
-            .arg(project_path)
+            .arg(path)
             .status()
             .map(|_| ())
             .map_err(|e| e.into())
