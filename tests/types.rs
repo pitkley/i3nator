@@ -35,7 +35,7 @@ fn full_config() {
         applications: vec![Application {
                                command: ApplicationCommand {
                                    program: "mycommand",
-                                   args: vec!["--with", "multiple args"],
+                                   args: Some(vec!["--with", "multiple args"]),
                                },
                                working_directory: Some("/path/to/a/different/working/directory"),
                                text: None,
