@@ -11,9 +11,6 @@ extern crate clap;
 #[macro_use]
 extern crate error_chain;
 extern crate i3nator;
-#[macro_use]
-extern crate lazy_static;
-extern crate xdg;
 
 mod cli;
 mod errors {
@@ -42,21 +39,13 @@ mod errors {
 
 use clap::ArgMatches;
 use errors::*;
+use i3nator::projects;
 use i3nator::projects::Project;
 use std::env;
 use std::ffi::OsString;
-use std::fs;
-use std::fs::File;
-use std::io::prelude::*;
 use std::process::Command;
 
 static PROJECT_TEMPLATE: &'static [u8] = include_bytes!("../resources/project_template.toml");
-
-lazy_static! {
-    static ref PROJECTS_PREFIX: OsString = OsString::from("projects");
-    static ref XDG_DIRS: xdg::BaseDirectories =
-        xdg::BaseDirectories::with_prefix(crate_name!()).expect("couldn't get XDG base directory");
-}
 
 fn command_copy(matches: &ArgMatches<'static>) -> Result<()> {
     // `EXISTING` and `NEW` should not be empty, clap ensures this.
@@ -64,12 +53,11 @@ fn command_copy(matches: &ArgMatches<'static>) -> Result<()> {
     let new_project_name = matches.value_of_os("NEW").unwrap();
 
     let existing_project = Project::open(existing_project_name)?;
-    let new_project = Project::create(new_project_name)?;
+    let new_project = existing_project.copy(new_project_name)?;
 
-    fs::copy(existing_project.path, new_project.path)?;
     println!("Copied existing project '{}' to new project '{}'",
-             existing_project_name.to_string_lossy(),
-             new_project_name.to_string_lossy());
+             existing_project.name,
+             new_project.name);
     Ok(())
 }
 
@@ -87,8 +75,7 @@ fn command_edit(matches: &ArgMatches<'static>) -> Result<()> {
     let project_name = matches.value_of_os("PROJECT").unwrap();
     let project = Project::open(project_name)?;
 
-    println!("opening your editor to edit project {}",
-             project_name.to_string_lossy());
+    println!("opening your editor to edit project {}", project.name);
     Command::new(get_editor()?)
         .arg(project.path)
         .status()
@@ -97,22 +84,14 @@ fn command_edit(matches: &ArgMatches<'static>) -> Result<()> {
 }
 
 fn command_list(_matches: &ArgMatches<'static>) -> Result<()> {
-    let mut files = XDG_DIRS.list_config_files_once(PROJECTS_PREFIX.to_string_lossy().into_owned());
+    let projects = projects::list();
 
-    if files.is_empty() {
+    if projects.is_empty() {
         Err(ErrorKind::NoProjectExist.into())
     } else {
-        // Sort projects
-        files.sort();
-
         println!("i3nator projects:");
-        for file in files {
-            // Map file to it's stem name (no path, no extension)
-            if let Some(file_stem) = file.file_stem()
-                   .and_then(|stem| stem.to_str())
-                   .map(|stem| stem.to_owned()) {
-                println!("  {}", file_stem);
-            }
+        for project in projects {
+            println!("  {}", project);
         }
 
         Ok(())
@@ -126,17 +105,10 @@ fn command_local(_matches: &ArgMatches<'static>) -> Result<()> {
 fn command_new(matches: &ArgMatches<'static>) -> Result<()> {
     // `PROJECT` should not be empty, clap ensures this.
     let project_name = matches.value_of_os("PROJECT").unwrap();
-    let project = Project::create(project_name)?;
-
-    // Copy template into config file
-    let mut file = File::create(&project.path)?;
-    file.write_all(PROJECT_TEMPLATE)?;
-    file.flush()?;
-    drop(file);
+    let project = Project::create_from_template(project_name, PROJECT_TEMPLATE)?;
 
     // Open config file for editing
-    println!("opening your editor to edit project {}",
-             project_name.to_string_lossy());
+    println!("opening your editor to edit project {}", project.name);
     Command::new(get_editor()?)
         .arg(project.path)
         .status()
