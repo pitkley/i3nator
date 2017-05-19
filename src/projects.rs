@@ -42,7 +42,7 @@ impl Project {
 
         let name = name.as_ref().to_string_lossy().into_owned();
 
-        if let Some(_) = XDG_DIRS.find_config_file(&path) {
+        if XDG_DIRS.find_config_file(&path).is_some() {
             Err(ErrorKind::ProjectExists(name).into())
         } else {
             XDG_DIRS
@@ -132,7 +132,6 @@ impl Project {
 
     pub fn delete(&mut self) -> Result<()> {
         fs::remove_file(&self.path)?;
-        drop(self);
         Ok(())
     }
 
@@ -190,13 +189,16 @@ impl Project {
             // 1. `--working-directory` command-line parameter
             // 2. `working_directory` option in config for application
             // 3. `working_directory` option in the general section of the config
-            let working_directory = working_directory
-                .map(OsStr::to_os_string)
-                .or(application
-                        .working_directory
-                        .as_ref()
-                        .map(OsString::from))
-                .or(general.working_directory.as_ref().map(OsString::from));
+            let working_directory =
+                working_directory
+                    .map(OsStr::to_os_string)
+                    .or_else(|| {
+                                 application
+                                     .working_directory
+                                     .as_ref()
+                                     .map(OsString::from)
+                             })
+                    .or_else(|| general.working_directory.as_ref().map(OsString::from));
 
             if let Some(working_directory) = working_directory {
                 cmd.current_dir(working_directory);
