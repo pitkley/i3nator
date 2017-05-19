@@ -10,8 +10,11 @@ use errors::*;
 use std::ffi::{OsStr, OsString};
 use std::fs;
 use std::fs::File;
+use std::io::BufReader;
 use std::io::prelude::*;
 use std::path::PathBuf;
+use toml;
+use types::*;
 use xdg;
 
 lazy_static! {
@@ -23,6 +26,7 @@ lazy_static! {
 pub struct Project {
     pub name: String,
     pub path: PathBuf,
+    config: Option<Config>,
 }
 
 impl Project {
@@ -44,6 +48,7 @@ impl Project {
                          Project {
                              name: name,
                              path: path,
+                             config: None,
                          }
                      })
                 .map_err(|e| e.into())
@@ -79,9 +84,27 @@ impl Project {
                      Project {
                          name: name.to_owned(),
                          path: path,
+                         config: None,
                      }
                  })
             .ok_or_else(|| ErrorKind::UnknownProject(name).into())
+    }
+
+    fn load(&mut self) -> Result<()> {
+        let mut file = BufReader::new(File::open(&self.path)?);
+        let mut contents = String::new();
+        file.read_to_string(&mut contents)?;
+        self.config = Some(toml::from_str::<Config>(&contents)?.clone());
+
+        Ok(())
+    }
+
+    pub fn config(&mut self) -> Result<&Config> {
+        if self.config.is_none() {
+            self.load()?;
+        }
+
+        Ok(self.config.as_ref().unwrap())
     }
 
     pub fn copy<S: AsRef<OsStr> + ?Sized>(&self, new_name: &S) -> Result<Project> {

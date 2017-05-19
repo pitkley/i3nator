@@ -10,6 +10,7 @@ error_chain! {
     foreign_links {
         IoError(::std::io::Error);
         Utf8Error(::std::str::Utf8Error);
+        TomlError(::toml::de::Error);
     }
 
     errors {
