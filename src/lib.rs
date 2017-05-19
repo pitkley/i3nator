@@ -17,6 +17,7 @@ extern crate lazy_static;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
+extern crate tempfile;
 extern crate toml;
 extern crate xdg;
 

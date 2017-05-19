@@ -8,6 +8,8 @@
 
 error_chain! {
     foreign_links {
+        I3EstablishError(::i3ipc::EstablishError);
+        I3MessageError(::i3ipc::MessageError);
         IoError(::std::io::Error);
         Utf8Error(::std::str::Utf8Error);
         TomlError(::toml::de::Error);
@@ -22,6 +24,16 @@ error_chain! {
         EditorNotFound {
             description("cannot find an editor")
             display("cannot find an editor. Please specify $VISUAL or $EDITOR")
+        }
+
+        InvalidUtF8Path(t: String) {
+            description("path is invalid UTF8")
+            display("path is invalid UTF8: '{}'", t)
+        }
+
+        LayoutNotSpecified {
+            description("layout and not specified")
+            display("both `layout` and `layout_path` not specified")
         }
 
         NoProjectExist {
