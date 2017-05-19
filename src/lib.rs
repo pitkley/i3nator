@@ -11,6 +11,7 @@
 
 #[macro_use]
 extern crate error_chain;
+extern crate i3ipc;
 #[macro_use]
 extern crate lazy_static;
 extern crate serde;
