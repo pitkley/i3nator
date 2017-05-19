@@ -117,10 +117,19 @@ fn command_list(_matches: &ArgMatches<'static>,
     }
 }
 
-fn command_local(_matches: &ArgMatches<'static>,
-                 _global_matches: &ArgMatches<'static>)
+fn command_local(matches: &ArgMatches<'static>,
+                 global_matches: &ArgMatches<'static>)
                  -> Result<()> {
-    unimplemented!()
+    // `FILE` should not be empty, clap ensures this.
+    let project_path = matches.value_of_os("file").unwrap();
+    let mut project = Project::from_path(project_path)?;
+    let mut i3 = I3Connection::connect()?;
+
+    println!("Starting project '{}'", project.name);
+    project
+        .start(&mut i3, global_matches.value_of_os("working-directory"))?;
+
+    Ok(())
 }
 
 fn command_new(matches: &ArgMatches<'static>, _global_matches: &ArgMatches<'static>) -> Result<()> {
@@ -145,6 +154,8 @@ fn command_start(matches: &ArgMatches<'static>,
     let project_name = matches.value_of_os("PROJECT").unwrap();
     let mut project = Project::open(project_name)?;
     let mut i3 = I3Connection::connect()?;
+
+    println!("Starting project '{}'", project.name);
     project
         .start(&mut i3, global_matches.value_of_os("working-directory"))?;
 

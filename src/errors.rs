@@ -31,6 +31,11 @@ error_chain! {
             display("path is invalid UTF8: '{}'", t)
         }
 
+        PathDoesntExist(t: String) {
+            description("path doesn't exist")
+            display("path doesn't exist: '{}'", t)
+        }
+
         LayoutNotSpecified {
             description("layout and not specified")
             display("both `layout` and `layout_path` not specified")

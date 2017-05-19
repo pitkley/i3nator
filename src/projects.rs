@@ -72,6 +72,20 @@ impl Project {
         Ok(project)
     }
 
+    pub fn from_path<P: AsRef<Path> + ?Sized>(path: &P) -> Result<Self> {
+        let path = path.as_ref();
+
+        if !path.exists() || !path.is_file() {
+            Err(ErrorKind::PathDoesntExist(path.to_string_lossy().into_owned()).into())
+        } else {
+            Ok(Project {
+                   name: "local".to_owned(),
+                   path: path.to_path_buf(),
+                   config: None,
+               })
+        }
+    }
+
     pub fn open<S: AsRef<OsStr> + ?Sized>(name: &S) -> Result<Self> {
         let mut path = OsString::new();
         path.push(PROJECTS_PREFIX.as_os_str());
