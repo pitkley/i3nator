@@ -53,9 +53,7 @@ use std::process::{Command, ExitStatus};
 
 static PROJECT_TEMPLATE: &'static [u8] = include_bytes!("../resources/project_template.toml");
 
-fn command_copy(matches: &ArgMatches<'static>,
-                _global_matches: &ArgMatches<'static>)
-                -> Result<()> {
+fn command_copy(matches: &ArgMatches<'static>) -> Result<()> {
     // `EXISTING` and `NEW` should not be empty, clap ensures this.
     let existing_project_name = matches.value_of_os("EXISTING").unwrap();
     let new_project_name = matches.value_of_os("NEW").unwrap();
@@ -76,9 +74,7 @@ fn command_copy(matches: &ArgMatches<'static>,
     }
 }
 
-fn command_delete(matches: &ArgMatches<'static>,
-                  _global_matches: &ArgMatches<'static>)
-                  -> Result<()> {
+fn command_delete(matches: &ArgMatches<'static>) -> Result<()> {
     // `PROJECT`s should not be empty, clap ensures this.
     let projects = matches.values_of_os("PROJECT").unwrap();
 
@@ -90,9 +86,7 @@ fn command_delete(matches: &ArgMatches<'static>,
     Ok(())
 }
 
-fn command_edit(matches: &ArgMatches<'static>,
-                _global_matches: &ArgMatches<'static>)
-                -> Result<()> {
+fn command_edit(matches: &ArgMatches<'static>) -> Result<()> {
     // `PROJECT` should not be empty, clap ensures this.
     let project_name = matches.value_of_os("PROJECT").unwrap();
     let project = Project::open(project_name)?;
@@ -101,9 +95,7 @@ fn command_edit(matches: &ArgMatches<'static>,
     open_editor(&project.path).map(|_| ())
 }
 
-fn command_list(_matches: &ArgMatches<'static>,
-                _global_matches: &ArgMatches<'static>)
-                -> Result<()> {
+fn command_list(_matches: &ArgMatches<'static>) -> Result<()> {
     let projects = projects::list();
 
     if projects.is_empty() {
@@ -118,9 +110,7 @@ fn command_list(_matches: &ArgMatches<'static>,
     }
 }
 
-fn command_local(matches: &ArgMatches<'static>,
-                 global_matches: &ArgMatches<'static>)
-                 -> Result<()> {
+fn command_local(matches: &ArgMatches<'static>) -> Result<()> {
     // `FILE` should not be empty, clap ensures this.
     let project_path = matches.value_of_os("file").unwrap();
     let mut project = Project::from_path(project_path)?;
@@ -128,12 +118,14 @@ fn command_local(matches: &ArgMatches<'static>,
 
     println!("Starting project '{}'", project.name);
     project
-        .start(&mut i3, global_matches.value_of_os("working-directory"))?;
+        .start(&mut i3,
+               matches.value_of_os("working-directory"),
+               matches.value_of("workspace"))?;
 
     Ok(())
 }
 
-fn command_new(matches: &ArgMatches<'static>, _global_matches: &ArgMatches<'static>) -> Result<()> {
+fn command_new(matches: &ArgMatches<'static>) -> Result<()> {
     // `PROJECT` should not be empty, clap ensures this.
     let project_name = matches.value_of_os("PROJECT").unwrap();
     let project = Project::create_from_template(project_name, PROJECT_TEMPLATE)?;
@@ -148,9 +140,7 @@ fn command_new(matches: &ArgMatches<'static>, _global_matches: &ArgMatches<'stat
     }
 }
 
-fn command_start(matches: &ArgMatches<'static>,
-                 global_matches: &ArgMatches<'static>)
-                 -> Result<()> {
+fn command_start(matches: &ArgMatches<'static>) -> Result<()> {
     // `PROJECT` should not be empty, clap ensures this.
     let project_name = matches.value_of_os("PROJECT").unwrap();
     let mut project = Project::open(project_name)?;
@@ -158,7 +148,9 @@ fn command_start(matches: &ArgMatches<'static>,
 
     println!("Starting project '{}'", project.name);
     project
-        .start(&mut i3, global_matches.value_of_os("working-directory"))?;
+        .start(&mut i3,
+               matches.value_of_os("working-directory"),
+               matches.value_of("workspace"))?;
 
     Ok(())
 }
@@ -180,13 +172,13 @@ fn run() -> Result<()> {
     let matches = cli::cli().get_matches();
 
     match matches.subcommand() {
-        ("copy", Some(sub_matches)) => command_copy(sub_matches, &matches),
-        ("delete", Some(sub_matches)) => command_delete(sub_matches, &matches),
-        ("edit", Some(sub_matches)) => command_edit(sub_matches, &matches),
-        ("list", Some(sub_matches)) => command_list(sub_matches, &matches),
-        ("local", Some(sub_matches)) => command_local(sub_matches, &matches),
-        ("new", Some(sub_matches)) => command_new(sub_matches, &matches),
-        ("start", Some(sub_matches)) => command_start(sub_matches, &matches),
+        ("copy", Some(sub_matches)) => command_copy(sub_matches),
+        ("delete", Some(sub_matches)) => command_delete(sub_matches),
+        ("edit", Some(sub_matches)) => command_edit(sub_matches),
+        ("list", Some(sub_matches)) => command_list(sub_matches),
+        ("local", Some(sub_matches)) => command_local(sub_matches),
+        ("new", Some(sub_matches)) => command_new(sub_matches),
+        ("start", Some(sub_matches)) => command_start(sub_matches),
         ("", None) =>
             // No subcommand given. The clap `AppSettings` should be set to output the help by
             // default, so this is unreachable.

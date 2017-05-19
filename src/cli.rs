@@ -9,6 +9,25 @@
 use clap::{Arg, App, AppSettings, SubCommand};
 
 pub fn cli() -> App<'static, 'static> {
+    let working_directory = Arg::with_name("working-directory")
+        .help("Directory used as context for starting the applications")
+        .long_help("Directory used as context for starting the applications. This overrides any \
+                    specified working-directory in the projects configuration.")
+        .short("d")
+        .long("working-directory")
+        .takes_value(true)
+        .value_name("PATH")
+        .required(false);
+    let workspace = Arg::with_name("workspace")
+        .help("Workspace to apply the layout to")
+        .long_help("Workspace to apply the layout to. This overrides the specified workspace in \
+                    the projects configuration.")
+        .short("w")
+        .long("workspace")
+        .takes_value(true)
+        .value_name("WORKSPACE")
+        .required(false);
+
     App::new(crate_name!())
         .version(crate_version!())
         .author(crate_authors!())
@@ -41,7 +60,9 @@ pub fn cli() -> App<'static, 'static> {
                              .short("f")
                              .long("file")
                              .value_name("FILE")
-                             .default_value("i3nator.toml")))
+                             .default_value("i3nator.toml"))
+                        .arg(working_directory.clone())
+                        .arg(workspace.clone()))
         .subcommand(SubCommand::with_name("new")
                         .about("create a new project and open it in your editor")
                         .arg(Arg::with_name("PROJECT").required(true))
@@ -51,17 +72,9 @@ pub fn cli() -> App<'static, 'static> {
         .subcommand(SubCommand::with_name("start")
                         .alias("run")
                         .about("start a project according to it's configuration")
-                        .arg(Arg::with_name("PROJECT").required(true)))
-        .arg(Arg::with_name("working-directory")
-                 .help("Directory used as context for starting the applications")
-                 .long_help("Directory used as context for starting the applications. \
-                             This overrides any specified working-directory in the projects \
-                             configuration.")
-                 .short("d")
-                 .long("working-directory")
-                 .takes_value(true)
-                 .value_name("PATH")
-                 .required(false))
+                        .arg(Arg::with_name("PROJECT").required(true))
+                        .arg(working_directory)
+                        .arg(workspace))
     // TODO: determine if we can implement `stop`.
     // This would probably require keeping track of PIDs and workspaces and such, so my
     // immediate thought is "no".

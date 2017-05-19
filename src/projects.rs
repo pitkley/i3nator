@@ -137,7 +137,8 @@ impl Project {
 
     pub fn start(&mut self,
                  i3: &mut I3Connection,
-                 working_directory: Option<&OsStr>)
+                 working_directory: Option<&OsStr>,
+                 workspace: Option<&str>)
                  -> Result<()> {
         let config = self.config()?;
         let general = &config.general;
@@ -164,7 +165,10 @@ impl Project {
         };
 
         // Change workspace if provided
-        if let Some(ref workspace) = general.workspace {
+        let workspace = workspace
+            .map(Into::into)
+            .or_else(|| general.workspace.as_ref().cloned());
+        if let Some(ref workspace) = workspace {
             i3.command(&format!("workspace {}", workspace))?;
         }
 
