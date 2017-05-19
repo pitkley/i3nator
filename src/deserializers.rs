@@ -70,19 +70,19 @@ pub fn option_string_or_struct<'de, T, D>(deserializer: D) -> Result<Option<T>, 
     string_or_struct(deserializer).map(Some)
 }
 
-struct StringOrSeqString<'a>(PhantomData<Vec<&'a str>>);
+struct StringOrSeqString(PhantomData<Vec<String>>);
 
-impl<'de> de::Visitor<'de> for StringOrSeqString<'de> {
-    type Value = Vec<&'de str>;
+impl<'de> de::Visitor<'de> for StringOrSeqString {
+    type Value = Vec<String>;
 
     fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         formatter.write_str("string or sequence of strings")
     }
 
-    fn visit_borrowed_str<E>(self, value: &'de str) -> Result<Self::Value, E>
+    fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
         where E: de::Error
     {
-        Ok(vec![value])
+        Ok(vec![value.to_owned()])
     }
 
     fn visit_seq<S>(self, visitor: S) -> Result<Self::Value, S::Error>
@@ -92,14 +92,13 @@ impl<'de> de::Visitor<'de> for StringOrSeqString<'de> {
     }
 }
 
-pub fn string_or_seq_string<'de, D>(deserializer: D) -> Result<Vec<&'de str>, D::Error>
+pub fn string_or_seq_string<'de, D>(deserializer: D) -> Result<Vec<String>, D::Error>
     where D: Deserializer<'de>
 {
     deserializer.deserialize_any(StringOrSeqString(PhantomData))
 }
 
-pub fn option_string_or_seq_string<'de, D>(deserializer: D)
-                                           -> Result<Option<Vec<&'de str>>, D::Error>
+pub fn option_string_or_seq_string<'de, D>(deserializer: D) -> Result<Option<Vec<String>>, D::Error>
     where D: Deserializer<'de>
 {
     string_or_seq_string(deserializer).map(Some)
