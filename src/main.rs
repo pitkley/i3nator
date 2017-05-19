@@ -10,12 +10,16 @@
 extern crate clap;
 #[macro_use]
 extern crate error_chain;
+extern crate i3ipc;
 extern crate i3nator;
+extern crate tempfile;
 
 mod cli;
 mod errors {
     error_chain! {
         foreign_links {
+            I3EstablishError(::i3ipc::EstablishError);
+            I3MessageError(::i3ipc::MessageError);
             IoError(::std::io::Error);
         }
 
@@ -39,15 +43,19 @@ mod errors {
 
 use clap::ArgMatches;
 use errors::*;
+use i3ipc::I3Connection;
 use i3nator::projects;
 use i3nator::projects::Project;
+use std::convert::Into;
 use std::env;
 use std::ffi::{OsStr, OsString};
 use std::process::{Command, ExitStatus};
 
 static PROJECT_TEMPLATE: &'static [u8] = include_bytes!("../resources/project_template.toml");
 
-fn command_copy(matches: &ArgMatches<'static>) -> Result<()> {
+fn command_copy(matches: &ArgMatches<'static>,
+                _global_matches: &ArgMatches<'static>)
+                -> Result<()> {
     // `EXISTING` and `NEW` should not be empty, clap ensures this.
     let existing_project_name = matches.value_of_os("EXISTING").unwrap();
     let new_project_name = matches.value_of_os("NEW").unwrap();
@@ -68,7 +76,9 @@ fn command_copy(matches: &ArgMatches<'static>) -> Result<()> {
     }
 }
 
-fn command_delete(matches: &ArgMatches<'static>) -> Result<()> {
+fn command_delete(matches: &ArgMatches<'static>,
+                  _global_matches: &ArgMatches<'static>)
+                  -> Result<()> {
     // `PROJECT` should not be empty, clap ensures this.
     let project_name = matches.value_of_os("PROJECT").unwrap();
 
@@ -79,7 +89,9 @@ fn command_delete(matches: &ArgMatches<'static>) -> Result<()> {
     result
 }
 
-fn command_edit(matches: &ArgMatches<'static>) -> Result<()> {
+fn command_edit(matches: &ArgMatches<'static>,
+                _global_matches: &ArgMatches<'static>)
+                -> Result<()> {
     // `PROJECT` should not be empty, clap ensures this.
     let project_name = matches.value_of_os("PROJECT").unwrap();
     let project = Project::open(project_name)?;
@@ -88,7 +100,9 @@ fn command_edit(matches: &ArgMatches<'static>) -> Result<()> {
     open_editor(&project.path).map(|_| ())
 }
 
-fn command_list(_matches: &ArgMatches<'static>) -> Result<()> {
+fn command_list(_matches: &ArgMatches<'static>,
+                _global_matches: &ArgMatches<'static>)
+                -> Result<()> {
     let projects = projects::list();
 
     if projects.is_empty() {
@@ -103,11 +117,22 @@ fn command_list(_matches: &ArgMatches<'static>) -> Result<()> {
     }
 }
 
-fn command_local(_matches: &ArgMatches<'static>) -> Result<()> {
-    unimplemented!()
+fn command_local(matches: &ArgMatches<'static>,
+                 global_matches: &ArgMatches<'static>)
+                 -> Result<()> {
+    // `FILE` should not be empty, clap ensures this.
+    let project_path = matches.value_of_os("file").unwrap();
+    let mut project = Project::from_path(project_path)?;
+    let mut i3 = I3Connection::connect()?;
+
+    println!("Starting project '{}'", project.name);
+    project
+        .start(&mut i3, global_matches.value_of_os("working-directory"))?;
+
+    Ok(())
 }
 
-fn command_new(matches: &ArgMatches<'static>) -> Result<()> {
+fn command_new(matches: &ArgMatches<'static>, _global_matches: &ArgMatches<'static>) -> Result<()> {
     // `PROJECT` should not be empty, clap ensures this.
     let project_name = matches.value_of_os("PROJECT").unwrap();
     let project = Project::create_from_template(project_name, PROJECT_TEMPLATE)?;
@@ -122,8 +147,19 @@ fn command_new(matches: &ArgMatches<'static>) -> Result<()> {
     }
 }
 
-fn command_start(_matches: &ArgMatches<'static>) -> Result<()> {
-    unimplemented!()
+fn command_start(matches: &ArgMatches<'static>,
+                 global_matches: &ArgMatches<'static>)
+                 -> Result<()> {
+    // `PROJECT` should not be empty, clap ensures this.
+    let project_name = matches.value_of_os("PROJECT").unwrap();
+    let mut project = Project::open(project_name)?;
+    let mut i3 = I3Connection::connect()?;
+
+    println!("Starting project '{}'", project.name);
+    project
+        .start(&mut i3, global_matches.value_of_os("working-directory"))?;
+
+    Ok(())
 }
 
 fn get_editor() -> Result<OsString> {
@@ -143,13 +179,13 @@ fn run() -> Result<()> {
     let matches = cli::cli().get_matches();
 
     match matches.subcommand() {
-        ("copy", Some(matches)) => command_copy(matches),
-        ("delete", Some(matches)) => command_delete(matches),
-        ("edit", Some(matches)) => command_edit(matches),
-        ("list", Some(matches)) => command_list(matches),
-        ("local", Some(matches)) => command_local(matches),
-        ("new", Some(matches)) => command_new(matches),
-        ("start", Some(matches)) => command_start(matches),
+        ("copy", Some(sub_matches)) => command_copy(sub_matches, &matches),
+        ("delete", Some(sub_matches)) => command_delete(sub_matches, &matches),
+        ("edit", Some(sub_matches)) => command_edit(sub_matches, &matches),
+        ("list", Some(sub_matches)) => command_list(sub_matches, &matches),
+        ("local", Some(sub_matches)) => command_local(sub_matches, &matches),
+        ("new", Some(sub_matches)) => command_new(sub_matches, &matches),
+        ("start", Some(sub_matches)) => command_start(sub_matches, &matches),
         ("", None) =>
             // No subcommand given. The clap `AppSettings` should be set to output the help by
             // default, so this is unreachable.

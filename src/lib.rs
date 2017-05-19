@@ -11,11 +11,14 @@
 
 #[macro_use]
 extern crate error_chain;
+extern crate i3ipc;
 #[macro_use]
 extern crate lazy_static;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
+extern crate tempfile;
+extern crate toml;
 extern crate xdg;
 
 mod deserializers;

@@ -50,7 +50,18 @@ pub fn cli() -> App<'static, 'static> {
                                  .required(false)))
         .subcommand(SubCommand::with_name("start")
                         .alias("run")
-                        .about("start a project according to it's configuration"))
+                        .about("start a project according to it's configuration")
+                        .arg(Arg::with_name("PROJECT").required(true)))
+        .arg(Arg::with_name("working-directory")
+                 .help("Directory used as context for starting the applications")
+                 .long_help("Directory used as context for starting the applications. \
+                             This overrides any specified working-directory in the projects \
+                             configuration.")
+                 .short("d")
+                 .long("working-directory")
+                 .takes_value(true)
+                 .value_name("PATH")
+                 .required(false))
     // TODO: determine if we can implement `stop`.
     // This would probably require keeping track of PIDs and workspaces and such, so my
     // immediate thought is "no".

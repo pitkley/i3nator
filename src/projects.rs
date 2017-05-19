@@ -7,11 +7,17 @@
 // except according to those terms.
 
 use errors::*;
+use i3ipc::I3Connection;
 use std::ffi::{OsStr, OsString};
 use std::fs;
 use std::fs::File;
+use std::io::BufReader;
 use std::io::prelude::*;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
+use tempfile::NamedTempFile;
+use toml;
+use types::*;
 use xdg;
 
 lazy_static! {
@@ -23,6 +29,7 @@ lazy_static! {
 pub struct Project {
     pub name: String,
     pub path: PathBuf,
+    config: Option<Config>,
 }
 
 impl Project {
@@ -44,6 +51,7 @@ impl Project {
                          Project {
                              name: name,
                              path: path,
+                             config: None,
                          }
                      })
                 .map_err(|e| e.into())
@@ -64,6 +72,20 @@ impl Project {
         Ok(project)
     }
 
+    pub fn from_path<P: AsRef<Path> + ?Sized>(path: &P) -> Result<Self> {
+        let path = path.as_ref();
+
+        if !path.exists() || !path.is_file() {
+            Err(ErrorKind::PathDoesntExist(path.to_string_lossy().into_owned()).into())
+        } else {
+            Ok(Project {
+                   name: "local".to_owned(),
+                   path: path.to_path_buf(),
+                   config: None,
+               })
+        }
+    }
+
     pub fn open<S: AsRef<OsStr> + ?Sized>(name: &S) -> Result<Self> {
         let mut path = OsString::new();
         path.push(PROJECTS_PREFIX.as_os_str());
@@ -79,9 +101,27 @@ impl Project {
                      Project {
                          name: name.to_owned(),
                          path: path,
+                         config: None,
                      }
                  })
             .ok_or_else(|| ErrorKind::UnknownProject(name).into())
+    }
+
+    fn load(&mut self) -> Result<()> {
+        let mut file = BufReader::new(File::open(&self.path)?);
+        let mut contents = String::new();
+        file.read_to_string(&mut contents)?;
+        self.config = Some(toml::from_str::<Config>(&contents)?.clone());
+
+        Ok(())
+    }
+
+    pub fn config(&mut self) -> Result<&Config> {
+        if self.config.is_none() {
+            self.load()?;
+        }
+
+        Ok(self.config.as_ref().unwrap())
     }
 
     pub fn copy<S: AsRef<OsStr> + ?Sized>(&self, new_name: &S) -> Result<Project> {
@@ -93,6 +133,81 @@ impl Project {
     pub fn delete(&mut self) -> Result<()> {
         fs::remove_file(&self.path)?;
         drop(self);
+        Ok(())
+    }
+
+    pub fn start(&mut self,
+                 i3: &mut I3Connection,
+                 working_directory: Option<&OsStr>)
+                 -> Result<()> {
+        let config = self.config()?;
+        let general = &config.general;
+
+        // Create temporary file if required
+        let mut tempfile = if general.layout.is_some() {
+            Some(NamedTempFile::new()?)
+        } else {
+            None
+        };
+
+        // Get the provided layout-path or the path of the temporary file
+        let path: &Path = if let Some(ref path) = general.layout_path {
+            path
+        } else if let Some(ref layout) = general.layout {
+            // The layout has been provided directly, save into the temporary file.
+            let mut tempfile = tempfile.as_mut().unwrap();
+            tempfile.write_all(layout.as_bytes())?;
+            tempfile.flush()?;
+            tempfile.path()
+        } else {
+            // Neither `layout` nor `layout_path` has been specified
+            bail!(ErrorKind::LayoutNotSpecified)
+        };
+
+        // Change workspace if provided
+        if let Some(ref workspace) = general.workspace {
+            i3.command(&format!("workspace {}", workspace))?;
+        }
+
+        // Append the layout to the workspace
+        i3.command(&format!("append_layout {}",
+                              path.to_str()
+                                  .ok_or_else(|| {
+                                                  ErrorKind::InvalidUtF8Path(path.to_string_lossy()
+                                                                             .into_owned())
+                                              })?))?;
+
+        // Start the applications
+        let applications = &config.applications;
+        for application in applications {
+            let mut cmd = Command::new(&application.command.program);
+            // Set args if available
+            if let Some(ref args) = application.command.args {
+                cmd.args(args);
+            }
+
+            // Get working directory. Precedence is as follows:
+            // 1. `--working-directory` command-line parameter
+            // 2. `working_directory` option in config for application
+            // 3. `working_directory` option in the general section of the config
+            let working_directory = working_directory
+                .map(OsStr::to_os_string)
+                .or(application
+                        .working_directory
+                        .as_ref()
+                        .map(OsString::from))
+                .or(general.working_directory.as_ref().map(OsString::from));
+
+            if let Some(working_directory) = working_directory {
+                cmd.current_dir(working_directory);
+            }
+
+            cmd.stdin(Stdio::null())
+                .stdout(Stdio::null())
+                .stderr(Stdio::null())
+                .spawn()?;
+        }
+
         Ok(())
     }
 }
