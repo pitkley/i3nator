@@ -79,14 +79,15 @@ fn command_copy(matches: &ArgMatches<'static>,
 fn command_delete(matches: &ArgMatches<'static>,
                   _global_matches: &ArgMatches<'static>)
                   -> Result<()> {
-    // `PROJECT` should not be empty, clap ensures this.
-    let project_name = matches.value_of_os("PROJECT").unwrap();
+    // `PROJECT`s should not be empty, clap ensures this.
+    let projects = matches.values_of_os("PROJECT").unwrap();
 
-    let result = Project::open(project_name)?
-        .delete()
-        .map_err(|e| e.into());
-    println!("Deleted project '{}'", project_name.to_string_lossy());
-    result
+    for project_name in projects {
+        Project::open(project_name)?.delete()?;
+        println!("Deleted project '{}'", project_name.to_string_lossy());
+    }
+
+    Ok(())
 }
 
 fn command_edit(matches: &ArgMatches<'static>,
