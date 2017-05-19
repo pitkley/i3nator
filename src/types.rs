@@ -10,6 +10,7 @@ use deserializers::*;
 use serde::de;
 use serde::de::{Deserialize, Deserializer};
 use shlex;
+use std::path::PathBuf;
 
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -21,17 +22,17 @@ pub struct Config {
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct General {
-    pub working_directory: Option<String>,
+    pub working_directory: Option<PathBuf>,
     pub workspace: Option<String>,
     pub layout: Option<String>,
-    pub layout_path: Option<String>,
+    pub layout_path: Option<PathBuf>,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct Application {
     pub command: ApplicationCommand,
-    pub working_directory: Option<String>,
+    pub working_directory: Option<PathBuf>,
     #[serde(default, deserialize_with="option_string_or_seq_string")]
     pub text: Option<Vec<String>>,
     #[serde(default="default_text_return")]

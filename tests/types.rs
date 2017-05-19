@@ -27,10 +27,10 @@ fn full_config() {
     let actual: Config = toml::from_str(fragment).unwrap();
     let expected = Config {
         general: General {
-            working_directory: Some("/path/to/my/working/directory".to_owned()),
+            working_directory: Some("/path/to/my/working/directory".to_owned().into()),
             workspace: Some("0".to_owned()),
             layout: None,
-            layout_path: Some("/path/to/my/layout.json".to_owned()),
+            layout_path: Some("/path/to/my/layout.json".to_owned().into()),
         },
         applications: vec![Application {
                                command: ApplicationCommand {
@@ -39,7 +39,8 @@ fn full_config() {
                                                    "multiple args".to_owned()]),
                                },
                                working_directory: Some("/path/to/a/different/working/directory"
-                                                           .to_owned()),
+                                                           .to_owned()
+                                                           .into()),
                                text: None,
                                text_return: true,
                                keys: None,
