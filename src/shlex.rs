@@ -47,7 +47,7 @@ impl<'a> Shlex<'a> {
                     ' ' | '\t' | '\n' => break,
                     _ => Ok(()),
                 };
-                if let Err(_) = result {
+                if result.is_err() {
                     return result.map(|_| None);
                 }
                 ch = self.next_byte();
@@ -64,9 +64,8 @@ impl<'a> Shlex<'a> {
     fn parse_double(&mut self) -> Result<()> {
         loop {
             if let Some(ch) = self.next_byte() {
-                match ch as char {
-                    '"' => return Ok(()),
-                    _ => {}
+                if let '"' = ch as char {
+                    return Ok(());
                 }
             } else {
                 return Err("".into());
@@ -77,9 +76,8 @@ impl<'a> Shlex<'a> {
     fn parse_single(&mut self) -> Result<()> {
         loop {
             if let Some(ch) = self.next_byte() {
-                match ch as char {
-                    '\'' => return Ok(()),
-                    _ => {}
+                if let '\'' = ch as char {
+                    return Ok(());
                 }
             } else {
                 return Err("".into());
@@ -98,8 +96,7 @@ impl<'a> Iterator for Shlex<'a> {
 
     fn next(&mut self) -> Option<&'a str> {
         match self.next_word().ok() {
-            None => None,
-            Some(None) => None,
+            None | Some(None) => None,
             Some(o) => o,
         }
     }
