@@ -95,15 +95,25 @@ fn command_edit(matches: &ArgMatches<'static>) -> Result<()> {
     open_editor(&project.path).map(|_| ())
 }
 
-fn command_list(_matches: &ArgMatches<'static>) -> Result<()> {
+fn command_list(matches: &ArgMatches<'static>) -> Result<()> {
     let projects = projects::list();
+    let quiet = matches.is_present("quiet");
 
     if projects.is_empty() {
+        // TODO: make error quiet as well?
+        // We already exit with a non-zero exit code, so this might not be required in e.g. the
+        // context of a shell script.
         Err(ErrorKind::NoProjectExist.into())
     } else {
-        println!("i3nator projects:");
+        if !quiet {
+            println!("i3nator projects:");
+        }
         for project in projects {
-            println!("  {}", project);
+            if quiet {
+                println!("{}", project);
+            } else {
+                println!("  {}", project);
+            }
         }
 
         Ok(())

@@ -53,7 +53,12 @@ pub fn cli() -> App<'static, 'static> {
                         .arg(Arg::with_name("PROJECT").required(true)))
         // TODO: decide if we want to add `implode?`
         .subcommand(SubCommand::with_name("list")
-                        .about("list all projects"))
+                        .about("list all projects")
+                        .arg(Arg::with_name("quiet")
+                                .short("q")
+                                .long("quiet")
+                                .takes_value(false)
+                                .required(false)))
         .subcommand(SubCommand::with_name("local")
                         .about("run a project from a local TOML-file")
                         .arg(Arg::with_name("file")
