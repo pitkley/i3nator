@@ -107,18 +107,18 @@ impl Project {
             .ok_or_else(|| ErrorKind::UnknownProject(name).into())
     }
 
-    fn load(&mut self) -> Result<()> {
+    fn load(&self) -> Result<Config> {
         let mut file = BufReader::new(File::open(&self.path)?);
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
-        self.config = Some(toml::from_str::<Config>(&contents)?.clone());
-
-        Ok(())
+        toml::from_str::<Config>(&contents)
+            .clone()
+            .map_err(|e| e.into())
     }
 
     pub fn config(&mut self) -> Result<&Config> {
         if self.config.is_none() {
-            self.load()?;
+            self.config = Some(self.load()?);
         }
 
         Ok(self.config.as_ref().unwrap())
@@ -229,9 +229,13 @@ impl Project {
 
         Ok(())
     }
+
+    pub fn verify(&self) -> Result<()> {
+        self.load().map(|_| ())
+    }
 }
 
-pub fn list() -> Vec<String> {
+pub fn list() -> Vec<OsString> {
     let mut files = XDG_DIRS.list_config_files_once(PROJECTS_PREFIX.to_string_lossy().into_owned());
     files.sort();
     files
@@ -239,6 +243,6 @@ pub fn list() -> Vec<String> {
         .map(|file| file.file_stem())
         .filter(Option::is_some)
         .map(Option::unwrap)
-        .map(|stem| stem.to_string_lossy().into_owned())
+        .map(OsStr::to_os_string)
         .collect::<Vec<_>>()
 }

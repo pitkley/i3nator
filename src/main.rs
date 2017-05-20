@@ -10,8 +10,11 @@
 extern crate clap;
 #[macro_use]
 extern crate error_chain;
+extern crate getch;
 extern crate i3ipc;
 extern crate i3nator;
+#[macro_use]
+extern crate lazy_static;
 extern crate tempfile;
 
 mod cli;
@@ -43,15 +46,21 @@ mod errors {
 
 use clap::ArgMatches;
 use errors::*;
+use getch::Getch;
 use i3ipc::I3Connection;
 use i3nator::projects;
 use i3nator::projects::Project;
+use std::ascii::AsciiExt;
 use std::convert::Into;
 use std::env;
 use std::ffi::{OsStr, OsString};
 use std::process::{Command, ExitStatus};
 
 static PROJECT_TEMPLATE: &'static [u8] = include_bytes!("../resources/project_template.toml");
+
+lazy_static! {
+    static ref GETCH: Getch = Getch::new().expect("failed to create getch");
+}
 
 fn command_copy(matches: &ArgMatches<'static>) -> Result<()> {
     // `EXISTING` and `NEW` should not be empty, clap ensures this.
@@ -67,11 +76,13 @@ fn command_copy(matches: &ArgMatches<'static>) -> Result<()> {
 
     // Open config file for editing
     if !matches.is_present("no-edit") {
-        println!("Opening your editor to edit project {}", new_project.name);
-        open_editor(&new_project.path).map(|_| ())
-    } else {
-        Ok(())
+        open_editor(&new_project)?;
+        if !matches.is_present("no-verify") {
+            verify_project(&new_project)?;
+        }
     }
+
+    Ok(())
 }
 
 fn command_delete(matches: &ArgMatches<'static>) -> Result<()> {
@@ -91,8 +102,14 @@ fn command_edit(matches: &ArgMatches<'static>) -> Result<()> {
     let project_name = matches.value_of_os("PROJECT").unwrap();
     let project = Project::open(project_name)?;
 
-    println!("Opening your editor to edit project {}", project.name);
-    open_editor(&project.path).map(|_| ())
+    open_editor(&project)?;
+
+    // Verify project contents
+    if !matches.is_present("no-verify") {
+        verify_project(&project)?;
+    }
+
+    Ok(())
 }
 
 fn command_list(matches: &ArgMatches<'static>) -> Result<()> {
@@ -110,9 +127,9 @@ fn command_list(matches: &ArgMatches<'static>) -> Result<()> {
         }
         for project in projects {
             if quiet {
-                println!("{}", project);
+                println!("{}", project.to_string_lossy());
             } else {
-                println!("  {}", project);
+                println!("  {}", project.to_string_lossy());
             }
         }
 
@@ -143,11 +160,13 @@ fn command_new(matches: &ArgMatches<'static>) -> Result<()> {
 
     // Open config file for editing
     if !matches.is_present("no-edit") {
-        println!("Opening your editor to edit project {}", project.name);
-        open_editor(&project.path).map(|_| ())
-    } else {
-        Ok(())
+        open_editor(&project)?;
+        if !matches.is_present("no-verify") {
+            verify_project(&project)?;
+        }
     }
+
+    Ok(())
 }
 
 fn command_rename(matches: &ArgMatches<'static>) -> Result<()> {
@@ -163,8 +182,10 @@ fn command_rename(matches: &ArgMatches<'static>) -> Result<()> {
 
     // Open editor for new project if desired
     if matches.is_present("edit") {
-        println!("Opening your editor to edit project {}", new_project.name);
-        open_editor(&new_project.path)?;
+        open_editor(&new_project)?;
+        if !matches.is_present("no-verify") {
+            verify_project(&new_project)?;
+        }
     }
 
     Ok(())
@@ -185,17 +206,83 @@ fn command_start(matches: &ArgMatches<'static>) -> Result<()> {
     Ok(())
 }
 
+fn command_verify(matches: &ArgMatches<'static>) -> Result<()> {
+    // `PROJECT`s can be empty, if so, use the entire project list
+    let projects: Vec<OsString> = matches
+        .values_of_os("PROJECT")
+        .map(|v| v.map(OsStr::to_os_string).collect::<Vec<_>>())
+        .unwrap_or_else(|| projects::list());
+
+    for project_name in projects {
+        if let Err(e) = Project::open(&project_name)?.verify() {
+            println!("Configuration INVALID: '{}'",
+                     project_name.to_string_lossy());
+            println!("Error:");
+            println!("    {}", e);
+            println!();
+        } else {
+            println!("Configuration   VALID: '{}'",
+                     project_name.to_string_lossy());
+        }
+    }
+
+    Ok(())
+}
+
 fn get_editor() -> Result<OsString> {
     env::var_os("VISUAL")
         .or_else(|| env::var_os("EDITOR"))
         .ok_or_else(|| ErrorKind::EditorNotFound.into())
 }
 
-fn open_editor<S: AsRef<OsStr> + ?Sized>(path: &S) -> Result<ExitStatus> {
+fn open_editor(project: &Project) -> Result<ExitStatus> {
+    println!("Opening your editor to edit project {}", project.name);
     Command::new(get_editor()?)
-        .arg(path)
+        .arg(&project.path)
         .status()
         .map_err(|e| e.into())
+}
+
+fn verify_project(project: &Project) -> Result<()> {
+    while let Err(e) = project.verify() {
+        println!();
+        println!("PROJECT VERIFICATION FAILED!");
+        println!("Error:");
+        println!("  {}", e);
+        println!();
+
+        let mut ch: Option<char>;
+        while {
+                  println!("What do you want to do?");
+                  println!("(R)eopen editor, (A)ccept anyway");
+
+                  ch = GETCH
+                      .getch()
+                      .ok()
+                      .map(|byte| byte.to_ascii_lowercase())
+                      .map(|byte| byte as char);
+
+                  if ch.is_none() {
+                      true
+                  } else {
+                      match ch {
+                          Some('a') | Some('r') => false,
+                          _ => true,
+                      }
+                  }
+              } {
+            // Ugly do-while syntax:
+            //   https://gist.github.com/huonw/8435502
+        }
+
+        match ch {
+            Some('a') => break,
+            Some('r') => open_editor(project)?,
+            _ => continue,
+        };
+    }
+
+    Ok(())
 }
 
 fn run() -> Result<()> {
@@ -210,6 +297,7 @@ fn run() -> Result<()> {
         ("new", Some(sub_matches)) => command_new(sub_matches),
         ("rename", Some(sub_matches)) => command_rename(sub_matches),
         ("start", Some(sub_matches)) => command_start(sub_matches),
+        ("verify", Some(sub_matches)) => command_verify(sub_matches),
         ("", None) =>
             // No subcommand given. The clap `AppSettings` should be set to output the help by
             // default, so this is unreachable.
