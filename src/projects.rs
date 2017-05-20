@@ -107,18 +107,18 @@ impl Project {
             .ok_or_else(|| ErrorKind::UnknownProject(name).into())
     }
 
-    fn load(&mut self) -> Result<()> {
+    fn load(&self) -> Result<Config> {
         let mut file = BufReader::new(File::open(&self.path)?);
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
-        self.config = Some(toml::from_str::<Config>(&contents)?.clone());
-
-        Ok(())
+        toml::from_str::<Config>(&contents)
+            .clone()
+            .map_err(|e| e.into())
     }
 
     pub fn config(&mut self) -> Result<&Config> {
         if self.config.is_none() {
-            self.load()?;
+            self.config = Some(self.load()?);
         }
 
         Ok(self.config.as_ref().unwrap())
@@ -228,6 +228,10 @@ impl Project {
         }
 
         Ok(())
+    }
+
+    pub fn verify(&self) -> Result<()> {
+        self.load().map(|_| ())
     }
 }
 
