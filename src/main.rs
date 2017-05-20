@@ -127,9 +127,9 @@ fn command_list(matches: &ArgMatches<'static>) -> Result<()> {
         }
         for project in projects {
             if quiet {
-                println!("{}", project);
+                println!("{}", project.to_string_lossy());
             } else {
-                println!("  {}", project);
+                println!("  {}", project.to_string_lossy());
             }
         }
 

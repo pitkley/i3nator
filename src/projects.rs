@@ -235,7 +235,7 @@ impl Project {
     }
 }
 
-pub fn list() -> Vec<String> {
+pub fn list() -> Vec<OsString> {
     let mut files = XDG_DIRS.list_config_files_once(PROJECTS_PREFIX.to_string_lossy().into_owned());
     files.sort();
     files
@@ -243,6 +243,6 @@ pub fn list() -> Vec<String> {
         .map(|file| file.file_stem())
         .filter(Option::is_some)
         .map(Option::unwrap)
-        .map(|stem| stem.to_string_lossy().into_owned())
+        .map(OsStr::to_os_string)
         .collect::<Vec<_>>()
 }
