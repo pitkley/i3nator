@@ -53,7 +53,7 @@ use i3nator::projects::Project;
 use std::ascii::AsciiExt;
 use std::convert::Into;
 use std::env;
-use std::ffi::OsString;
+use std::ffi::{OsStr, OsString};
 use std::process::{Command, ExitStatus};
 
 static PROJECT_TEMPLATE: &'static [u8] = include_bytes!("../resources/project_template.toml");
@@ -206,6 +206,29 @@ fn command_start(matches: &ArgMatches<'static>) -> Result<()> {
     Ok(())
 }
 
+fn command_verify(matches: &ArgMatches<'static>) -> Result<()> {
+    // `PROJECT`s can be empty, if so, use the entire project list
+    let projects: Vec<OsString> = matches
+        .values_of_os("PROJECT")
+        .map(|v| v.map(OsStr::to_os_string).collect::<Vec<_>>())
+        .unwrap_or_else(|| projects::list());
+
+    for project_name in projects {
+        if let Err(e) = Project::open(&project_name)?.verify() {
+            println!("Configuration INVALID: '{}'",
+                     project_name.to_string_lossy());
+            println!("Error:");
+            println!("    {}", e);
+            println!();
+        } else {
+            println!("Configuration   VALID: '{}'",
+                     project_name.to_string_lossy());
+        }
+    }
+
+    Ok(())
+}
+
 fn get_editor() -> Result<OsString> {
     env::var_os("VISUAL")
         .or_else(|| env::var_os("EDITOR"))
@@ -221,7 +244,6 @@ fn open_editor(project: &Project) -> Result<ExitStatus> {
 }
 
 fn verify_project(project: &Project) -> Result<()> {
-    let mut project = project.clone();
     while let Err(e) = project.verify() {
         println!();
         println!("PROJECT VERIFICATION FAILED!");
@@ -275,6 +297,7 @@ fn run() -> Result<()> {
         ("new", Some(sub_matches)) => command_new(sub_matches),
         ("rename", Some(sub_matches)) => command_rename(sub_matches),
         ("start", Some(sub_matches)) => command_start(sub_matches),
+        ("verify", Some(sub_matches)) => command_verify(sub_matches),
         ("", None) =>
             // No subcommand given. The clap `AppSettings` should be set to output the help by
             // default, so this is unreachable.

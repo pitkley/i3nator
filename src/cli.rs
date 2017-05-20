@@ -110,6 +110,9 @@ pub fn cli() -> App<'static, 'static> {
                         .arg(Arg::with_name("PROJECT").required(true))
                         .arg(working_directory)
                         .arg(workspace))
+        .subcommand(SubCommand::with_name("verify")
+                        .about("verify the configuration of existing projects")
+                        .arg(Arg::with_name("PROJECT").multiple(true).required(false)))
     // TODO: determine if we can implement `stop`.
     // This would probably require keeping track of PIDs and workspaces and such, so my
     // immediate thought is "no".
