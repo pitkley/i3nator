@@ -124,15 +124,28 @@ impl Project {
         Ok(self.config.as_ref().unwrap())
     }
 
-    pub fn copy<S: AsRef<OsStr> + ?Sized>(&self, new_name: &S) -> Result<Project> {
+    pub fn copy<S: AsRef<OsStr> + ?Sized>(&self, new_name: &S) -> Result<Self> {
         let new_project = Project::create(new_name)?;
         fs::copy(&self.path, &new_project.path)?;
         Ok(new_project)
     }
 
-    pub fn delete(&mut self) -> Result<()> {
+    pub fn delete(&self) -> Result<()> {
         fs::remove_file(&self.path)?;
         Ok(())
+    }
+
+    pub fn rename<S: AsRef<OsStr> + ?Sized>(&self, new_name: &S) -> Result<Self> {
+        // To avoid having to duplicate the path-handling in `create` et al, just copying and
+        // deleting is the easiest way to rename.
+        //
+        // TODO: this is obviously not the cleanest way, `std::fs::rename` would be. Maybe we
+        // should extract the path-handling code from `create` into a separate method, like
+        // `projects::project_path`.
+        let new_project = self.copy(new_name)?;
+        self.delete()?;
+
+        Ok(new_project)
     }
 
     pub fn start(&mut self,

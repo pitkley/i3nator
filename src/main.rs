@@ -150,6 +150,26 @@ fn command_new(matches: &ArgMatches<'static>) -> Result<()> {
     }
 }
 
+fn command_rename(matches: &ArgMatches<'static>) -> Result<()> {
+    // `CURRENT` and `NEW` should not be empty, clap ensures this.
+    let current_project_name = matches.value_of_os("CURRENT").unwrap();
+    let new_project_name = matches.value_of_os("NEW").unwrap();
+
+    let current_project = Project::open(current_project_name)?;
+    println!("Renaming project from '{}' to '{}'",
+             current_project_name.to_string_lossy(),
+             new_project_name.to_string_lossy());
+    let new_project = current_project.rename(new_project_name)?;
+
+    // Open editor for new project if desired
+    if matches.is_present("edit") {
+        println!("Opening your editor to edit project {}", new_project.name);
+        open_editor(&new_project.path)?;
+    }
+
+    Ok(())
+}
+
 fn command_start(matches: &ArgMatches<'static>) -> Result<()> {
     // `PROJECT` should not be empty, clap ensures this.
     let project_name = matches.value_of_os("PROJECT").unwrap();
@@ -188,6 +208,7 @@ fn run() -> Result<()> {
         ("list", Some(sub_matches)) => command_list(sub_matches),
         ("local", Some(sub_matches)) => command_local(sub_matches),
         ("new", Some(sub_matches)) => command_new(sub_matches),
+        ("rename", Some(sub_matches)) => command_rename(sub_matches),
         ("start", Some(sub_matches)) => command_start(sub_matches),
         ("", None) =>
             // No subcommand given. The clap `AppSettings` should be set to output the help by
