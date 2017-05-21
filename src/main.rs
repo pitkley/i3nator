@@ -112,6 +112,23 @@ fn command_edit(matches: &ArgMatches<'static>) -> Result<()> {
     Ok(())
 }
 
+fn command_info(matches: &ArgMatches<'static>) -> Result<()> {
+    // `PROJECT` should not be empty, clap ensures this.
+    let project_name = matches.value_of_os("PROJECT").unwrap();
+    let project = Project::open(project_name)?;
+
+    println!("Name: {}", project.name);
+    println!("Configuration path: {}", project.path.to_string_lossy());
+    println!("Configuration valid: {}",
+             if project.verify().is_ok() {
+                 "yes"
+             } else {
+                 "NO"
+             });
+
+    Ok(())
+}
+
 fn command_list(matches: &ArgMatches<'static>) -> Result<()> {
     let projects = projects::list();
     let quiet = matches.is_present("quiet");
@@ -293,6 +310,7 @@ fn run() -> Result<()> {
         ("copy", Some(sub_matches)) => command_copy(sub_matches),
         ("delete", Some(sub_matches)) => command_delete(sub_matches),
         ("edit", Some(sub_matches)) => command_edit(sub_matches),
+        ("info", Some(sub_matches)) => command_info(sub_matches),
         ("list", Some(sub_matches)) => command_list(sub_matches),
         ("local", Some(sub_matches)) => command_local(sub_matches),
         ("new", Some(sub_matches)) => command_new(sub_matches),
