@@ -6,6 +6,8 @@
 // option. This file may not be copied, modified or distributed
 // except according to those terms.
 
+//! Module for project handling.
+
 use errors::*;
 use i3ipc::I3Connection;
 use std::ffi::{OsStr, OsString};
@@ -26,13 +28,41 @@ lazy_static! {
         xdg::BaseDirectories::with_prefix("i3nator").expect("couldn't get XDG base directory");
 }
 
+/// A structure representing a `i3nator` project.
 pub struct Project {
+    /// The name of the project.
+    ///
+    /// As represented by the stem of the filename on disk.
     pub name: String,
+
+    /// The path to the project configuration.
     pub path: PathBuf,
+
     config: Option<Config>,
 }
 
 impl Project {
+    /// Create a project given a `name`.
+    ///
+    /// This will not create the configuration file, but it will ensure a legal XDG path with all
+    /// directories leading up to the file existing.
+    ///
+    /// If you want to pre-fill the configuration file with a template, see
+    /// [`Project::create_from_template`][fn-Project-create_from_template].
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: A `OsStr` naming the project and the configuration file on disk.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` which is:
+    ///
+    /// - `Ok`: an instance of `Project` for the given `name`.
+    /// - `Err`: an error, e.g. if the project already exists or couldn't be created.
+    ///
+    ///
+    /// [fn-Project-create_from_template]: #method.create_from_template
     pub fn create<S: AsRef<OsStr> + ?Sized>(name: &S) -> Result<Self> {
         let mut path = OsString::new();
         path.push(PROJECTS_PREFIX.as_os_str());
@@ -58,6 +88,24 @@ impl Project {
         }
     }
 
+    /// Create a project given a `name`, pre-filling the configuration file with a given `template`.
+    ///
+    /// See [`Project::create`][fn-Project-create] for additional information.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: A `OsStr` naming the project and the configuration file on disk.
+    /// - `template`: A byte-slice which will be written to the configuration file on disk.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` which is:
+    ///
+    /// - `Ok`: an instance of `Project` for the given `name` with the contents of `template`.
+    /// - `Err`: an error, e.g. if the project already exists or couldn't be created.
+    ///
+    ///
+    /// [fn-Project-create]: #method.create
     pub fn create_from_template<S: AsRef<OsStr> + ?Sized>(name: &S,
                                                           template: &[u8])
                                                           -> Result<Self> {
@@ -72,6 +120,26 @@ impl Project {
         Ok(project)
     }
 
+    /// Opens an existing project for a given path.
+    ///
+    /// This will not impose any XDG conventions, but rather allows to open a configuration from
+    /// any path.
+    ///
+    /// See [`Project::open`][fn-Project-open] if you want to open a project by name.
+    ///
+    /// # Parameters
+    ///
+    /// - `path`: A `Path` specifiying the configuration file on disk.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` which is:
+    ///
+    /// - `Ok`: an instance of `Project` for the given `path`.
+    /// - `Err`: an error, e.g. if the file does not exist.
+    ///
+    ///
+    /// [fn-Project-open]: #method.open
     pub fn from_path<P: AsRef<Path> + ?Sized>(path: &P) -> Result<Self> {
         let path = path.as_ref();
 
@@ -86,6 +154,26 @@ impl Project {
         }
     }
 
+    /// Opens an existing project using a `name`.
+    ///
+    /// This will search for a matching project in the XDG directories.
+    ///
+    /// See [`Project::from_path`][fn-Project-from_path] if you want to open a project using any
+    /// path.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: A `OsStr` naming the project and the configuration file on disk.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` which is:
+    ///
+    /// - `Ok`: an instance of `Project` for the given `name`.
+    /// - `Err`: an error, e.g. if the file does not exist.
+    ///
+    ///
+    /// [fn-Project-from_path]: #method.from_path
     pub fn open<S: AsRef<OsStr> + ?Sized>(name: &S) -> Result<Self> {
         let mut path = OsString::new();
         path.push(PROJECTS_PREFIX.as_os_str());
@@ -116,6 +204,22 @@ impl Project {
             .map_err(|e| e.into())
     }
 
+    /// Gets the project's configuration, loading and storing it in the current project instance if
+    /// it hasn't been before.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` which is:
+    ///
+    /// - `Ok`: an instance of [`Config`][struct-Config] for the project.
+    /// - `Err`: an error, e.g. if parsing the configuration failed.
+    ///
+    ///    If you only want to check if the configuration is valid, without modifying the project
+    ///    instance, you can use [`Project::verify`][fn-Project-verify].
+    ///
+    ///
+    /// [struct-Config]: ../types/struct.Config.html
+    /// [fn-Project-verify]: #method.verify
     pub fn config(&mut self) -> Result<&Config> {
         if self.config.is_none() {
             self.config = Some(self.load()?);
@@ -124,17 +228,52 @@ impl Project {
         Ok(self.config.as_ref().unwrap())
     }
 
+    /// Create a copy of the current project, that is a copy of the configuration file on disk,
+    /// with a name of `new_name`.
+    ///
+    /// # Parameters
+    ///
+    /// - `new_name`: A `OsStr` that is the name of the destination project.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` which is:
+    ///
+    /// - `Ok`: an instance of `Project` for the new project.
+    /// - `Err`: an error, e.g. if a project with `new_name` already exists or copying the file
+    /// failed.
     pub fn copy<S: AsRef<OsStr> + ?Sized>(&self, new_name: &S) -> Result<Self> {
         let new_project = Project::create(new_name)?;
         fs::copy(&self.path, &new_project.path)?;
         Ok(new_project)
     }
 
+    /// Delete this project's configuration from disk.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` which is:
+    ///
+    /// - `Ok`: nothing (`()`).
+    /// - `Err`: an error if deleting the file failed.
     pub fn delete(&self) -> Result<()> {
         fs::remove_file(&self.path)?;
         Ok(())
     }
 
+    /// Rename the current project.
+    ///
+    /// # Parameters
+    ///
+    /// - `new_name`: A `OsStr` that is the name of the destination project.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` which is:
+    ///
+    /// - `Ok`: an instance of `Project` for the renamed project.
+    /// - `Err`: an error, e.g. if a project with `new_name` already exists or renaming the file
+    /// failed.
     pub fn rename<S: AsRef<OsStr> + ?Sized>(&self, new_name: &S) -> Result<Self> {
         // To avoid having to duplicate the path-handling in `create` et al, just copying and
         // deleting is the easiest way to rename.
@@ -148,6 +287,32 @@ impl Project {
         Ok(new_project)
     }
 
+    /// Start the project.
+    ///
+    /// This will:
+    ///
+    /// 1. append the specified layout to a given workspace,
+    /// 2. start the specified applications.
+    ///
+    /// # Parameters:
+    ///
+    /// - `i3`: An `I3Connection` to append the layout to a given workspace.
+    /// - `working_directory`: An optional working directory which overrides any specified working
+    /// directories in the project configuration.
+    /// - `workspace`: An optional workspace which overrides the specified workspace in the project
+    /// configuration.
+    ///
+    /// # Returns:
+    ///
+    /// A `Result` which is:
+    ///
+    /// - `Ok`: nothing (`()`).
+    /// - `Err`: an error, if:
+    ///
+    ///   - the configuration is invalid,
+    ///   - if a `layout` was specified but could not be stored in a temporary file,
+    ///   - an i3-command failed,
+    ///   - an application could not be started
     pub fn start(&mut self,
                  i3: &mut I3Connection,
                  working_directory: Option<&OsStr>,
@@ -230,11 +395,26 @@ impl Project {
         Ok(())
     }
 
+    /// This verifies the project's configuration, without storing it in the current project
+    /// instance.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` which is:
+    ///
+    /// - `Ok`: nothing (`()`) if the verification succeeded.
+    /// - `Err`: an error if the configuration could not be parsed with details on what failed.
     pub fn verify(&self) -> Result<()> {
         self.load().map(|_| ())
     }
 }
 
+/// Get a list of all project names.
+///
+/// This will check the current users XDG base directories for `i3nator` project configurations,
+/// and return a list of their names for use with e.g. [`Project::open`][fn-Project-open].
+///
+/// [fn-Project-open]: struct.Project.html#method.open
 pub fn list() -> Vec<OsString> {
     let mut files = XDG_DIRS.list_config_files_once(PROJECTS_PREFIX.to_string_lossy().into_owned());
     files.sort();

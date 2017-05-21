@@ -2,19 +2,25 @@
 
 # General configuration items
 [general]
-# Working directory to use
+# Working directory to use (this is optional)
 working_directory = "/path/to/my/working/directory"
 
-# Name of the workspace the layout should be applied to
+# Name of the workspace the layout should be applied to (this is optional, if
+# not specified, the active workspace will be used)
 workspace = "1"
 
 # Path to your layout-file
 layout_path = "/path/to/my/layout.json"
 
 # Alternatively, you can include the JSON-contents of the layout directly:
-# layout = "{ ... }"
+# layout = """
+# {
+#     ...
+# }"""
 
 # List of applications to start
 [[applications]]
+# Command to run to start the application
 command = "mycommand --with 'multiple args'"
-working_directory = "/path/to/a/different/working/directory"
+# Different working directory to use (optional)
+# working_directory = "/path/to/a/different/working/directory"
