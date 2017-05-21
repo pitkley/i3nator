@@ -73,6 +73,11 @@ pub fn cli() -> App<'static, 'static> {
                                  .long("no-verify")
                                  .required(false)))
         // TODO: decide if we want to add `implode`?
+        .subcommand(SubCommand::with_name("info")
+                        .about("Show information for the specified project")
+                        .arg(Arg::with_name("PROJECT")
+                                 .help("Name of the project to show information for")
+                                 .required(true)))
         .subcommand(SubCommand::with_name("list")
                         .about("list all projects")
                         .arg(Arg::with_name("quiet")
