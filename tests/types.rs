@@ -22,6 +22,7 @@ fn full_config() {
         [[applications]]
         command = "mycommand --with 'multiple args'"
         working_directory = "/path/to/a/different/working/directory"
+        exec = { commands = ["command one", "command two"], exec_type = "text_no_return" }
         "#;
 
     let actual: Config = toml::from_str(fragment).unwrap();
@@ -41,11 +42,44 @@ fn full_config() {
                                working_directory: Some("/path/to/a/different/working/directory"
                                                            .to_owned()
                                                            .into()),
-                               text: None,
-                               text_return: true,
-                               keys: None,
+                               exec: Some(Exec {
+                                              commands: vec!["command one".to_owned(),
+                                                             "command two".to_owned()],
+                                              exec_type: Some(ExecType::TextNoReturn),
+                                          }),
                            }],
     };
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn exec_commands_only() {
+    let fragment = r#"
+        commands = ["command one", "command two"]"#;
+
+    let expected = Exec {
+        commands: vec!["command one".to_owned(), "command two".to_owned()],
+        exec_type: None,
+    };
+
+    let actual: Exec = toml::from_str(&fragment).unwrap();
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn exec_commands_and_type() {
+    let fragment = r#"
+        commands = ["command one", "command two"]
+        exec_type = "text_no_return""#;
+
+    let expected = Exec {
+        commands: vec!["command one".to_owned(), "command two".to_owned()],
+        exec_type: Some(ExecType::TextNoReturn),
+    };
+
+    let actual: Exec = toml::from_str(&fragment).unwrap();
 
     assert_eq!(actual, expected);
 }

@@ -103,14 +103,8 @@ pub struct Application {
     /// [general-working_directory]: struct.General.html#structfield.working_directory
     pub working_directory: Option<PathBuf>,
 
-    #[serde(default, deserialize_with="option_string_or_seq_string")]
-    /// *WIP:* List of strings to input into the started application
-    pub text: Option<Vec<String>>,
-    #[serde(default="default_text_return")]
-    /// *WIP:* Wether to simulate a `Return` after every string entered from `text`.
-    pub text_return: bool,
-    /// *WIP:* Specific keys to input into the started application (such as hotkeys).
-    pub keys: Option<Vec<String>>,
+    /// Commands to execute or keys to simulate after application startup.
+    pub exec: Option<Exec>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -153,6 +147,47 @@ pub struct ApplicationCommand {
     pub args: Option<Vec<String>>,
 }
 
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+/// Commands to execute or keys to simulate after application startup.
+///
+/// `xdotool` is used to simulate text or keys to input.
+pub struct Exec {
+    /// List of text or keys to input into the application.
+    ///
+    /// Text can be defined as simple strings. Keystrokes have to specified in a format `xdotool`
+    /// expects them, see `xdotool`'s [official documentation][xdotool-keyboard].
+    ///
+    /// [xdotool-keyboard]:
+    ///   https://github.com/jordansissel/xdotool/blob/master/xdotool.pod#keyboard-commands
+    pub commands: Vec<String>,
+
+    /// Defines how the commands above should be interpreted.
+    ///
+    /// If not specified, [`ExecType::Text`][variant-ExecType-Text] will be used by default.
+    ///
+    /// [variant-ExecType-Text]: enum.ExecType.html#variant.Text
+    pub exec_type: Option<ExecType>,
+}
+
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+/// Defines how the commands in [`Exec`][struct-Exec] should be interpreted.
+///
+/// [struct-Exec]: struct.Exec.html
+pub enum ExecType {
+    /// Interpret the commands given as separate text-lines, inputting them in order with a
+    /// `Return` after each.
+    Text,
+
+    /// Interpret the commands given as text, but do not input a `Return` after each element.
+    TextNoReturn,
+
+    /// Interpret the commands given as key presses.
+    ///
+    /// This does not input any `Return`s.
+    Keys,
+}
+
 impl<'de> Deserialize<'de> for ApplicationCommand {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
         where D: Deserializer<'de>
@@ -186,8 +221,4 @@ impl<'de> Deserialize<'de> for ApplicationCommand {
                      }
                  })
     }
-}
-
-fn default_text_return() -> bool {
-    true
 }
