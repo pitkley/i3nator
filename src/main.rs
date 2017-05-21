@@ -232,6 +232,7 @@ fn command_verify(matches: &ArgMatches<'static>) -> Result<()> {
 fn get_editor() -> Result<OsString> {
     env::var_os("VISUAL")
         .or_else(|| env::var_os("EDITOR"))
+        .and_then(|s| if !s.is_empty() { Some(s) } else { None })
         .ok_or_else(|| ErrorKind::EditorNotFound.into())
 }
 
