@@ -18,7 +18,7 @@ You have multiple options to install i3nator:
 
    ```console
    $ cargo install i3nator
-  ```
+   ```
 
 2. Alternatively, you can download the supplied static binary from the [release
    page][i3nator-releases], this should work without any additional dependencies.
