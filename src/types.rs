@@ -35,7 +35,6 @@
 //! working_directory = "/path/to/a/different/working/directory"
 //! ```
 
-use deserializers::*;
 use serde::de;
 use serde::de::{Deserialize, Deserializer};
 use shlex;
