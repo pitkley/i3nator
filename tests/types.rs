@@ -45,7 +45,7 @@ fn full_config() {
                                exec: Some(Exec {
                                               commands: vec!["command one".to_owned(),
                                                              "command two".to_owned()],
-                                              exec_type: Some(ExecType::TextNoReturn),
+                                              exec_type: ExecType::TextNoReturn,
                                           }),
                            }],
     };
@@ -60,7 +60,7 @@ fn exec_commands_only() {
 
     let expected = Exec {
         commands: vec!["command one".to_owned(), "command two".to_owned()],
-        exec_type: None,
+        exec_type: ExecType::Text,
     };
 
     let actual: Exec = toml::from_str(&fragment).unwrap();
@@ -76,7 +76,7 @@ fn exec_commands_and_type() {
 
     let expected = Exec {
         commands: vec!["command one".to_owned(), "command two".to_owned()],
-        exec_type: Some(ExecType::TextNoReturn),
+        exec_type: ExecType::TextNoReturn,
     };
 
     let actual: Exec = toml::from_str(&fragment).unwrap();

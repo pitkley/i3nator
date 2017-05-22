@@ -93,7 +93,7 @@ pub struct Application {
     /// The command used for starting an application.
     ///
     /// See [`ApplicationCommand`](struct.ApplicationCommand.html).
-    #[serde(deserialize_with="deserialize_application_command")]
+    #[serde(deserialize_with = "deserialize_application_command")]
     pub command: ApplicationCommand,
 
     /// The working directory defines in which directory-context the applications should be
@@ -167,7 +167,12 @@ pub struct Exec {
     /// If not specified, [`ExecType::Text`][variant-ExecType-Text] will be used by default.
     ///
     /// [variant-ExecType-Text]: enum.ExecType.html#variant.Text
-    pub exec_type: Option<ExecType>,
+    #[serde(default = "default_exec_type")]
+    pub exec_type: ExecType,
+}
+
+fn default_exec_type() -> ExecType {
+    ExecType::Text
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
