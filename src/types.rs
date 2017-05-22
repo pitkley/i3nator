@@ -39,6 +39,7 @@ use deserializers::*;
 use serde::de;
 use serde::de::{Deserialize, Deserializer};
 use shlex;
+use std::fmt;
 use std::path::PathBuf;
 
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -93,6 +94,7 @@ pub struct Application {
     /// The command used for starting an application.
     ///
     /// See [`ApplicationCommand`](struct.ApplicationCommand.html).
+    #[serde(deserialize_with="deserialize_application_command")]
     pub command: ApplicationCommand,
 
     /// The working directory defines in which directory-context the applications should be
@@ -107,7 +109,7 @@ pub struct Application {
     pub exec: Option<Exec>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Deserialize, Debug, Default, Clone, PartialEq, Eq)]
 /// The command used for starting an application.
 ///
 /// # Example
@@ -188,37 +190,55 @@ pub enum ExecType {
     Keys,
 }
 
-impl<'de> Deserialize<'de> for ApplicationCommand {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where D: Deserializer<'de>
-    {
-        let empty_command: D::Error = de::Error::custom("command can not be empty");
-        let result: Result<Vec<String>, D::Error> = string_or_seq_string(deserializer);
-        result
-            .and_then(|mut v| match v.len() {
-                          0 => Err(empty_command),
-                          1 => {
-                              match shlex::split(&v[0]) {
-                                  Some(mut v) => {
-                                      if v.is_empty() {
-                                          Err(empty_command)
-                                      } else {
-                                          Ok((v.remove(0).to_owned(),
-                                              v.into_iter().map(str::to_owned).collect::<Vec<_>>()))
-                                      }
-                                  }
-                                  None => Err(empty_command),
-                              }
-                          }
-                          _ => {
-                              Ok((v.remove(0), v.iter().map(|s| s.to_owned()).collect::<Vec<_>>()))
-                          }
-                      })
-            .map(|(program, args)| {
-                     ApplicationCommand {
-                         program: program,
-                         args: if args.is_empty() { None } else { Some(args) },
-                     }
-                 })
+fn deserialize_application_command<'de, D>(deserializer: D) -> Result<ApplicationCommand, D::Error>
+    where D: Deserializer<'de>
+{
+    impl<'de> de::Visitor<'de> for ApplicationCommand {
+        type Value = ApplicationCommand;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+            formatter.write_str("string, sequence of strings or map")
+        }
+
+        fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+            where E: de::Error
+        {
+            match shlex::split(value) {
+                Some(mut v) => {
+                    if v.is_empty() {
+                        Err(de::Error::custom("command can not be empty"))
+                    } else {
+                        Ok(ApplicationCommand {
+                               program: v.remove(0).to_owned(),
+                               args: Some(v.into_iter().map(str::to_owned).collect::<Vec<_>>()),
+                           })
+                    }
+                }
+                None => Err(de::Error::custom("command can not be empty")),
+            }
+        }
+
+        fn visit_seq<S>(self, visitor: S) -> Result<Self::Value, S::Error>
+            where S: de::SeqAccess<'de>
+        {
+            let mut v: Vec<String> =
+                Deserialize::deserialize(de::value::SeqAccessDeserializer::new(visitor))?;
+            if v.is_empty() {
+                Err(de::Error::custom("command can not be empty"))
+            } else {
+                Ok(ApplicationCommand {
+                       program: v.remove(0),
+                       args: Some(v),
+                   })
+            }
+        }
+
+        fn visit_map<M>(self, visitor: M) -> Result<Self::Value, M::Error>
+            where M: de::MapAccess<'de>
+        {
+            Deserialize::deserialize(de::value::MapAccessDeserializer::new(visitor))
+        }
     }
+
+    deserializer.deserialize_any(ApplicationCommand::default())
 }
