@@ -39,7 +39,9 @@ use serde::de;
 use serde::de::{Deserialize, Deserializer};
 use shlex;
 use std::fmt;
+use std::marker::PhantomData;
 use std::path::PathBuf;
+use std::time::Duration;
 
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -93,7 +95,7 @@ pub struct Application {
     /// The command used for starting an application.
     ///
     /// See [`ApplicationCommand`](struct.ApplicationCommand.html).
-    #[serde(deserialize_with="deserialize_application_command")]
+    #[serde(deserialize_with = "deserialize_application_command")]
     pub command: ApplicationCommand,
 
     /// The working directory defines in which directory-context the applications should be
@@ -105,6 +107,7 @@ pub struct Application {
     pub working_directory: Option<PathBuf>,
 
     /// Commands to execute or keys to simulate after application startup.
+    #[serde(default, deserialize_with = "deserialize_opt_exec")]
     pub exec: Option<Exec>,
 }
 
@@ -167,7 +170,20 @@ pub struct Exec {
     /// If not specified, [`ExecType::Text`][variant-ExecType-Text] will be used by default.
     ///
     /// [variant-ExecType-Text]: enum.ExecType.html#variant.Text
-    pub exec_type: Option<ExecType>,
+    #[serde(default = "default_exec_type")]
+    pub exec_type: ExecType,
+
+    /// Specify a duration
+    #[serde(default = "default_timeout", deserialize_with = "deserialize_duration")]
+    pub timeout: Duration,
+}
+
+fn default_exec_type() -> ExecType {
+    ExecType::Text
+}
+
+fn default_timeout() -> Duration {
+    Duration::from_secs(5)
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -189,10 +205,12 @@ pub enum ExecType {
     Keys,
 }
 
+struct Phantom<T>(PhantomData<T>);
+
 fn deserialize_application_command<'de, D>(deserializer: D) -> Result<ApplicationCommand, D::Error>
     where D: Deserializer<'de>
 {
-    impl<'de> de::Visitor<'de> for ApplicationCommand {
+    impl<'de> de::Visitor<'de> for Phantom<ApplicationCommand> {
         type Value = ApplicationCommand;
 
         fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
@@ -239,5 +257,89 @@ fn deserialize_application_command<'de, D>(deserializer: D) -> Result<Applicatio
         }
     }
 
-    deserializer.deserialize_any(ApplicationCommand::default())
+    deserializer.deserialize_any(Phantom::<ApplicationCommand>(PhantomData))
+}
+
+fn deserialize_duration<'de, D>(deserializer: D) -> Result<Duration, D::Error>
+    where D: Deserializer<'de>
+{
+    struct DurationWrapper(Duration);
+
+    impl<'de> de::Visitor<'de> for Phantom<Duration> {
+        type Value = DurationWrapper;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+            formatter.write_str("integer or map")
+        }
+
+        fn visit_i64<E>(self, value: i64) -> Result<Self::Value, E>
+            where E: de::Error
+        {
+            Ok(DurationWrapper(Duration::from_secs(value as u64)))
+        }
+
+        fn visit_map<M>(self, visitor: M) -> Result<Self::Value, M::Error>
+            where M: de::MapAccess<'de>
+        {
+            Deserialize::deserialize(de::value::MapAccessDeserializer::new(visitor))
+                .map(DurationWrapper)
+        }
+    }
+
+    deserializer
+        .deserialize_any(Phantom::<Duration>(PhantomData))
+        .map(|d| d.0)
+}
+
+fn deserialize_exec<'de, D>(deserializer: D) -> Result<Exec, D::Error>
+    where D: Deserializer<'de>
+{
+    impl<'de> de::Visitor<'de> for Phantom<Exec> {
+        type Value = Exec;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+            formatter.write_str("string, sequence of strings or map")
+        }
+
+        fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+            where E: de::Error
+        {
+            Ok(Exec {
+                   commands: vec![value.to_owned()],
+                   exec_type: default_exec_type(),
+                   timeout: default_timeout(),
+               })
+        }
+
+        fn visit_seq<S>(self, visitor: S) -> Result<Self::Value, S::Error>
+            where S: de::SeqAccess<'de>
+        {
+            let v: Vec<String> =
+                Deserialize::deserialize(de::value::SeqAccessDeserializer::new(visitor))?;
+
+            if v.is_empty() {
+                Err(de::Error::custom("commands can not be empty"))
+            } else {
+                Ok(Exec {
+                       commands: v,
+                       exec_type: default_exec_type(),
+                       timeout: default_timeout(),
+                   })
+            }
+        }
+
+        fn visit_map<M>(self, visitor: M) -> Result<Self::Value, M::Error>
+            where M: de::MapAccess<'de>
+        {
+            Deserialize::deserialize(de::value::MapAccessDeserializer::new(visitor))
+        }
+    }
+
+    deserializer.deserialize_any(Phantom::<Exec>(PhantomData))
+}
+
+fn deserialize_opt_exec<'de, D>(deserializer: D) -> Result<Option<Exec>, D::Error>
+    where D: Deserializer<'de>
+{
+    deserialize_exec(deserializer).map(Some)
 }

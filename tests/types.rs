@@ -10,6 +10,7 @@ extern crate i3nator;
 extern crate toml;
 
 use i3nator::types::*;
+use std::time::Duration;
 
 #[test]
 fn full_config() {
@@ -45,7 +46,8 @@ fn full_config() {
                                exec: Some(Exec {
                                               commands: vec!["command one".to_owned(),
                                                              "command two".to_owned()],
-                                              exec_type: Some(ExecType::TextNoReturn),
+                                              exec_type: ExecType::TextNoReturn,
+                                              timeout: Duration::from_secs(5),
                                           }),
                            }],
     };
@@ -60,7 +62,8 @@ fn exec_commands_only() {
 
     let expected = Exec {
         commands: vec!["command one".to_owned(), "command two".to_owned()],
-        exec_type: None,
+        exec_type: ExecType::Text,
+        timeout: Duration::from_secs(5),
     };
 
     let actual: Exec = toml::from_str(&fragment).unwrap();
@@ -76,7 +79,26 @@ fn exec_commands_and_type() {
 
     let expected = Exec {
         commands: vec!["command one".to_owned(), "command two".to_owned()],
-        exec_type: Some(ExecType::TextNoReturn),
+        exec_type: ExecType::TextNoReturn,
+        timeout: Duration::from_secs(5),
+    };
+
+    let actual: Exec = toml::from_str(&fragment).unwrap();
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn exec_commands_type_and_timeout() {
+    let fragment = r#"
+        commands = ["command one", "command two"]
+        exec_type = "text_no_return"
+        timeout = 10"#;
+
+    let expected = Exec {
+        commands: vec!["command one".to_owned(), "command two".to_owned()],
+        exec_type: ExecType::TextNoReturn,
+        timeout: Duration::from_secs(10),
     };
 
     let actual: Exec = toml::from_str(&fragment).unwrap();

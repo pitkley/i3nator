@@ -82,6 +82,12 @@ error_chain! {
             display("project already exists: '{}'", t)
         }
 
+        /// An error that occurs if text or key-presses could not be input into an application.
+        TextOrKeyInputFailed {
+            description("text or key input failed")
+            display("inputting text or key-presses into an application failed")
+        }
+
         /// An error that occurs if a project does not exist under a specified name.
         UnknownProject(t: String) {
             description("project is unknown")

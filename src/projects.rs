@@ -16,10 +16,12 @@ use std::fs::File;
 use std::io::BufReader;
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::{Child, Command, Stdio};
+use std::time::Duration;
 use tempfile::NamedTempFile;
 use toml;
 use types::*;
+use wait_timeout::ChildExt;
 use xdg;
 
 lazy_static! {
@@ -293,6 +295,15 @@ impl Project {
     ///
     /// 1. append the specified layout to a given workspace,
     /// 2. start the specified applications.
+    /// 3. execute commands in the applications, if specified.
+    ///
+    /// Command execution is achieved through the use of [`xdotool`][xdotool], which in turn
+    /// simulates key-events through X11 in applications. This is not without problems, though.
+    /// Some applications do not react to `SendEvent`s, at least by default.
+    ///
+    /// One example: in `xterm` you have to specifically enable for `SendEvent`s to be processed.
+    /// This can be done through the the [`XTerm.vt100.allowSendEvents`][xterm-allow-send-events]
+    /// resource, which ensures that `SendEvent`s are activated when `xterm` starts.
     ///
     /// # Parameters:
     ///
@@ -312,7 +323,12 @@ impl Project {
     ///   - the configuration is invalid,
     ///   - if a `layout` was specified but could not be stored in a temporary file,
     ///   - an i3-command failed,
-    ///   - an application could not be started
+    ///   - an application could not be started,
+    ///   - a command could not be sent to an application.
+    ///
+    ///
+    /// [xdotool]: https://github.com/jordansissel/xdotool
+    /// [xterm-allow-send-events]: https://www.x.org/archive/X11R6.7.0/doc/xterm.1.html#sect6
     pub fn start(&mut self,
                  i3: &mut I3Connection,
                  working_directory: Option<&OsStr>,
@@ -381,10 +397,15 @@ impl Project {
                 cmd.current_dir(working_directory);
             }
 
-            cmd.stdin(Stdio::null())
+            let child = cmd.stdin(Stdio::null())
                 .stdout(Stdio::null())
                 .stderr(Stdio::null())
                 .spawn()?;
+
+            // Input text into application, if any
+            if let Some(ref exec) = application.exec {
+                exec_commands(&child, exec)?;
+            }
         }
 
         Ok(())
@@ -420,4 +441,78 @@ pub fn list() -> Vec<OsString> {
         .map(Option::unwrap)
         .map(OsStr::to_os_string)
         .collect::<Vec<_>>()
+}
+
+fn exec_text(base_parameters: &[&str], text: &str, timeout: Duration) -> Result<()> {
+    let args = &[base_parameters, &["type", "--window", "%1", text]].concat();
+    let mut child = Command::new("xdotool")
+        .args(args)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()?;
+
+    // Return of `wait_timeout` is `None` if the process didn't exit.
+    if child.wait_timeout(timeout)?.is_none() {
+        // Kill the xdotool process, return error
+        child.kill()?;
+        child.wait()?;
+        Err(ErrorKind::TextOrKeyInputFailed.into())
+    } else {
+        Ok(())
+    }
+}
+
+fn exec_keys<S: AsRef<OsStr>>(base_parameters: &[&str],
+                              keys: &[S],
+                              timeout: Duration)
+                              -> Result<()> {
+    let args = &[base_parameters, &["key", "--window", "%1"]].concat();
+    let mut child = Command::new("xdotool")
+        .args(args)
+        .args(keys)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()?;
+
+    // Return of `wait_timeout` is `None` if the process didn't exit.
+    if child.wait_timeout(timeout)?.is_none() {
+        // Kill the xdotool process, return error
+        child.kill()?;
+        child.wait()?;
+        Err(ErrorKind::TextOrKeyInputFailed.into())
+    } else {
+        Ok(())
+    }
+}
+
+fn exec_commands(child: &Child, exec: &Exec) -> Result<()> {
+    let timeout = exec.timeout;
+    let pid = child.id().to_string();
+    let base_parameters = &["search",
+                            "--sync",
+                            "--onlyvisible",
+                            "--any",
+                            "--pid",
+                            &pid,
+                            "ignorepattern"];
+
+    let commands = &exec.commands;
+    match exec.exec_type {
+        ExecType::Text => {
+            for command in commands {
+                exec_text(base_parameters, &command, timeout)?;
+                exec_keys(base_parameters, &["Return"], timeout)?;
+            }
+        }
+        ExecType::TextNoReturn => {
+            for command in commands {
+                exec_text(base_parameters, &command, timeout)?;
+            }
+        }
+        ExecType::Keys => exec_keys(base_parameters, commands.as_slice(), timeout)?,
+    }
+
+    Ok(())
 }
