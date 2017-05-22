@@ -165,6 +165,7 @@ extern crate serde;
 extern crate serde_derive;
 extern crate tempfile;
 extern crate toml;
+extern crate wait_timeout;
 extern crate xdg;
 
 pub mod errors;

@@ -16,10 +16,12 @@ use std::fs::File;
 use std::io::BufReader;
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::{Child, Command, Stdio};
+use std::time::Duration;
 use tempfile::NamedTempFile;
 use toml;
 use types::*;
+use wait_timeout::ChildExt;
 use xdg;
 
 lazy_static! {
@@ -381,10 +383,15 @@ impl Project {
                 cmd.current_dir(working_directory);
             }
 
-            cmd.stdin(Stdio::null())
+            let child = cmd.stdin(Stdio::null())
                 .stdout(Stdio::null())
                 .stderr(Stdio::null())
                 .spawn()?;
+
+            // Input text into application, if any
+            if let Some(ref exec) = application.exec {
+                exec_commands(&child, exec)?;
+            }
         }
 
         Ok(())
@@ -420,4 +427,78 @@ pub fn list() -> Vec<OsString> {
         .map(Option::unwrap)
         .map(OsStr::to_os_string)
         .collect::<Vec<_>>()
+}
+
+fn exec_text(base_parameters: &[&str], text: &str, timeout: Duration) -> Result<()> {
+    let args = &[base_parameters, &["type", "--window", "%1", text]].concat();
+    let mut child = Command::new("xdotool")
+        .args(args)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()?;
+
+    // Return of `wait_timeout` is `None` if the process didn't exit.
+    if child.wait_timeout(timeout)?.is_none() {
+        // Kill the xdotool process, return error
+        child.kill()?;
+        child.wait()?;
+        Err(ErrorKind::TextOrKeyInputFailed.into())
+    } else {
+        Ok(())
+    }
+}
+
+fn exec_key(base_parameters: &[&str], key: &str, timeout: Duration) -> Result<()> {
+    let args = &[base_parameters, &["key", "--window", "%1", key]].concat();
+    let mut child = Command::new("xdotool")
+        .args(args)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()?;
+
+    // Return of `wait_timeout` is `None` if the process didn't exit.
+    if child.wait_timeout(timeout)?.is_none() {
+        // Kill the xdotool process, return error
+        child.kill()?;
+        child.wait()?;
+        Err(ErrorKind::TextOrKeyInputFailed.into())
+    } else {
+        Ok(())
+    }
+}
+
+fn exec_commands(child: &Child, exec: &Exec) -> Result<()> {
+    let timeout = exec.timeout;
+    let pid = child.id().to_string();
+    let base_parameters = &["search",
+                            "--sync",
+                            "--onlyvisible",
+                            "--any",
+                            "--pid",
+                            &pid,
+                            "ignorepattern"];
+
+    let commands = &exec.commands;
+    match exec.exec_type {
+        ExecType::Text => {
+            for command in commands {
+                exec_text(base_parameters, &command, timeout)?;
+                exec_key(base_parameters, "Return", timeout)?;
+            }
+        }
+        ExecType::TextNoReturn => {
+            for command in commands {
+                exec_text(base_parameters, &command, timeout)?;
+            }
+        }
+        ExecType::Keys => {
+            for key in commands {
+                exec_key(base_parameters, &key, timeout)?;
+            }
+        }
+    }
+
+    Ok(())
 }
