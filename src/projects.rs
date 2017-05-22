@@ -352,11 +352,11 @@ impl Project {
 
         // Append the layout to the workspace
         i3.command(&format!("append_layout {}",
-                              path.to_str()
-                                  .ok_or_else(|| {
-                                                  ErrorKind::InvalidUtF8Path(path.to_string_lossy()
-                                                                             .into_owned())
-                                              })?))?;
+                             path.to_str()
+                                 .ok_or_else(|| {
+                                                 ErrorKind::InvalidUtF8Path(path.to_string_lossy()
+                                                                                .into_owned())
+                                             })?))?;
 
         // Start the applications
         let applications = &config.applications;
@@ -374,12 +374,7 @@ impl Project {
             let working_directory =
                 working_directory
                     .map(OsStr::to_os_string)
-                    .or_else(|| {
-                                 application
-                                     .working_directory
-                                     .as_ref()
-                                     .map(OsString::from)
-                             })
+                    .or_else(|| application.working_directory.as_ref().map(OsString::from))
                     .or_else(|| general.working_directory.as_ref().map(OsString::from));
 
             if let Some(working_directory) = working_directory {
