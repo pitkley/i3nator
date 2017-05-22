@@ -449,10 +449,14 @@ fn exec_text(base_parameters: &[&str], text: &str, timeout: Duration) -> Result<
     }
 }
 
-fn exec_key(base_parameters: &[&str], key: &str, timeout: Duration) -> Result<()> {
-    let args = &[base_parameters, &["key", "--window", "%1", key]].concat();
+fn exec_keys<S: AsRef<OsStr>>(base_parameters: &[&str],
+                              keys: &[S],
+                              timeout: Duration)
+                              -> Result<()> {
+    let args = &[base_parameters, &["key", "--window", "%1"]].concat();
     let mut child = Command::new("xdotool")
         .args(args)
+        .args(keys)
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
@@ -485,7 +489,7 @@ fn exec_commands(child: &Child, exec: &Exec) -> Result<()> {
         ExecType::Text => {
             for command in commands {
                 exec_text(base_parameters, &command, timeout)?;
-                exec_key(base_parameters, "Return", timeout)?;
+                exec_keys(base_parameters, &["Return"], timeout)?;
             }
         }
         ExecType::TextNoReturn => {
@@ -493,11 +497,7 @@ fn exec_commands(child: &Child, exec: &Exec) -> Result<()> {
                 exec_text(base_parameters, &command, timeout)?;
             }
         }
-        ExecType::Keys => {
-            for key in commands {
-                exec_key(base_parameters, &key, timeout)?;
-            }
-        }
+        ExecType::Keys => exec_keys(base_parameters, commands.as_slice(), timeout)?,
     }
 
     Ok(())
