@@ -22,5 +22,22 @@ layout_path = "/path/to/my/layout.json"
 [[applications]]
 # Command to run to start the application
 command = "mycommand --with 'multiple args'"
+
 # Different working directory to use (optional)
 # working_directory = "/path/to/a/different/working/directory"
+
+# Execute commands in the started application
+# exec = "anothercommand --with 'multiple args'"
+
+# You can also execute multiple commands:
+# exec = ["command one", "command two"]
+
+# By default, the commands get "typed" into the application, followed by a
+# simulated press of "Return". You can influence this behaviour to either not
+# press return, or to interpret the given commands as individual keypresses:
+# exec = { commands = ["echo", " ", "hi"], exec_type = "text_no_return" }
+# ^- this will only input "echo hi" into the application, without simulating a
+#    Return.
+# exec = { commands = ["e", "c", "h", "o", "space", "h", "i", "Return"] }
+# ^- this will forward the elements of `commands` as they are to `xdotool key`,
+#    i.e. they will be executed as individual keypresses.

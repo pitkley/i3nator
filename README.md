@@ -32,6 +32,9 @@ You have multiple options to install i3nator:
    $ cargo install
    ```
 
+**Note:** If you want to be able to use the automatic command execution feature, you will need
+to install [`xdotool`][xdotool].
+
 ## Usage:
 
 Following the usage of i3nator as of 0.1.0.
@@ -125,6 +128,9 @@ SUBCOMMANDS:
       the `command` to the full command to be used to start the application and optionally
       configuring a different working directory if desired.
 
+      If you want to execute additional commands or keypresses in the started applications, you
+      can also define `exec`.
+
 6. Save and close your editor. This will automatically verify the created configuration. If
    there is an issue it will tell you what failed and allow you to reedit the file directly or
    ignore the error and exit.
@@ -144,3 +150,4 @@ $ i3nator start myproject
 [i3wm-modify-layout]: https://i3wm.org/docs/layout-saving.html#_editing_layout_files
 [i3wm-layout-saving]: https://i3wm.org/docs/layout-saving.html
 [i3wm-save-tree]: https://i3wm.org/docs/layout-saving.html#_saving_the_layout
+[xdotool]: https://github.com/jordansissel/xdotool

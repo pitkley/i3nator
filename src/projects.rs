@@ -295,6 +295,15 @@ impl Project {
     ///
     /// 1. append the specified layout to a given workspace,
     /// 2. start the specified applications.
+    /// 3. execute commands in the applications, if specified.
+    ///
+    /// Command execution is achieved through the use of [`xdotool`][xdotool], which in turn
+    /// simulates key-events through X11 in applications. This is not without problems, though.
+    /// Some applications do not react to `SendEvent`s, at least by default.
+    ///
+    /// One example: in `xterm` you have to specifically enable for `SendEvent`s to be processed.
+    /// This can be done through the the [`XTerm.vt100.allowSendEvents`][xterm-allow-send-events]
+    /// resource, which ensures that `SendEvent`s are activated when `xterm` starts.
     ///
     /// # Parameters:
     ///
@@ -314,7 +323,12 @@ impl Project {
     ///   - the configuration is invalid,
     ///   - if a `layout` was specified but could not be stored in a temporary file,
     ///   - an i3-command failed,
-    ///   - an application could not be started
+    ///   - an application could not be started,
+    ///   - a command could not be sent to an application.
+    ///
+    ///
+    /// [xdotool]: https://github.com/jordansissel/xdotool
+    /// [xterm-allow-send-events]: https://www.x.org/archive/X11R6.7.0/doc/xterm.1.html#sect6
     pub fn start(&mut self,
                  i3: &mut I3Connection,
                  working_directory: Option<&OsStr>,
