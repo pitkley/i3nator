@@ -167,7 +167,6 @@ extern crate tempfile;
 extern crate toml;
 extern crate xdg;
 
-mod deserializers;
 pub mod errors;
 pub mod projects;
 mod shlex;
