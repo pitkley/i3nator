@@ -40,6 +40,7 @@ use serde::de::{Deserialize, Deserializer};
 use shlex;
 use std::fmt;
 use std::path::PathBuf;
+use std::time::Duration;
 
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -169,10 +170,18 @@ pub struct Exec {
     /// [variant-ExecType-Text]: enum.ExecType.html#variant.Text
     #[serde(default = "default_exec_type")]
     pub exec_type: ExecType,
+
+    /// Specify a duration
+    #[serde(default = "default_timeout", deserialize_with = "deserialize_duration")]
+    pub timeout: Duration,
 }
 
 fn default_exec_type() -> ExecType {
     ExecType::Text
+}
+
+fn default_timeout() -> Duration {
+    Duration::from_secs(5)
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -245,4 +254,35 @@ fn deserialize_application_command<'de, D>(deserializer: D) -> Result<Applicatio
     }
 
     deserializer.deserialize_any(ApplicationCommand::default())
+}
+
+fn deserialize_duration<'de, D>(deserializer: D) -> Result<Duration, D::Error>
+    where D: Deserializer<'de>
+{
+    struct DurationWrapper(Duration);
+
+    impl<'de> de::Visitor<'de> for DurationWrapper {
+        type Value = DurationWrapper;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+            formatter.write_str("integer or map")
+        }
+
+        fn visit_i64<E>(self, value: i64) -> Result<Self::Value, E>
+            where E: de::Error
+        {
+            Ok(DurationWrapper(Duration::from_secs(value as u64)))
+        }
+
+        fn visit_map<M>(self, visitor: M) -> Result<Self::Value, M::Error>
+            where M: de::MapAccess<'de>
+        {
+            Deserialize::deserialize(de::value::MapAccessDeserializer::new(visitor))
+                .map(DurationWrapper)
+        }
+    }
+
+    deserializer
+        .deserialize_any(DurationWrapper(Duration::default()))
+        .map(|d| d.0)
 }
