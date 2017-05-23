@@ -263,10 +263,8 @@ fn deserialize_application_command<'de, D>(deserializer: D) -> Result<Applicatio
 fn deserialize_duration<'de, D>(deserializer: D) -> Result<Duration, D::Error>
     where D: Deserializer<'de>
 {
-    struct DurationWrapper(Duration);
-
     impl<'de> de::Visitor<'de> for Phantom<Duration> {
-        type Value = DurationWrapper;
+        type Value = Duration;
 
         fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
             formatter.write_str("integer or map")
@@ -275,20 +273,17 @@ fn deserialize_duration<'de, D>(deserializer: D) -> Result<Duration, D::Error>
         fn visit_i64<E>(self, value: i64) -> Result<Self::Value, E>
             where E: de::Error
         {
-            Ok(DurationWrapper(Duration::from_secs(value as u64)))
+            Ok(Duration::from_secs(value as u64))
         }
 
         fn visit_map<M>(self, visitor: M) -> Result<Self::Value, M::Error>
             where M: de::MapAccess<'de>
         {
             Deserialize::deserialize(de::value::MapAccessDeserializer::new(visitor))
-                .map(DurationWrapper)
         }
     }
 
-    deserializer
-        .deserialize_any(Phantom::<Duration>(PhantomData))
-        .map(|d| d.0)
+    deserializer.deserialize_any(Phantom::<Duration>(PhantomData))
 }
 
 fn deserialize_exec<'de, D>(deserializer: D) -> Result<Exec, D::Error>
