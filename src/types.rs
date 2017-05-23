@@ -38,9 +38,14 @@
 use serde::de;
 use serde::de::{Deserialize, Deserializer};
 use shlex;
+use std::borrow::Cow;
+use std::env;
+use std::ffi::{OsStr, OsString};
 use std::fmt;
 use std::marker::PhantomData;
-use std::path::PathBuf;
+#[cfg(unix)]
+use std::os::unix::ffi::OsStrExt;
+use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 /// This is the parent type defining the complete project configuration used by i3nator.
@@ -66,6 +71,7 @@ pub struct Config {
 pub struct General {
     /// The working directory defines in which directory-context the applications should be
     /// launched in.
+    #[serde(default, deserialize_with = "deserialize_opt_pathbuf_with_tilde")]
     pub working_directory: Option<PathBuf>,
 
     /// If the workspace is `Some`, `i3` will be instructed to open the layout on the specified
@@ -82,6 +88,7 @@ pub struct General {
     /// [`append_layout`][append-layout].
     ///
     /// [append-layout]: https://i3wm.org/docs/layout-saving.html#_append_layout_command
+    #[serde(default, deserialize_with = "deserialize_opt_pathbuf_with_tilde")]
     pub layout_path: Option<PathBuf>,
 }
 
@@ -104,6 +111,7 @@ pub struct Application {
     /// This overrides [`general.working_directory`][general-working_directory].
     ///
     /// [general-working_directory]: struct.General.html#structfield.working_directory
+    #[serde(default, deserialize_with = "deserialize_opt_pathbuf_with_tilde")]
     pub working_directory: Option<PathBuf>,
 
     /// Commands to execute or keys to simulate after application startup.
@@ -337,4 +345,61 @@ fn deserialize_opt_exec<'de, D>(deserializer: D) -> Result<Option<Exec>, D::Erro
     where D: Deserializer<'de>
 {
     deserialize_exec(deserializer).map(Some)
+}
+
+fn deserialize_pathbuf_with_tilde<'de, D>(deserializer: D) -> Result<PathBuf, D::Error>
+    where D: Deserializer<'de>
+{
+    let pathbuf: PathBuf = Deserialize::deserialize(deserializer)?;
+    Ok(tilde(&pathbuf).into_owned())
+}
+
+fn deserialize_opt_pathbuf_with_tilde<'de, D>(deserializer: D) -> Result<Option<PathBuf>, D::Error>
+    where D: Deserializer<'de>
+{
+    deserialize_pathbuf_with_tilde(deserializer).map(Some)
+}
+
+/// Taken from crate "shellexpand", adapted to work with `Path` instead of `str`:
+///   https://github.com/netvl/shellexpand/blob/
+///     501c4fdd8275fea2e56e71a2659cd90d21d18565/src/lib.rs#L558-L639
+///
+/// (Linebreak in link to make rustfmt happy...)
+///
+/// Dual-licensed under MIT/Apache 2.0
+/// Copyright (c) 2016 Vladimir Matveev
+#[doc(hidden)]
+fn tilde_with_context<SI: ?Sized, P, HD>(input: &SI, home_dir: HD) -> Cow<Path>
+    where SI: AsRef<Path>,
+          P: AsRef<Path>,
+          HD: FnOnce() -> Option<P>
+{
+    let input_str = input.as_ref();
+    let bytes = input_str.as_os_str().as_bytes();
+    if bytes[0] == '~' as u8 {
+        let input_after_tilde = &bytes[1..];
+        if input_after_tilde.is_empty() || input_after_tilde[0] == '/' as u8 {
+            if let Some(hd) = home_dir() {
+                let mut s = OsString::new();
+                s.push(hd.as_ref().to_path_buf());
+                s.push(OsStr::from_bytes(input_after_tilde));
+                PathBuf::from(s).into()
+            } else {
+                // home dir is not available
+                input_str.into()
+            }
+        } else {
+            // we cannot handle `~otheruser/` paths yet
+            input_str.into()
+        }
+    } else {
+        // input doesn't start with tilde
+        input_str.into()
+    }
+}
+
+fn tilde<SI: ?Sized>(input: &SI) -> Cow<Path>
+    where SI: AsRef<Path>
+{
+    tilde_with_context(input, env::home_dir)
 }
