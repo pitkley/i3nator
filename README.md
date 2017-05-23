@@ -61,7 +61,7 @@ SUBCOMMANDS:
               Prints this message or the help of the given subcommand(s)
 
     info <PROJECT>
-              !!! TODO !!!
+              Show information for the specified project
 
     list [FLAGS]
               List all projects
@@ -79,7 +79,7 @@ SUBCOMMANDS:
               Start a project according to it's configuration
 
     verify [PROJECT]...
-              verify the configuration of the existing projects
+              Verify the configuration of the existing projects
 ```
 
 ## Example
