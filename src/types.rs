@@ -43,9 +43,9 @@ use std::marker::PhantomData;
 use std::path::PathBuf;
 use std::time::Duration;
 
+/// This is the parent type defining the complete project configuration used by i3nator.
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
-/// This is the parent type defining the complete project configuration used by i3nator.
 pub struct Config {
     /// The general configuration section.
     ///
@@ -58,11 +58,11 @@ pub struct Config {
     pub applications: Vec<Application>,
 }
 
-#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(deny_unknown_fields)]
 /// The general configuration section.
 ///
 /// This section defines how a project behaves in general.
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
 pub struct General {
     /// The working directory defines in which directory-context the applications should be
     /// launched in.
@@ -85,12 +85,12 @@ pub struct General {
     pub layout_path: Option<PathBuf>,
 }
 
-#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(deny_unknown_fields)]
 /// The applications configuration.
 ///
 /// This configuration defines how to start an applications and what potential commands to execute
 /// in them.
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
 pub struct Application {
     /// The command used for starting an application.
     ///
@@ -111,7 +111,6 @@ pub struct Application {
     pub exec: Option<Exec>,
 }
 
-#[derive(Deserialize, Debug, Default, Clone, PartialEq, Eq)]
 /// The command used for starting an application.
 ///
 /// # Example
@@ -143,6 +142,7 @@ pub struct Application {
 /// ```
 ///
 /// A string will be split up into separate args, honoring single- and double-quoted elements.
+#[derive(Deserialize, Debug, Default, Clone, PartialEq, Eq)]
 pub struct ApplicationCommand {
     /// The executable to start.
     pub program: String,
@@ -151,10 +151,10 @@ pub struct ApplicationCommand {
     pub args: Option<Vec<String>>,
 }
 
-#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 /// Commands to execute or keys to simulate after application startup.
 ///
 /// `xdotool` is used to simulate text or keys to input.
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct Exec {
     /// List of text or keys to input into the application.
     ///
@@ -186,11 +186,11 @@ fn default_timeout() -> Duration {
     Duration::from_secs(5)
 }
 
-#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "snake_case")]
 /// Defines how the commands in [`Exec`][struct-Exec] should be interpreted.
 ///
 /// [struct-Exec]: struct.Exec.html
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
 pub enum ExecType {
     /// Interpret the commands given as separate text-lines, inputting them in order with a
     /// `Return` after each.
