@@ -36,7 +36,7 @@ pub fn cli() -> App<'static, 'static> {
                     AppSettings::GlobalVersion,
                     AppSettings::InferSubcommands,
                     AppSettings::SubcommandRequiredElseHelp,
-                    AppSettings::VersionlessSubcommands,])
+                    AppSettings::VersionlessSubcommands])
         .subcommand(SubCommand::with_name("copy")
                         .about("Copy an existing project to a new project")
                         .arg(Arg::with_name("EXISTING")
@@ -46,17 +46,18 @@ pub fn cli() -> App<'static, 'static> {
                                  .help("Name of the new, destination project")
                                  .required(true))
                         .arg(Arg::with_name("no-edit")
-                                 .help("Don't open the new project for editing after copying")
+                                 .help("Don't open the new project for editing after \
+                                        copying")
                                  .long("no-edit")
                                  .required(false))
                         .arg(Arg::with_name("no-verify")
-                                 .help("Don't verify the contents of the new project after the \
-                                        editor closes")
+                                 .help("Don't verify the contents of the new project \
+                                        after the editor closes")
                                  .long("no-verify")
                                  .required(false)
                                  .conflicts_with("no-edit")))
         .subcommand(SubCommand::with_name("delete")
-                         .alias("remove")
+                        .alias("remove")
                         .about("Delete existing projects")
                         .arg(Arg::with_name("PROJECT")
                                  .help("Names of the projects to delete")
@@ -69,11 +70,10 @@ pub fn cli() -> App<'static, 'static> {
                                  .help("Name of the project to edit")
                                  .required(true))
                         .arg(Arg::with_name("no-verify")
-                                 .help("Don't verify the contents of the new project after the \
-                                        editor closes")
+                                 .help("Don't verify the contents of the new project \
+                                        after the editor closes")
                                  .long("no-verify")
                                  .required(false)))
-        // TODO: decide if we want to add `implode`?
         .subcommand(SubCommand::with_name("info")
                         .about("Show information for the specified project")
                         .arg(Arg::with_name("PROJECT")
@@ -82,11 +82,11 @@ pub fn cli() -> App<'static, 'static> {
         .subcommand(SubCommand::with_name("list")
                         .about("List all projects")
                         .arg(Arg::with_name("quiet")
-                                .help("List one project per line, no other output")
-                                .short("q")
-                                .long("quiet")
-                                .takes_value(false)
-                                .required(false)))
+                                 .help("List one project per line, no other output")
+                                 .short("q")
+                                 .long("quiet")
+                                 .takes_value(false)
+                                 .required(false)))
         .subcommand(SubCommand::with_name("local")
                         .about("Run a project from a local TOML-file")
                         .arg(Arg::with_name("file")
@@ -107,8 +107,8 @@ pub fn cli() -> App<'static, 'static> {
                                  .long("no-edit")
                                  .required(false))
                         .arg(Arg::with_name("no-verify")
-                                 .help("Don't verify the contents of the new project after the \
-                                        editor closes")
+                                 .help("Don't verify the contents of the new project \
+                                        after the editor closes")
                                  .long("no-verify")
                                  .required(false)
                                  .conflicts_with("no-edit")))
@@ -125,8 +125,8 @@ pub fn cli() -> App<'static, 'static> {
                                  .long("edit")
                                  .required(false))
                         .arg(Arg::with_name("no-verify")
-                                 .help("Don't verify the contents of the new project after the \
-                                        editor closes")
+                                 .help("Don't verify the contents of the new project \
+                                        after the editor closes")
                                  .long("no-verify")
                                  .required(false)
                                  .requires("edit")))
@@ -142,11 +142,8 @@ pub fn cli() -> App<'static, 'static> {
                         .about("Verify the configuration of the existing projects")
                         .arg(Arg::with_name("PROJECT")
                                  .help("Names of the projects to verify")
-                                 .long_help("Name of the projects to verify. If not specified, \
-                                             all projects will be checked.")
+                                 .long_help("Name of the projects to verify. If not \
+                                             specified, all projects will be checked.")
                                  .multiple(true)
                                  .required(false)))
-    // TODO: determine if we can implement `stop`.
-    // This would probably require keeping track of PIDs and workspaces and such, so my
-    // immediate thought is "no".
 }
