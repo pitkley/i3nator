@@ -181,6 +181,42 @@ fn application_command_map_no_args() {
 }
 
 #[test]
+fn duration_secs() {
+    equivalent! {
+        r#"commands = []
+           timeout = 10"#,
+        Exec {
+            commands: vec![],
+            exec_type: ExecType::Text,
+            timeout: Duration::from_secs(10),
+        };
+        Exec
+    }
+}
+
+#[test]
+fn duration_map() {
+    equivalent! {
+        r#"commands = []
+           timeout = { secs = 10, nanos = 42 }"#,
+        Exec {
+            commands: vec![],
+            exec_type: ExecType::Text,
+            timeout: Duration::new(10, 42),
+        };
+        Exec
+    }
+}
+
+#[test]
+#[should_panic(expected = "invalid type: string")]
+fn duration_str() {
+    toml::from_str::<Exec>(r#"commands = []
+                              timeout = "10""#)
+            .unwrap();
+}
+
+#[test]
 fn exec_commands_only() {
     let expected = Exec {
         commands: vec!["command one".to_owned(), "command two".to_owned()],
