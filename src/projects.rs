@@ -484,7 +484,10 @@ fn exec_commands(child: &Child, exec: &Exec) -> Result<()> {
                             "--any",
                             "--pid",
                             &pid,
-                            "ignorepattern"];
+                            "ignorepattern",
+                            "windowfocus",
+                            "--sync",
+                            "%1"];
 
     let commands = &exec.commands;
     match exec.exec_type {
