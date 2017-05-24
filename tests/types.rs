@@ -30,8 +30,8 @@ fn full_config() {
         applications: vec![Application {
                                command: ApplicationCommand {
                                    program: "mycommand".to_owned(),
-                                   args: Some(vec!["--with".to_owned(),
-                                                   "multiple args".to_owned()]),
+                                   args: vec!["--with".to_owned(),
+                                              "multiple args".to_owned()],
                                },
                                working_directory: Some("/path/to/a/different/working/directory"
                                                            .to_owned()

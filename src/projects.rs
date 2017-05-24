@@ -366,10 +366,7 @@ impl Project {
         let applications = &config.applications;
         for application in applications {
             let mut cmd = Command::new(&application.command.program);
-            // Set args if available
-            if let Some(ref args) = application.command.args {
-                cmd.args(args);
-            }
+            cmd.args(&application.command.args);
 
             // Get working directory. Precedence is as follows:
             // 1. `--working-directory` command-line parameter
