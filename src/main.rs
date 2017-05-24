@@ -324,4 +324,5 @@ fn run() -> Result<()> {
     }
 }
 
+#[cfg(unix)]
 quick_main!(run);
