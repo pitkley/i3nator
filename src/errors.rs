@@ -58,18 +58,6 @@ error_chain! {
             display("path doesn't exist: '{}'", t)
         }
 
-        /// An error that occurs if both [`layout`][structfield-General-layout] and
-        /// [`layout_path`][structfield-General-layout_path] of [`General`][struct-General]
-        /// have not been specified.
-        ///
-        /// [struct-General]: ../types/struct.General.html
-        /// [structfield-General-layout]: ../types/struct.General.html#structfield.layout
-        /// [structfield-General-layout_path]: ../types/struct.General.html#structfield.layout_path
-        LayoutNotSpecified {
-            description("layout and not specified")
-            display("both `layout` and `layout_path` not specified")
-        }
-
         /// An error that occurs if no project exists.
         NoProjectExist {
             description("no projects exist")

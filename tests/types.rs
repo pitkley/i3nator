@@ -18,7 +18,7 @@ fn full_config() {
         [general]
         working_directory = "/path/to/my/working/directory"
         workspace = "0"
-        layout_path = "/path/to/my/layout.json"
+        layout = "/path/to/my/layout.json"
 
         [[applications]]
         command = "mycommand --with 'multiple args'"
@@ -31,8 +31,7 @@ fn full_config() {
         general: General {
             working_directory: Some("/path/to/my/working/directory".to_owned().into()),
             workspace: Some("0".to_owned()),
-            layout: None,
-            layout_path: Some("/path/to/my/layout.json".to_owned().into()),
+            layout: "/path/to/my/layout.json".into(),
         },
         applications: vec![Application {
                                command: ApplicationCommand {
