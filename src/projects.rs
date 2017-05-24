@@ -337,25 +337,16 @@ impl Project {
         let config = self.config()?;
         let general = &config.general;
 
-        // Create temporary file if required
-        let mut tempfile = if general.layout.is_some() {
-            Some(NamedTempFile::new()?)
-        } else {
-            None
-        };
-
-        // Get the provided layout-path or the path of the temporary file
-        let path: &Path = if let Some(ref path) = general.layout_path {
-            path
-        } else if let Some(ref layout) = general.layout {
-            // The layout has been provided directly, save into the temporary file.
-            let mut tempfile = tempfile.as_mut().unwrap();
-            tempfile.write_all(layout.as_bytes())?;
+        // Determine if the layout is a path or the actual contents.
+        let mut tempfile;
+        let path: &Path = if general.layout.find('{').is_some() {
+            // We assume that if the layout contains a `{`, that it is not a path.
+            tempfile = NamedTempFile::new()?;
+            tempfile.write_all(general.layout.as_bytes())?;
             tempfile.flush()?;
             tempfile.path()
         } else {
-            // Neither `layout` nor `layout_path` has been specified
-            bail!(ErrorKind::LayoutNotSpecified)
+            Path::new(&general.layout)
         };
 
         // Change workspace if provided

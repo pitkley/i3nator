@@ -78,18 +78,17 @@ pub struct General {
     /// workspace. If it is `None`, `i3` will use the currently focused workspace.
     pub workspace: Option<String>,
 
-    /// The layout to append to a workspace, given as the quasi-JSON `i3-save-tree` returns and
-    /// [`append_layout`][append-layout] expects.
+    /// The layout to append to a workspace.
+    ///
+    /// This should either be:
+    ///
+    /// * the quasi-JSON as returned by `i3-save-tree`
+    /// * or a file-path containing the quasi-JSON as returned by `i3-save-tree`.
+    ///
+    /// Either one will be passed to [`append_layout`][append-layout].
     ///
     /// [append-layout]: https://i3wm.org/docs/layout-saving.html#_append_layout_command
-    pub layout: Option<String>,
-
-    /// A file-path containing a quasi-JSON as returned by `i3-save-tree` and expected by
-    /// [`append_layout`][append-layout].
-    ///
-    /// [append-layout]: https://i3wm.org/docs/layout-saving.html#_append_layout_command
-    #[serde(default, deserialize_with = "deserialize_opt_pathbuf_with_tilde")]
-    pub layout_path: Option<PathBuf>,
+    pub layout: String,
 }
 
 /// The applications configuration.

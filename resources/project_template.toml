@@ -10,9 +10,10 @@ working_directory = "/path/to/my/working/directory"
 workspace = "1"
 
 # Path to your layout-file
-layout_path = "/path/to/my/layout.json"
+layout = "/path/to/my/layout.json"
 
-# Alternatively, you can include the JSON-contents of the layout directly:
+# Alternatively, you can include the JSON-contents of the layout directly,
+# using the same configuration key:
 # layout = """
 # {
 #     ...
