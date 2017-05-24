@@ -12,21 +12,15 @@ extern crate toml;
 use i3nator::types::*;
 use std::time::Duration;
 
+macro_rules! equivalent {
+    ( $fragment:expr, $expected:expr; $ty:ty ) => {
+        let actual: $ty = toml::from_str($fragment).unwrap();
+        assert_eq!(actual, $expected);
+    }
+}
+
 #[test]
 fn full_config() {
-    let fragment = r#"
-        [general]
-        working_directory = "/path/to/my/working/directory"
-        workspace = "0"
-        layout = "/path/to/my/layout.json"
-
-        [[applications]]
-        command = "mycommand --with 'multiple args'"
-        working_directory = "/path/to/a/different/working/directory"
-        exec = { commands = ["command one", "command two"], exec_type = "text_no_return" }
-        "#;
-
-    let actual: Config = toml::from_str(fragment).unwrap();
     let expected = Config {
         general: General {
             working_directory: Some("/path/to/my/working/directory".to_owned().into()),
@@ -51,13 +45,24 @@ fn full_config() {
                            }],
     };
 
-    assert_eq!(actual, expected);
+    equivalent! {
+        r#"[general]
+           working_directory = "/path/to/my/working/directory"
+           workspace = "0"
+           layout = "/path/to/my/layout.json"
+
+           [[applications]]
+           command = "mycommand --with 'multiple args'"
+           working_directory = "/path/to/a/different/working/directory"
+           exec = { commands = ["command one", "command two"], exec_type = "text_no_return" }
+           "#,
+        expected;
+        Config
+    }
 }
 
 #[test]
 fn exec_commands_only() {
-    let fragment = r#"
-        commands = ["command one", "command two"]"#;
 
     let expected = Exec {
         commands: vec!["command one".to_owned(), "command two".to_owned()],
@@ -65,42 +70,42 @@ fn exec_commands_only() {
         timeout: Duration::from_secs(5),
     };
 
-    let actual: Exec = toml::from_str(fragment).unwrap();
-
-    assert_eq!(actual, expected);
+    equivalent! {
+        r#"commands = ["command one", "command two"]"#,
+        expected;
+        Exec
+    }
 }
 
 #[test]
 fn exec_commands_and_type() {
-    let fragment = r#"
-        commands = ["command one", "command two"]
-        exec_type = "text_no_return""#;
-
     let expected = Exec {
         commands: vec!["command one".to_owned(), "command two".to_owned()],
         exec_type: ExecType::TextNoReturn,
         timeout: Duration::from_secs(5),
     };
 
-    let actual: Exec = toml::from_str(fragment).unwrap();
-
-    assert_eq!(actual, expected);
+    equivalent! {
+        r#"commands = ["command one", "command two"]
+           exec_type = "text_no_return""#,
+        expected;
+        Exec
+    }
 }
 
 #[test]
 fn exec_commands_type_and_timeout() {
-    let fragment = r#"
-        commands = ["command one", "command two"]
-        exec_type = "text_no_return"
-        timeout = 10"#;
-
     let expected = Exec {
         commands: vec!["command one".to_owned(), "command two".to_owned()],
         exec_type: ExecType::TextNoReturn,
         timeout: Duration::from_secs(10),
     };
 
-    let actual: Exec = toml::from_str(fragment).unwrap();
-
-    assert_eq!(actual, expected);
+    equivalent! {
+        r#"commands = ["command one", "command two"]
+           exec_type = "text_no_return"
+           timeout = 10"#,
+        expected;
+        Exec
+    }
 }

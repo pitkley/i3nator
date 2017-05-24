@@ -179,9 +179,3 @@ pub mod errors;
 pub mod projects;
 mod shlex;
 pub mod types;
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {}
-}
