@@ -160,7 +160,7 @@
 //! [xdotool]: https://github.com/jordansissel/xdotool
 
 #![recursion_limit = "1024"] // `error_chain!` can recurse deeply
-#![warn(missing_docs)] // TODO: increase from `warn` to `deny`
+#![deny(missing_docs)]
 
 #[macro_use]
 extern crate error_chain;

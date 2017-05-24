@@ -134,9 +134,6 @@ fn command_list(matches: &ArgMatches<'static>) -> Result<()> {
     let quiet = matches.is_present("quiet");
 
     if projects.is_empty() {
-        // TODO: make error quiet as well?
-        // We already exit with a non-zero exit code, so this might not be required in e.g. the
-        // context of a shell script.
         Err(ErrorKind::NoProjectExist.into())
     } else {
         if !quiet {

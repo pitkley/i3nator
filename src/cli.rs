@@ -73,7 +73,6 @@ pub fn cli() -> App<'static, 'static> {
                                         editor closes")
                                  .long("no-verify")
                                  .required(false)))
-        // TODO: decide if we want to add `implode`?
         .subcommand(SubCommand::with_name("info")
                         .about("Show information for the specified project")
                         .arg(Arg::with_name("PROJECT")
@@ -146,7 +145,4 @@ pub fn cli() -> App<'static, 'static> {
                                              all projects will be checked.")
                                  .multiple(true)
                                  .required(false)))
-    // TODO: determine if we can implement `stop`.
-    // This would probably require keeping track of PIDs and workspaces and such, so my
-    // immediate thought is "no".
 }
