@@ -225,7 +225,7 @@ fn command_verify(matches: &ArgMatches<'static>) -> Result<()> {
     let projects: Vec<OsString> = matches
         .values_of_os("PROJECT")
         .map(|v| v.map(OsStr::to_os_string).collect::<Vec<_>>())
-        .unwrap_or_else(|| projects::list());
+        .unwrap_or_else(projects::list);
 
     for project_name in projects {
         if let Err(e) = Project::open(&project_name)?.verify() {
@@ -324,4 +324,5 @@ fn run() -> Result<()> {
     }
 }
 
+#[cfg(unix)]
 quick_main!(run);

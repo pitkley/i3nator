@@ -65,7 +65,7 @@ fn exec_commands_only() {
         timeout: Duration::from_secs(5),
     };
 
-    let actual: Exec = toml::from_str(&fragment).unwrap();
+    let actual: Exec = toml::from_str(fragment).unwrap();
 
     assert_eq!(actual, expected);
 }
@@ -82,7 +82,7 @@ fn exec_commands_and_type() {
         timeout: Duration::from_secs(5),
     };
 
-    let actual: Exec = toml::from_str(&fragment).unwrap();
+    let actual: Exec = toml::from_str(fragment).unwrap();
 
     assert_eq!(actual, expected);
 }
@@ -100,7 +100,7 @@ fn exec_commands_type_and_timeout() {
         timeout: Duration::from_secs(10),
     };
 
-    let actual: Exec = toml::from_str(&fragment).unwrap();
+    let actual: Exec = toml::from_str(fragment).unwrap();
 
     assert_eq!(actual, expected);
 }
