@@ -30,8 +30,7 @@ fn full_config() {
         applications: vec![Application {
                                command: ApplicationCommand {
                                    program: "mycommand".to_owned(),
-                                   args: vec!["--with".to_owned(),
-                                              "multiple args".to_owned()],
+                                   args: vec!["--with".to_owned(), "multiple args".to_owned()],
                                },
                                working_directory: Some("/path/to/a/different/working/directory"
                                                            .to_owned()
@@ -62,8 +61,127 @@ fn full_config() {
 }
 
 #[test]
-fn exec_commands_only() {
+fn application_command_str() {
+    let expected = Application {
+        command: ApplicationCommand {
+            program: "mycommand".to_owned(),
+            args: vec!["--with".to_owned(), "multiple args".to_owned()],
+        },
+        working_directory: None,
+        exec: None,
+    };
 
+    equivalent! {
+        r#"command = "mycommand --with 'multiple args'""#,
+        expected;
+        Application
+    }
+}
+
+#[test]
+fn application_command_str_no_args() {
+    let expected = Application {
+        command: ApplicationCommand {
+            program: "mycommand".to_owned(),
+            args: vec![],
+        },
+        working_directory: None,
+        exec: None,
+    };
+
+    equivalent! {
+        r#"command = "mycommand""#,
+        expected;
+        Application
+    }
+}
+
+#[test]
+#[should_panic(expected = "command can not be empty")]
+fn application_command_empty_str() {
+    toml::from_str::<Application>(r#"command = """#).unwrap();
+}
+
+#[test]
+fn application_command_seq() {
+    let expected = Application {
+        command: ApplicationCommand {
+            program: "mycommand".to_owned(),
+            args: vec!["--with".to_owned(), "multiple args".to_owned()],
+        },
+        working_directory: None,
+        exec: None,
+    };
+
+    equivalent! {
+        r#"command = ["mycommand", "--with", "multiple args"]"#,
+        expected;
+        Application
+    }
+}
+
+#[test]
+fn application_command_seq_no_args() {
+    let expected = Application {
+        command: ApplicationCommand {
+            program: "mycommand".to_owned(),
+            args: vec![],
+        },
+        working_directory: None,
+        exec: None,
+    };
+
+    equivalent! {
+        r#"command = ["mycommand"]"#,
+        expected;
+        Application
+    }
+}
+
+#[test]
+#[should_panic(expected = "command can not be empty")]
+fn application_command_empty_seq() {
+    toml::from_str::<Application>(r#"command = []"#).unwrap();
+}
+
+#[test]
+fn application_command_map() {
+    let expected = Application {
+        command: ApplicationCommand {
+            program: "mycommand".to_owned(),
+            args: vec!["--with".to_owned(), "multiple args".to_owned()],
+        },
+        working_directory: None,
+        exec: None,
+    };
+
+    equivalent! {
+        r#"command = { program = "mycommand", args = ["--with", "multiple args"] }"#,
+        expected;
+        Application
+    }
+}
+
+#[test]
+fn application_command_map_no_args() {
+    let expected = Application {
+        command: ApplicationCommand {
+            program: "mycommand".to_owned(),
+            args: vec![],
+        },
+        working_directory: None,
+        exec: None,
+    };
+
+    equivalent! {
+        r#"command = { program = "mycommand" }"#,
+        expected;
+        Application
+    }
+}
+
+#[test]
+fn exec_commands_only() {
     let expected = Exec {
         commands: vec!["command one".to_owned(), "command two".to_owned()],
         exec_type: ExecType::Text,
