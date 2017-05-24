@@ -180,7 +180,14 @@ pub struct Exec {
     #[serde(default = "default_exec_type")]
     pub exec_type: ExecType,
 
-    /// Specify a duration
+    /// Specify a timeout after which a command has to be succesfully input into the application.
+    ///
+    /// The input of commands is done with `xdotool --sync`, that is `xdotool` will block until the
+    /// required application starts up. `xdotool` might fail to find a started application, if that
+    /// application does not behave well within the X11 standards.
+    ///
+    /// In this case, `xdotool` would block indefinitely. This timeout will kill the `xdotool`
+    /// process if it does not exit (successfully or unsuccessfully).
     #[serde(default = "default_timeout", deserialize_with = "deserialize_duration")]
     pub timeout: Duration,
 }
