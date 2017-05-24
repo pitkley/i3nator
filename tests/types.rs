@@ -263,3 +263,49 @@ fn exec_commands_type_and_timeout() {
         Exec
     }
 }
+
+#[test]
+fn exec_str() {
+    let expected = Application {
+        command: ApplicationCommand {
+            program: "-".to_owned(),
+            args: vec![],
+        },
+        working_directory: None,
+        exec: Some(Exec {
+                       commands: vec!["command one".to_owned()],
+                       exec_type: ExecType::Text,
+                       timeout: Duration::from_secs(5),
+                   }),
+    };
+
+    equivalent! {
+        r#"command = "-"
+           exec = "command one""#,
+        expected;
+        Application
+    }
+}
+
+#[test]
+fn exec_seq() {
+    let expected = Application {
+        command: ApplicationCommand {
+            program: "-".to_owned(),
+            args: vec![],
+        },
+        working_directory: None,
+        exec: Some(Exec {
+                       commands: vec!["command one".to_owned(), "command two".to_owned()],
+                       exec_type: ExecType::Text,
+                       timeout: Duration::from_secs(5),
+                   }),
+    };
+
+    equivalent! {
+        r#"command = "-"
+           exec = ["command one", "command two"]"#,
+        expected;
+        Application
+    }
+}
