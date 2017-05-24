@@ -382,9 +382,9 @@ fn tilde_with_context<SI: ?Sized, P, HD>(input: &SI, home_dir: HD) -> Cow<Path>
 {
     let input_str = input.as_ref();
     let bytes = input_str.as_os_str().as_bytes();
-    if bytes[0] == '~' as u8 {
+    if bytes[0] == b'~' {
         let input_after_tilde = &bytes[1..];
-        if input_after_tilde.is_empty() || input_after_tilde[0] == '/' as u8 {
+        if input_after_tilde.is_empty() || input_after_tilde[0] == b'/' {
             if let Some(hd) = home_dir() {
                 let mut s = OsString::new();
                 s.push(hd.as_ref().to_path_buf());

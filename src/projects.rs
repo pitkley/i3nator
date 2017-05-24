@@ -493,13 +493,13 @@ fn exec_commands(child: &Child, exec: &Exec) -> Result<()> {
     match exec.exec_type {
         ExecType::Text => {
             for command in commands {
-                exec_text(base_parameters, &command, timeout)?;
+                exec_text(base_parameters, command, timeout)?;
                 exec_keys(base_parameters, &["Return"], timeout)?;
             }
         }
         ExecType::TextNoReturn => {
             for command in commands {
-                exec_text(base_parameters, &command, timeout)?;
+                exec_text(base_parameters, command, timeout)?;
             }
         }
         ExecType::Keys => exec_keys(base_parameters, commands.as_slice(), timeout)?,
