@@ -31,6 +31,7 @@ lazy_static! {
 }
 
 /// A structure representing a `i3nator` project.
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Project {
     /// The name of the project.
     ///
