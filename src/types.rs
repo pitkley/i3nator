@@ -144,7 +144,7 @@ pub struct Application {
 ///
 /// assert_eq!(string, sequence_of_strings);
 /// assert_eq!(string.program, "myprogram");
-/// assert_eq!(string.args, Some(vec!["--with".to_owned(), "multiple args".to_owned()]));
+/// assert_eq!(string.args, vec!["--with".to_owned(), "multiple args".to_owned()]);
 /// # }
 /// ```
 ///
@@ -155,7 +155,8 @@ pub struct ApplicationCommand {
     pub program: String,
 
     /// A list of arguments to pass to the executable.
-    pub args: Option<Vec<String>>,
+    #[serde(default)]
+    pub args: Vec<String>,
 }
 
 /// Commands to execute or keys to simulate after application startup.
@@ -241,7 +242,7 @@ fn deserialize_application_command<'de, D>(deserializer: D) -> Result<Applicatio
                     } else {
                         Ok(ApplicationCommand {
                                program: v.remove(0).to_owned(),
-                               args: Some(v.into_iter().map(str::to_owned).collect::<Vec<_>>()),
+                               args: v.into_iter().map(str::to_owned).collect::<Vec<_>>(),
                            })
                     }
                 }
@@ -259,7 +260,7 @@ fn deserialize_application_command<'de, D>(deserializer: D) -> Result<Applicatio
             } else {
                 Ok(ApplicationCommand {
                        program: v.remove(0),
-                       args: Some(v),
+                       args: v,
                    })
             }
         }

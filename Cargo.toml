@@ -22,10 +22,16 @@ xdg = "^2.1"
 [build-dependencies]
 clap = "^2.24"
 
+[dev-dependencies]
+tempdir = "^0.3"
+
 [[bin]]
 name = "i3nator"
 path = "src/main.rs"
 doc = false
+
+[features]
+sequential-tests = []
 
 [package.metadata.release]
 sign-commit = true

@@ -112,6 +112,7 @@ test dynamic binary on stable:
     dependencies: []
     script:
         - cargo test -- --nocapture
+        - cargo test -j1 --features sequential-tests -- --test-threads 1 --nocapture
     cache:
         key: "dynamic binary on stable"
         paths:
@@ -125,6 +126,7 @@ test dynamic binary on beta:
     dependencies: []
     script:
         - cargo test -- --nocapture
+        - cargo test -j1 --features sequential-tests -- --test-threads 1 --nocapture
     cache:
         key: "dynamic binary on beta"
         paths:
@@ -138,6 +140,7 @@ test dynamic binary on nightly:
     dependencies: []
     script:
         - cargo test -- --nocapture
+        - cargo test -j1 --features sequential-tests -- --test-threads 1 --nocapture
     cache:
         key: "dynamic binary on nightly"
         paths:
@@ -152,6 +155,7 @@ test static binary:
     dependencies: []
     script:
         - cross test --target x86_64-unknown-linux-musl -- --nocapture
+        - cross test --target x86_64-unknown-linux-musl -j1 --features sequential-tests -- --test-threads 1 --nocapture
     cache:
         key: "static binary"
         paths:

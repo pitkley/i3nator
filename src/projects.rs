@@ -31,6 +31,7 @@ lazy_static! {
 }
 
 /// A structure representing a `i3nator` project.
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Project {
     /// The name of the project.
     ///
@@ -366,10 +367,7 @@ impl Project {
         let applications = &config.applications;
         for application in applications {
             let mut cmd = Command::new(&application.command.program);
-            // Set args if available
-            if let Some(ref args) = application.command.args {
-                cmd.args(args);
-            }
+            cmd.args(&application.command.args);
 
             // Get working directory. Precedence is as follows:
             // 1. `--working-directory` command-line parameter
