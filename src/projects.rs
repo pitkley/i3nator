@@ -67,12 +67,7 @@ impl Project {
     ///
     /// [fn-Project-create_from_template]: #method.create_from_template
     pub fn create<S: AsRef<OsStr> + ?Sized>(name: &S) -> Result<Self> {
-        let mut path = OsString::new();
-        path.push(PROJECTS_PREFIX.as_os_str());
-        path.push("/");
-        path.push(name);
-        path.push(".toml");
-
+        let path = project_path(name);
         let name = name.as_ref().to_string_lossy().into_owned();
 
         if XDG_DIRS.find_config_file(&path).is_some() {
@@ -178,12 +173,7 @@ impl Project {
     ///
     /// [fn-Project-from_path]: #method.from_path
     pub fn open<S: AsRef<OsStr> + ?Sized>(name: &S) -> Result<Self> {
-        let mut path = OsString::new();
-        path.push(PROJECTS_PREFIX.as_os_str());
-        path.push("/");
-        path.push(name);
-        path.push(".toml");
-
+        let path = project_path(name);
         let name = name.as_ref().to_string_lossy().into_owned();
 
         XDG_DIRS
@@ -427,6 +417,16 @@ pub fn list() -> Vec<OsString> {
         .map(Option::unwrap)
         .map(OsStr::to_os_string)
         .collect::<Vec<_>>()
+}
+
+fn project_path<S: AsRef<OsStr> + ?Sized>(name: &S) -> PathBuf {
+    let mut path = OsString::new();
+    path.push(PROJECTS_PREFIX.as_os_str());
+    path.push("/");
+    path.push(name);
+    path.push(".toml");
+
+    path.into()
 }
 
 fn exec_text(base_parameters: &[&str], text: &str, timeout: Duration) -> Result<()> {
