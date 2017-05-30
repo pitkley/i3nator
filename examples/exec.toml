@@ -1,0 +1,35 @@
+# i3nator project example using exec.
+#
+# This example will open two terminals, lay them out side-by-side as per the
+# specified layout and execute the specified commands in them.
+
+# General configuration items
+[general]
+# Working directory to use
+working_directory = "/home/user/development/myproject"
+
+# Name of the workspace the layout should be applied to
+workspace = "1"
+
+# Layout to use, inserted directly. This could also be saved to a file and
+# referenced by its filepath here.
+layout = """
+{
+    ...
+}"""
+
+# Applications to start
+[[applications]]
+# Command to run to start the application
+command = "termite --role split-left"
+# Commands provided as a simple list. This means they will be executed in
+# order, each followed by a "Return".
+exec = ["echo Hello", "echo World"]
+
+[[applications]]
+command = "termite --role split-right"
+# Here the command is specified as a map, explicitly setting the exec-type to
+# `keys` to tell i3nator to interpret the given list as single keypresses.
+exec = { commands = ["ctrl+r", "e", "c", "h", "o", "Return"], exec_type = "keys" }
+#        ^- this will simulate a press of CTRL+R, followed by typing 'echo' and
+#           pressing "Return" to accept whatever the reverse-search found.

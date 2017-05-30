@@ -8,8 +8,9 @@ applications too.
 
 * [Documentation][i3nator-docs]
 * [GitHub source repository][i3nator-gh]
+* [Example configurations][i3nator-examples]
 
-## Installation:
+## Installation
 
 You have multiple options to install i3nator:
 
@@ -35,9 +36,9 @@ You have multiple options to install i3nator:
 **Note:** If you want to be able to use the automatic command execution feature, you will need
 to install [`xdotool`][xdotool].
 
-## Usage:
+## Usage
 
-Following the usage of i3nator as of 0.1.0.
+Following the usage of i3nator as of 1.0.0.
 
 ```text
 USAGE:
@@ -82,7 +83,9 @@ SUBCOMMANDS:
               Verify the configuration of the existing projects
 ```
 
-## Example
+## Examples
+
+(See [here][i3nator-examples] for additional examples.)
 
 ### Full workflow
 
@@ -131,6 +134,19 @@ SUBCOMMANDS:
         If you want to execute additional commands or keypresses in the started applications,
         you can also define `exec`.
 
+    The resulting configuration could look something like this:
+
+    ```toml
+    [general]
+    working_directory = "/path/to/my/working/directory"
+    workspace = "1"
+    layout = "/path/to/my/layout.json"
+
+    [[applications]]
+    command = "mycommand --with 'multiple args'"
+    exec = ["command one", "command two"]
+    ```
+
 6. Save and close your editor. This will automatically verify the created configuration. If
    there is an issue it will tell you what failed and allow you to reedit the file directly or
    ignore the error and exit.
@@ -144,6 +160,7 @@ $ i3nator start myproject
 
 [gh-tmuxinator]: https://github.com/tmuxinator/tmuxinator
 [i3nator-docs]: https://docs.rs/i3nator
+[i3nator-examples]: https://github.com/pitkley/i3nator/tree/master/examples
 [i3nator-gh]: https://github.com/pitkley/i3nator
 [i3nator-releases]: https://github.com/pitkley/i3nator/releases
 [i3wm]: https://i3wm.org/
