@@ -16,9 +16,9 @@ You have multiple options to install i3nator:
 1. If you have a recent Rust with Cargo installed, you can install `i3nator` directly from
    crates.io:
 
-   ```console
-   $ cargo install i3nator
-   ```
+    ```console
+    $ cargo install i3nator
+    ```
 
 2. Alternatively, you can download the supplied static binary from the [release
    page][i3nator-releases], this should work without any additional dependencies.
@@ -26,11 +26,11 @@ You have multiple options to install i3nator:
 3. Another option is to install from directly from source (this again requires a recent Rust
    installation):
 
-   ```console
-   $ git clone https://github.com/pitkley/i3nator.git
-   $ cd i3nator
-   $ cargo install
-   ```
+    ```console
+    $ git clone https://github.com/pitkley/i3nator.git
+    $ cd i3nator
+    $ cargo install
+    ```
 
 **Note:** If you want to be able to use the automatic command execution feature, you will need
 to install [`xdotool`][xdotool].
@@ -90,30 +90,30 @@ SUBCOMMANDS:
 
 2. Save the workspace's layout using [`i3-save-tree`][i3wm-save-tree]:
 
-   ```console
-   $ i3-save-tree --workspace 1 > mylayout.json
-   ```
+    ```console
+    $ i3-save-tree --workspace 1 > mylayout.json
+    ```
 
-   You can also skip the file-redirection and copy the layout into your clipboard.
+    You can also skip the file-redirection and copy the layout into your clipboard.
 
 3. Modify the saved layout to accurately match created applications. See [Editing layout
    files][i3wm-modify-layout] on how to do this.
 
-   If you copied the layout to your clipboard, you will be able to do this in step 5.
+    If you copied the layout to your clipboard, you will be able to do this in step 5.
 
 4. Create a new project:
 
-   ```console
-   $ i3nator new myproject
-   Created project 'myproject'
-   Opening your editor to edit project myproject
-   ```
+    ```console
+    $ i3nator new myproject
+    Created project 'myproject'
+    Opening your editor to edit project myproject
+    ```
 
-   This will open your default editor with a configuration template. If it doesn't, you have to
-   specify either the `$VISUAL` or the `$EDITOR` environment variable.
+    This will open your default editor with a configuration template. If it doesn't, you have to
+    specify either the `$VISUAL` or the `$EDITOR` environment variable.
 
-   You can also simply edit the configuration file directly. Use `i3nator info <PROJECT>` to
-   retreive its path.
+    You can also simply edit the configuration file directly. Use `i3nator info <PROJECT>` to
+    retreive its path.
 
 5. Modify the template to fit your needs. This includes:
 
@@ -128,8 +128,8 @@ SUBCOMMANDS:
       the `command` to the full command to be used to start the application and optionally
       configuring a different working directory if desired.
 
-      If you want to execute additional commands or keypresses in the started applications, you
-      can also define `exec`.
+        If you want to execute additional commands or keypresses in the started applications,
+        you can also define `exec`.
 
 6. Save and close your editor. This will automatically verify the created configuration. If
    there is an issue it will tell you what failed and allow you to reedit the file directly or
