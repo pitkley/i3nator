@@ -158,6 +158,23 @@ your layout to a specified workspace and starts the configured applications:
 $ i3nator start myproject
 ```
 
+## License
+
+i3nator is licensed under either of
+
+* Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or
+  http://www.apache.org/licenses/LICENSE-2.0)
+* MIT license ([LICENSE-MIT](LICENSE-MIT) or
+  http://opensource.org/licenses/MIT)
+
+at your option.
+
+#### Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in i3nator by you, as defined in the Apache-2.0 license, shall be
+dual licensed as above, without any additional terms or conditions.
+
 [gh-tmuxinator]: https://github.com/tmuxinator/tmuxinator
 [i3nator-docs]: https://docs.rs/i3nator
 [i3nator-examples]: https://github.com/pitkley/i3nator/tree/master/examples
