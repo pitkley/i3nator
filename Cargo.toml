@@ -1,6 +1,6 @@
 [package]
 name = "i3nator"
-version = "1.0.0"
+version = "1.0.1-pre"
 authors = ["Pit Kleyersburg <pitkley@googlemail.com>"]
 license = "MIT/Apache-2.0"
 description = "i3nator is Tmuxinator for the i3 window manager"
