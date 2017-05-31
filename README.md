@@ -85,7 +85,9 @@ SUBCOMMANDS:
 
 ## Examples
 
-(See [here][i3nator-examples] for additional examples.)
+(See [here][i3nator-examples] for additional examples. See also the [`types::Config` API
+documentation][i3nator-docs-types-Config] for detailed documentation on the configuration
+parameters.)
 
 ### Full workflow
 
@@ -177,6 +179,7 @@ dual licensed as above, without any additional terms or conditions.
 
 [gh-tmuxinator]: https://github.com/tmuxinator/tmuxinator
 [i3nator-docs]: https://docs.rs/i3nator
+[i3nator-docs-types-Config]: https://docs.rs/i3nator/*/i3nator/types/struct.Config.html
 [i3nator-examples]: https://github.com/pitkley/i3nator/tree/master/examples
 [i3nator-gh]: https://github.com/pitkley/i3nator
 [i3nator-releases]: https://github.com/pitkley/i3nator/releases
