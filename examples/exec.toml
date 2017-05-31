@@ -15,7 +15,33 @@ workspace = "1"
 # referenced by its filepath here.
 layout = """
 {
-    ...
+    "border": "pixel",
+    "current_border_width": 2,
+    "floating": "auto_off",
+    "name": "split-left",
+    "percent": 0.5,
+    "swallows": [
+       {
+         "class": "^Termite$",
+         "window_role": "^split-left$"
+       }
+    ],
+    "type": "con"
+}
+
+{
+    "border": "pixel",
+    "current_border_width": 2,
+    "floating": "auto_off",
+    "name": "split-right",
+    "percent": 0.5,
+    "swallows": [
+       {
+         "class": "^Termite$",
+         "window_role": "^split-right$"
+       }
+    ],
+    "type": "con"
 }"""
 
 # Applications to start
