@@ -4,7 +4,14 @@ version = "1.0.0-pre"
 authors = ["Pit Kleyersburg <pitkley@googlemail.com>"]
 license = "MIT/Apache-2.0"
 description = "i3nator is Tmuxinator for the i3 window manager"
+homepage = "https://github.com/pitkley/i3nator"
+repository = "https://github.com/pitkley/i3nator.git"
+
+categories = ["command-line-interface", "command-line-utilities", "gui"]
+keywords = ["cli", "i3", "unix", "xdg"]
+
 build = "build.rs"
+
 include = [
     "**/*.rs",
     "resources/**/*",
