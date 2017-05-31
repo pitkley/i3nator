@@ -1,0 +1,53 @@
+# Simple i3nator project example.
+#
+# This example will open two terminals, and lay them out side-by-side as per
+# the specified layout.
+
+# General configuration items
+[general]
+# Working directory to use
+working_directory = "/home/user/development/myproject"
+
+# Name of the workspace the layout should be applied to
+workspace = "1"
+
+# Layout to use, inserted directly. This could also be saved to a file and
+# referenced by its filepath here.
+layout = """
+{
+    "border": "pixel",
+    "current_border_width": 2,
+    "floating": "auto_off",
+    "name": "split-left",
+    "percent": 0.5,
+    "swallows": [
+       {
+         "class": "^Termite$",
+         "window_role": "^split-left$"
+       }
+    ],
+    "type": "con"
+}
+
+{
+    "border": "pixel",
+    "current_border_width": 2,
+    "floating": "auto_off",
+    "name": "split-right",
+    "percent": 0.5,
+    "swallows": [
+       {
+         "class": "^Termite$",
+         "window_role": "^split-right$"
+       }
+    ],
+    "type": "con"
+}"""
+
+# Applications to start
+[[applications]]
+# Command to run to start the application
+command = "termite --role split-left"
+
+[[applications]]
+command = "termite --role split-right"
