@@ -19,7 +19,10 @@ cache:
         - sed -i "0,/FROM /{s/:.*/:${JOB_NAME[3]}/}" Dockerfile.build
         - docker pull "$(grep '^FROM' Dockerfile.build | awk '{ print $2; }' | head -n1)"
         - docker build -t "${CI_REGISTRY_IMAGE}/build:${JOB_NAME[3]}" -f Dockerfile.build .
-        - docker push "${CI_REGISTRY_IMAGE}/build:${JOB_NAME[3]}"
+        - |
+            for i in 1 2 3 4 5; do
+                docker push "${CI_REGISTRY_IMAGE}/build:${JOB_NAME[3]}" && break || sleep 1
+            done
 
 prepare rust image stable: *prepare-rust-image
 prepare rust image beta: *prepare-rust-image
