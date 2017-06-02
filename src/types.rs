@@ -382,7 +382,7 @@ fn deserialize_layout<'de, D>(deserializer: D) -> Result<Layout, D::Error>
             if value.find('{').is_some() {
                 Ok(Layout::Contents(value.into()))
             } else {
-                Ok(Layout::Path(value.into()))
+                Ok(Layout::Path(tilde(value).into_owned()))
             }
         }
     }
