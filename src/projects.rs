@@ -396,7 +396,31 @@ impl Project {
     /// - `Ok`: nothing (`()`) if the verification succeeded.
     /// - `Err`: an error if the configuration could not be parsed with details on what failed.
     pub fn verify(&self) -> Result<()> {
-        self.load().map(|_| ())
+        // Verify configuration can be loaded
+        let config = self.load()?;
+
+        // Collect all loaded paths
+        let mut paths: Vec<&Path> = vec![];
+        if let Some(ref p) = config.general.working_directory {
+            paths.push(p);
+        }
+        if let Layout::Path(ref p) = config.general.layout {
+            paths.push(p);
+        }
+        for application in &config.applications {
+            if let Some(ref p) = application.working_directory {
+                paths.push(p);
+            }
+        }
+
+        // Verify that all paths exist
+        for path in paths {
+            if !path.exists() {
+                return Err(ErrorKind::PathDoesntExist(path.to_string_lossy().into_owned()).into());
+            }
+        }
+
+        Ok(())
     }
 }
 
