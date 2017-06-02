@@ -268,11 +268,10 @@ impl Project {
     /// - `Err`: an error, e.g. if a project with `new_name` already exists or renaming the file
     /// failed.
     pub fn rename<S: AsRef<OsStr> + ?Sized>(&self, new_name: &S) -> Result<Self> {
-        // To avoid having to duplicate the path-handling in `create` et al, just copying and
-        // deleting is the easiest way to rename. Refactoring this to use renaming is tracked in
-        // #48.
-        let new_project = self.copy(new_name)?;
-        self.delete()?;
+        // Create new project
+        let new_project = Project::create(new_name)?;
+        // Rename old project
+        fs::rename(&self.path, &new_project.path)?;
 
         Ok(new_project)
     }
