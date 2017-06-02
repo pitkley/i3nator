@@ -25,7 +25,7 @@ fn full_config() {
         general: General {
             working_directory: Some("/path/to/my/working/directory".to_owned().into()),
             workspace: Some("0".to_owned()),
-            layout: "/path/to/my/layout.json".into(),
+            layout: Layout::Path("/path/to/my/layout.json".into()),
         },
         applications: vec![Application {
                                command: ApplicationCommand {
