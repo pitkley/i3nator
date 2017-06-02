@@ -154,7 +154,7 @@ fn open_unknown_project() {
 fn config() {
     with_projects_dir(|projects_dir| {
         let template = r#"[general]
-                          layout = "/some/layout/path"
+                          layout = "{ ... }"
 
                           [[applications]]
                           command = "mycommand""#;
@@ -170,7 +170,7 @@ fn config() {
             general: General {
                 working_directory: None,
                 workspace: None,
-                layout: Layout::Path("/some/layout/path".into()),
+                layout: Layout::Contents("{ ... }".to_owned()),
             },
             applications: vec![Application {
                                    command: ApplicationCommand {
