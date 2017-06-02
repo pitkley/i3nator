@@ -327,14 +327,14 @@ impl Project {
 
         // Determine if the layout is a path or the actual contents.
         let mut tempfile;
-        let path: &Path = if general.layout.find('{').is_some() {
-            // We assume that if the layout contains a `{`, that it is not a path.
-            tempfile = NamedTempFile::new()?;
-            tempfile.write_all(general.layout.as_bytes())?;
-            tempfile.flush()?;
-            tempfile.path()
-        } else {
-            Path::new(&general.layout)
+        let path: &Path = match general.layout {
+            Layout::Contents(ref contents) => {
+                tempfile = NamedTempFile::new()?;
+                tempfile.write_all(contents.as_bytes())?;
+                tempfile.flush()?;
+                tempfile.path()
+            }
+            Layout::Path(ref path) => path,
         };
 
         // Change workspace if provided

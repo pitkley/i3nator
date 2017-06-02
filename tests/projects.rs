@@ -170,7 +170,7 @@ fn config() {
             general: General {
                 working_directory: None,
                 workspace: None,
-                layout: "/some/layout/path".to_owned(),
+                layout: Layout::Path("/some/layout/path".into()),
             },
             applications: vec![Application {
                                    command: ApplicationCommand {
