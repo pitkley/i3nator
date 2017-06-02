@@ -88,7 +88,19 @@ pub struct General {
     /// Either one will be passed to [`append_layout`][append-layout].
     ///
     /// [append-layout]: https://i3wm.org/docs/layout-saving.html#_append_layout_command
-    pub layout: String,
+    #[serde(deserialize_with = "deserialize_layout")]
+    pub layout: Layout,
+}
+
+/// This holds the layout, in multiple formats.
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum Layout {
+    /// The layout is provided directly as a string.
+    Contents(String),
+
+    /// The layout is provided as a path.
+    Path(PathBuf),
 }
 
 /// The applications configuration.
@@ -352,6 +364,30 @@ fn deserialize_opt_exec<'de, D>(deserializer: D) -> Result<Option<Exec>, D::Erro
     where D: Deserializer<'de>
 {
     deserialize_exec(deserializer).map(Some)
+}
+
+fn deserialize_layout<'de, D>(deserializer: D) -> Result<Layout, D::Error>
+    where D: Deserializer<'de>
+{
+    impl<'de> de::Visitor<'de> for Phantom<Layout> {
+        type Value = Layout;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+            formatter.write_str("string")
+        }
+
+        fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+            where E: de::Error
+        {
+            if value.find('{').is_some() {
+                Ok(Layout::Contents(value.into()))
+            } else {
+                Ok(Layout::Path(value.into()))
+            }
+        }
+    }
+
+    deserializer.deserialize_any(Phantom::<Layout>(PhantomData))
 }
 
 fn deserialize_pathbuf_with_tilde<'de, D>(deserializer: D) -> Result<PathBuf, D::Error>
