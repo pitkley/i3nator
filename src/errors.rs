@@ -38,6 +38,12 @@ error_chain! {
             display("command splitting failed: '{}'", t)
         }
 
+        /// An error that occurs if a project under the same name already exists.
+        ConfigExists(p: String, t: String) {
+            description("config already exists")
+            display("config of type '{}' already exists: '{}'", p, t)
+        }
+
         /// An error that occurs when the default editor is not specified.
         ///
         /// One of the environment variables `$VISUAL` or `$EDITOR` has to be set.
@@ -58,18 +64,6 @@ error_chain! {
             display("path doesn't exist: '{}'", t)
         }
 
-        /// An error that occurs if no project exists.
-        NoProjectExist {
-            description("no projects exist")
-            display("no projects exist. Feel free to create one")
-        }
-
-        /// An error that occurs if a project under the same name already exists.
-        ProjectExists(t: String) {
-            description("project already exists")
-            display("project already exists: '{}'", t)
-        }
-
         /// An error that occurs if text or key-presses could not be input into an application.
         TextOrKeyInputFailed {
             description("text or key input failed")
@@ -77,9 +71,9 @@ error_chain! {
         }
 
         /// An error that occurs if a project does not exist under a specified name.
-        UnknownProject(t: String) {
-            description("project is unknown")
-            display("project is unknown: '{}'", t)
+        UnknownConfig(p: String, t: String) {
+            description("config is unknown")
+            display("config of type '{}' is unknown: '{}'", p, t)
         }
     }
 }

@@ -8,10 +8,10 @@
 
 //! Module for project handling.
 
+use configfile::ConfigFile;
 use errors::*;
 use i3ipc::I3Connection;
 use std::ffi::{OsStr, OsString};
-use std::fs;
 use std::fs::File;
 use std::io::BufReader;
 use std::io::prelude::*;
@@ -33,6 +33,8 @@ lazy_static! {
 /// A structure representing a `i3nator` project.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Project {
+    configfile: ConfigFile,
+
     /// The name of the project.
     ///
     /// As represented by the stem of the filename on disk.
@@ -67,23 +69,8 @@ impl Project {
     ///
     /// [fn-Project-create_from_template]: #method.create_from_template
     pub fn create<S: AsRef<OsStr> + ?Sized>(name: &S) -> Result<Self> {
-        let path = project_path(name);
-        let name = name.as_ref().to_string_lossy().into_owned();
-
-        if XDG_DIRS.find_config_file(&path).is_some() {
-            Err(ErrorKind::ProjectExists(name).into())
-        } else {
-            XDG_DIRS
-                .place_config_file(path)
-                .map(|path| {
-                         Project {
-                             name: name,
-                             path: path,
-                             config: None,
-                         }
-                     })
-                .map_err(|e| e.into())
-        }
+        let configfile = ConfigFile::create(PROJECTS_PREFIX.as_os_str(), name.as_ref())?;
+        Ok(Project::from_configfile(configfile))
     }
 
     /// Create a project given a `name`, pre-filling the configuration file with a given `template`.
@@ -107,15 +94,21 @@ impl Project {
     pub fn create_from_template<S: AsRef<OsStr> + ?Sized>(name: &S,
                                                           template: &[u8])
                                                           -> Result<Self> {
-        let project = Project::create(name)?;
+        let configfile =
+            ConfigFile::create_from_template(PROJECTS_PREFIX.as_os_str(), name.as_ref(), template)?;
+        Ok(Project::from_configfile(configfile))
+    }
 
-        // Copy template into config file
-        let mut file = File::create(&project.path)?;
-        file.write_all(template)?;
-        file.flush()?;
-        drop(file);
+    fn from_configfile(configfile: ConfigFile) -> Self {
+        let name = configfile.name.to_owned();
+        let path = configfile.path.clone();
 
-        Ok(project)
+        Project {
+            configfile: configfile,
+            name: name,
+            path: path,
+            config: None,
+        }
     }
 
     /// Opens an existing project for a given path.
@@ -139,17 +132,8 @@ impl Project {
     ///
     /// [fn-Project-open]: #method.open
     pub fn from_path<P: AsRef<Path> + ?Sized>(path: &P) -> Result<Self> {
-        let path = path.as_ref();
-
-        if !path.exists() || !path.is_file() {
-            Err(ErrorKind::PathDoesntExist(path.to_string_lossy().into_owned()).into())
-        } else {
-            Ok(Project {
-                   name: "local".to_owned(),
-                   path: path.to_path_buf(),
-                   config: None,
-               })
-        }
+        let configfile = ConfigFile::from_path(PROJECTS_PREFIX.as_os_str(), path)?;
+        Ok(Project::from_configfile(configfile))
     }
 
     /// Opens an existing project using a `name`.
@@ -173,19 +157,8 @@ impl Project {
     ///
     /// [fn-Project-from_path]: #method.from_path
     pub fn open<S: AsRef<OsStr> + ?Sized>(name: &S) -> Result<Self> {
-        let path = project_path(name);
-        let name = name.as_ref().to_string_lossy().into_owned();
-
-        XDG_DIRS
-            .find_config_file(&path)
-            .map(|path| {
-                     Project {
-                         name: name.to_owned(),
-                         path: path,
-                         config: None,
-                     }
-                 })
-            .ok_or_else(|| ErrorKind::UnknownProject(name).into())
+        let configfile = ConfigFile::open(PROJECTS_PREFIX.as_os_str(), name.as_ref())?;
+        Ok(Project::from_configfile(configfile))
     }
 
     fn load(&self) -> Result<Config> {
@@ -236,9 +209,8 @@ impl Project {
     /// - `Err`: an error, e.g. if a project with `new_name` already exists or copying the file
     /// failed.
     pub fn copy<S: AsRef<OsStr> + ?Sized>(&self, new_name: &S) -> Result<Self> {
-        let new_project = Project::create(new_name)?;
-        fs::copy(&self.path, &new_project.path)?;
-        Ok(new_project)
+        let configfile = self.configfile.copy(new_name)?;
+        Ok(Project::from_configfile(configfile))
     }
 
     /// Delete this project's configuration from disk.
@@ -250,7 +222,7 @@ impl Project {
     /// - `Ok`: nothing (`()`).
     /// - `Err`: an error if deleting the file failed.
     pub fn delete(&self) -> Result<()> {
-        fs::remove_file(&self.path)?;
+        self.configfile.delete()?;
         Ok(())
     }
 
@@ -268,12 +240,8 @@ impl Project {
     /// - `Err`: an error, e.g. if a project with `new_name` already exists or renaming the file
     /// failed.
     pub fn rename<S: AsRef<OsStr> + ?Sized>(&self, new_name: &S) -> Result<Self> {
-        // Create new project
-        let new_project = Project::create(new_name)?;
-        // Rename old project
-        fs::rename(&self.path, &new_project.path)?;
-
-        Ok(new_project)
+        let configfile = self.configfile.rename(new_name)?;
+        Ok(Project::from_configfile(configfile))
     }
 
     /// Start the project.
@@ -440,16 +408,6 @@ pub fn list() -> Vec<OsString> {
         .map(Option::unwrap)
         .map(OsStr::to_os_string)
         .collect::<Vec<_>>()
-}
-
-fn project_path<S: AsRef<OsStr> + ?Sized>(name: &S) -> PathBuf {
-    let mut path = OsString::new();
-    path.push(PROJECTS_PREFIX.as_os_str());
-    path.push("/");
-    path.push(name);
-    path.push(".toml");
-
-    path.into()
 }
 
 fn exec_text(base_parameters: &[&str], text: &str, timeout: Duration) -> Result<()> {
