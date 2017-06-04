@@ -60,6 +60,8 @@ use std::ascii::AsciiExt;
 use std::convert::Into;
 use std::env;
 use std::ffi::{OsStr, OsString};
+use std::fs::File;
+use std::io::{BufReader, Read, stdin};
 use std::process::{Command, ExitStatus};
 
 static PROJECT_TEMPLATE: &'static [u8] = include_bytes!("../resources/project_template.toml");
@@ -346,9 +348,29 @@ fn layout_list(matches: &ArgMatches<'static>) -> Result<()> {
 fn layout_new(matches: &ArgMatches<'static>) -> Result<()> {
     // `LAYOUT` should not be empty, clap ensures this.
     let layout_name = matches.value_of_os("LAYOUT").unwrap();
-    let layout = Layout::create(layout_name)?;
-    // TODO: add `stdin` option, read, use `create_from_template`.
-    //let layout = Layout::create_from_template(layout_name, LAYOUT_TEMPLATE)?;
+
+    let layout = if !matches.is_present("template") {
+        Layout::create(layout_name)?
+    } else {
+        let template = matches.value_of_os("template").unwrap();
+
+        // Open appropriate reader
+        let stdin_;
+        let reader: Box<Read> = if template == "-" {
+            stdin_ = stdin();
+            Box::new(stdin_.lock())
+        } else {
+            Box::new(File::open(template)?)
+        };
+        let mut reader = BufReader::new(reader);
+
+        // Load bytes from reader
+        let mut bytes: Vec<u8> = Vec::new();
+        reader.read_to_end(&mut bytes)?;
+
+        // Create layout from template
+        Layout::create_from_template(layout_name, &bytes)?
+    };
     println!("Created layout '{}'", layout.name);
 
     // Open config file for editing
