@@ -48,8 +48,8 @@ use clap::ArgMatches;
 use errors::*;
 use getch::Getch;
 use i3ipc::I3Connection;
-use i3nator::projects;
-use i3nator::projects::Project;
+use i3nator::configfile::ConfigFile;
+use i3nator::projects::{self, Project};
 use std::ascii::AsciiExt;
 use std::convert::Into;
 use std::env;
@@ -250,10 +250,10 @@ fn get_editor() -> Result<OsString> {
         .ok_or_else(|| ErrorKind::EditorNotFound.into())
 }
 
-fn open_editor(project: &Project) -> Result<ExitStatus> {
-    println!("Opening your editor to edit project {}", project.name);
+fn open_editor(configfile: &ConfigFile) -> Result<ExitStatus> {
+    println!("Opening your editor to {}", configfile.name);
     Command::new(get_editor()?)
-        .arg(&project.path)
+        .arg(configfile.path.as_os_str())
         .status()
         .map_err(|e| e.into())
 }

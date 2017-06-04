@@ -15,6 +15,7 @@ use std::ffi::{OsStr, OsString};
 use std::fs::File;
 use std::io::BufReader;
 use std::io::prelude::*;
+use std::ops::Deref;
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::time::Duration;
@@ -41,6 +42,14 @@ pub struct Project {
     pub path: PathBuf,
 
     config: Option<Config>,
+}
+
+impl Deref for Project {
+    type Target = ConfigFile;
+
+    fn deref(&self) -> &ConfigFile {
+        &self.configfile
+    }
 }
 
 impl Project {

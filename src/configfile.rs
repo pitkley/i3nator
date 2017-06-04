@@ -6,6 +6,8 @@
 // option. This file may not be copied, modified or distributed
 // except according to those terms.
 
+//! Module consolidating common functionality between projects and layouts.
+
 use errors::*;
 use std::ffi::{OsStr, OsString};
 use std::fs;
@@ -19,14 +21,43 @@ lazy_static! {
         xdg::BaseDirectories::with_prefix("i3nator").expect("couldn't get XDG base directory");
 }
 
+/// Helping type to consolidate common functionality between projects and layouts.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ConfigFile {
     prefix: OsString,
+
+    /// The name of the configfile.
+    ///
+    /// As represented by the stem of the filename on disk.
     pub name: String,
+
+    /// The path to the configfile.
     pub path: PathBuf,
 }
 
 impl ConfigFile {
+    /// Create a configfile given a `name` and a `prefix`.
+    ///
+    /// This will not create the configuration file, but it will ensure a legal XDG path with all
+    /// directories leading up to the file existing.
+    ///
+    /// If you want to pre-fill the configuration file with a template, see
+    /// [`ConfigFile::create_from_template`][fn-ConfigFile-create_from_template].
+    ///
+    /// # Parameters
+    ///
+    /// - `prefix`: A `OsStr` defining a prefix which is used as a sub-directory for the configfile.
+    /// - `name`: A `OsStr` naming the configuration file on disk.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` which is:
+    ///
+    /// - `Ok`: an instance of `ConfigFile` for the given `name`.
+    /// - `Err`: an error, e.g. if the configfile already exists or couldn't be created.
+    ///
+    ///
+    /// [fn-ConfigFile-create_from_template]: #method.create_from_template
     pub fn create<S: AsRef<OsStr> + ?Sized>(prefix: &S, name: &S) -> Result<Self> {
         let path = config_path(prefix, name);
 
@@ -48,6 +79,25 @@ impl ConfigFile {
         }
     }
 
+    /// Create a configfile given a `name`, pre-filling it with a given `template`.
+    ///
+    /// See [`ConfigFile::create`][fn-ConfigFile-create] for additional information.
+    ///
+    /// # Parameters
+    ///
+    /// - `prefix`: A `OsStr` defining a prefix which is used as a sub-directory for the configfile.
+    /// - `name`: A `OsStr` naming the the configuration file on disk.
+    /// - `template`: A byte-slice which will be written to the configuration file on disk.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` which is:
+    ///
+    /// - `Ok`: an instance of `ConfigFile` for the given `name` with the contents of `template`.
+    /// - `Err`: an error, e.g. if the configfile already exists or couldn't be created.
+    ///
+    ///
+    /// [fn-ConfigFile-create]: #method.create
     pub fn create_from_template<S: AsRef<OsStr> + ?Sized>(prefix: &S,
                                                           name: &S,
                                                           template: &[u8])
@@ -63,6 +113,27 @@ impl ConfigFile {
         Ok(configfile)
     }
 
+    /// Opens an existing configfile for a given path.
+    ///
+    /// This will not impose any XDG conventions, but rather allows to open a configuration from
+    /// any path.
+    ///
+    /// See [`ConfigFile::open`][fn-ConfigFile-open] if you want to open a configfile by name and
+    /// prefix.
+    ///
+    /// # Parameters
+    ///
+    /// - `path`: A `Path` specifiying the configuration file on disk.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` which is:
+    ///
+    /// - `Ok`: an instance of `ConfigFile` for the given `path`.
+    /// - `Err`: an error, e.g. if the file does not exist.
+    ///
+    ///
+    /// [fn-ConfigFile-open]: #method.open
     pub fn from_path<S: AsRef<OsStr> + ?Sized, P: AsRef<Path> + ?Sized>(prefix: &S,
                                                                         path: &P)
                                                                         -> Result<Self> {
@@ -79,6 +150,27 @@ impl ConfigFile {
         }
     }
 
+    /// Opens an existing configfile using a `name`.
+    ///
+    /// This will search for a matching configfile in the XDG directories.
+    ///
+    /// See [`ConfigFile::from_path`][fn-ConfigFile-from_path] if you want to open a configfile
+    /// using any path.
+    ///
+    /// # Parameters
+    ///
+    /// - `prefix`: A `OsStr` defining a prefix which is used as a sub-directory for the configfile.
+    /// - `name`: A `OsStr` naming the configuration file on disk.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` which is:
+    ///
+    /// - `Ok`: an instance of `ConfigFile` for the given `name`.
+    /// - `Err`: an error, e.g. if the file does not exist.
+    ///
+    ///
+    /// [fn-ConfigFile-from_path]: #method.from_path
     pub fn open<S: AsRef<OsStr> + ?Sized>(prefix: &S, name: &S) -> Result<Self> {
         let path = config_path(prefix, name);
         let name = name.as_ref().to_string_lossy().into_owned();
@@ -99,17 +191,54 @@ impl ConfigFile {
                         })
     }
 
+    /// Create a copy of the current configfile, that is a copy of the configuration file on disk,
+    /// with a name of `new_name`.
+    ///
+    /// This will keep the same prefix.
+    ///
+    /// # Parameters
+    ///
+    /// - `new_name`: A `OsStr` that is the name of the destination configfile.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` which is:
+    ///
+    /// - `Ok`: an instance of `ConfigFile` for the new configfile.
+    /// - `Err`: an error, e.g. if a configfile with `new_name` already exists or copying the file
+    /// failed.
     pub fn copy<S: AsRef<OsStr> + ?Sized>(&self, new_name: &S) -> Result<Self> {
         let new_configfile = ConfigFile::create(self.prefix.as_os_str(), new_name.as_ref())?;
         fs::copy(&self.path, &new_configfile.path)?;
         Ok(new_configfile)
     }
 
+    /// Delete this configfile from disk.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` which is:
+    ///
+    /// - `Ok`: nothing (`()`).
+    /// - `Err`: an error if deleting the file failed.
     pub fn delete(&self) -> Result<()> {
         fs::remove_file(&self.path)?;
         Ok(())
     }
 
+    /// Rename the current configfile.
+    ///
+    /// # Parameters
+    ///
+    /// - `new_name`: A `OsStr` that is the name of the destination configfile.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` which is:
+    ///
+    /// - `Ok`: an instance of `ConfigFile` for the renamed configfile.
+    /// - `Err`: an error, e.g. if a configfile with `new_name` already exists or renaming the file
+    /// failed.
     pub fn rename<S: AsRef<OsStr> + ?Sized>(&self, new_name: &S) -> Result<Self> {
         // Create new configfile
         let new_configfile = ConfigFile::create(self.prefix.as_os_str(), new_name.as_ref())?;
@@ -130,6 +259,12 @@ fn config_path<S: AsRef<OsStr> + ?Sized>(prefix: &S, name: &S) -> PathBuf {
     path.into()
 }
 
+/// Get a list of all configfile names for a given prefix.
+///
+/// This will check the current users XDG base directories for configuration files, and return a
+/// list of their names for use with e.g. [`ConfigFile::open`][fn-ConfigFile-open].
+///
+/// [fn-ConfigFile-open]: struct.Layout.html#method.open
 pub fn list<S: AsRef<OsStr> + ?Sized>(prefix: &S) -> Vec<OsString> {
     let mut files = XDG_DIRS.list_config_files_once(prefix.as_ref().to_string_lossy().into_owned());
     files.sort();
