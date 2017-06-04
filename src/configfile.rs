@@ -129,3 +129,15 @@ fn config_path<S: AsRef<OsStr> + ?Sized>(prefix: &S, name: &S) -> PathBuf {
 
     path.into()
 }
+
+pub fn list<S: AsRef<OsStr> + ?Sized>(prefix: &S) -> Vec<OsString> {
+    let mut files = XDG_DIRS.list_config_files_once(prefix.as_ref().to_string_lossy().into_owned());
+    files.sort();
+    files
+        .iter()
+        .map(|file| file.file_stem())
+        .filter(Option::is_some)
+        .map(Option::unwrap)
+        .map(OsStr::to_os_string)
+        .collect::<Vec<_>>()
+}

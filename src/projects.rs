@@ -8,7 +8,7 @@
 
 //! Module for project handling.
 
-use configfile::ConfigFile;
+use configfile::{self, ConfigFile};
 use errors::*;
 use i3ipc::I3Connection;
 use std::ffi::{OsStr, OsString};
@@ -22,12 +22,9 @@ use tempfile::NamedTempFile;
 use toml;
 use types::*;
 use wait_timeout::ChildExt;
-use xdg;
 
 lazy_static! {
     static ref PROJECTS_PREFIX: OsString = OsString::from("projects");
-    static ref XDG_DIRS: xdg::BaseDirectories =
-        xdg::BaseDirectories::with_prefix("i3nator").expect("couldn't get XDG base directory");
 }
 
 /// A structure representing a `i3nator` project.
@@ -399,15 +396,7 @@ impl Project {
 ///
 /// [fn-Project-open]: struct.Project.html#method.open
 pub fn list() -> Vec<OsString> {
-    let mut files = XDG_DIRS.list_config_files_once(PROJECTS_PREFIX.to_string_lossy().into_owned());
-    files.sort();
-    files
-        .iter()
-        .map(|file| file.file_stem())
-        .filter(Option::is_some)
-        .map(Option::unwrap)
-        .map(OsStr::to_os_string)
-        .collect::<Vec<_>>()
+    configfile::list(&*PROJECTS_PREFIX)
 }
 
 fn exec_text(base_parameters: &[&str], text: &str, timeout: Duration) -> Result<()> {
