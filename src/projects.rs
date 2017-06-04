@@ -11,6 +11,7 @@
 use configfile::{self, ConfigFile};
 use errors::*;
 use i3ipc::I3Connection;
+use layouts::Layout as ManagedLayout;
 use std::ffi::{OsStr, OsString};
 use std::fs::File;
 use std::io::BufReader;
@@ -300,12 +301,17 @@ impl Project {
 
         // Determine if the layout is a path or the actual contents.
         let mut tempfile;
+        let managed_layout_path;
         let path: &Path = match general.layout {
             Layout::Contents(ref contents) => {
                 tempfile = NamedTempFile::new()?;
                 tempfile.write_all(contents.as_bytes())?;
                 tempfile.flush()?;
                 tempfile.path()
+            }
+            Layout::Managed(ref name) => {
+                managed_layout_path = ManagedLayout::open(&name)?.path;
+                &managed_layout_path
             }
             Layout::Path(ref path) => path,
         };
@@ -378,9 +384,15 @@ impl Project {
         if let Some(ref p) = config.general.working_directory {
             paths.push(p);
         }
-        if let Layout::Path(ref p) = config.general.layout {
-            paths.push(p);
+
+        match config.general.layout {
+            Layout::Contents(_) => (),
+            Layout::Managed(ref name) => {
+                ManagedLayout::open(name)?;
+            }
+            Layout::Path(ref path) => paths.push(path),
         }
+
         for application in &config.applications {
             if let Some(ref p) = application.working_directory {
                 paths.push(p);
