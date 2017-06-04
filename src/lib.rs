@@ -214,6 +214,7 @@ extern crate xdg;
 
 pub mod configfile;
 pub mod errors;
+pub mod layouts;
 pub mod projects;
 mod shlex;
 pub mod types;

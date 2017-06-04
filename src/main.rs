@@ -36,6 +36,11 @@ mod errors {
                 display("cannot find an editor. Please specify $VISUAL or $EDITOR")
             }
 
+            NoLayoutExist {
+                description("no layouts exist")
+                display("no layouts exist. Feel free to create one")
+            }
+
             NoProjectExist {
                 description("no projects exist")
                 display("no projects exist. Feel free to create one")
@@ -49,6 +54,7 @@ use errors::*;
 use getch::Getch;
 use i3ipc::I3Connection;
 use i3nator::configfile::ConfigFile;
+use i3nator::layouts::{self, Layout};
 use i3nator::projects::{self, Project};
 use std::ascii::AsciiExt;
 use std::convert::Into;
@@ -127,6 +133,25 @@ fn command_info(matches: &ArgMatches<'static>) -> Result<()> {
              });
 
     Ok(())
+}
+
+fn command_layout(matches: &ArgMatches<'static>) -> Result<()> {
+    match matches.subcommand() {
+        ("copy", Some(sub_matches)) => layout_copy(sub_matches),
+        ("delete", Some(sub_matches)) => layout_delete(sub_matches),
+        ("edit", Some(sub_matches)) => layout_edit(sub_matches),
+        ("info", Some(sub_matches)) => layout_info(sub_matches),
+        ("list", Some(sub_matches)) => layout_list(sub_matches),
+        ("new", Some(sub_matches)) => layout_new(sub_matches),
+        ("rename", Some(sub_matches)) => layout_rename(sub_matches),
+        ("", None) =>
+            // No subcommand given. The clap `AppSettings` should be set to output the help by
+            // default, so this is unreachable.
+            unreachable!(),
+        _ =>
+            // If all subcommands are defined above, this should be unreachable.
+            unreachable!(),
+    }
 }
 
 fn command_list(matches: &ArgMatches<'static>) -> Result<()> {
@@ -243,6 +268,116 @@ fn command_verify(matches: &ArgMatches<'static>) -> Result<()> {
     Ok(())
 }
 
+fn layout_copy(matches: &ArgMatches<'static>) -> Result<()> {
+    // `EXISTING` and `NEW` should not be empty, clap ensures this.
+    let existing_layout_name = matches.value_of_os("EXISTING").unwrap();
+    let new_layout_name = matches.value_of_os("NEW").unwrap();
+
+    let existing_layout = Layout::open(existing_layout_name)?;
+    let new_layout = existing_layout.copy(new_layout_name)?;
+
+    println!("Copied existing layout '{}' to new layout '{}'",
+             existing_layout.name,
+             new_layout.name);
+
+    // Open config file for editing
+    if !matches.is_present("no-edit") {
+        open_editor(&new_layout)?;
+    }
+
+    Ok(())
+}
+
+fn layout_delete(matches: &ArgMatches<'static>) -> Result<()> {
+    // `LAYOUT`s should not be empty, clap ensures this.
+    let layouts = matches.values_of_os("LAYOUT").unwrap();
+
+    for layout_name in layouts {
+        Layout::open(layout_name)?.delete()?;
+        println!("Deleted layout '{}'", layout_name.to_string_lossy());
+    }
+
+    Ok(())
+}
+
+fn layout_edit(matches: &ArgMatches<'static>) -> Result<()> {
+    // `LAYOUT` should not be empty, clap ensures this.
+    let layout_name = matches.value_of_os("LAYOUT").unwrap();
+    let layout = Layout::open(layout_name)?;
+
+    open_editor(&layout)?;
+
+    Ok(())
+}
+
+fn layout_info(matches: &ArgMatches<'static>) -> Result<()> {
+    // `LAYOUT` should not be empty, clap ensures this.
+    let layout_name = matches.value_of_os("LAYOUT").unwrap();
+    let layout = Layout::open(layout_name)?;
+
+    println!("Name: {}", layout.name);
+    println!("Configuration path: {}", layout.path.to_string_lossy());
+
+    Ok(())
+}
+
+fn layout_list(matches: &ArgMatches<'static>) -> Result<()> {
+    let layouts = layouts::list();
+    let quiet = matches.is_present("quiet");
+
+    if layouts.is_empty() {
+        Err(ErrorKind::NoLayoutExist.into())
+    } else {
+        if !quiet {
+            println!("i3nator layouts:");
+        }
+        for layout in layouts {
+            if quiet {
+                println!("{}", layout.to_string_lossy());
+            } else {
+                println!("  {}", layout.to_string_lossy());
+            }
+        }
+
+        Ok(())
+    }
+}
+
+fn layout_new(matches: &ArgMatches<'static>) -> Result<()> {
+    // `LAYOUT` should not be empty, clap ensures this.
+    let layout_name = matches.value_of_os("LAYOUT").unwrap();
+    let layout = Layout::create(layout_name)?;
+    // TODO: add `stdin` option, read, use `create_from_template`.
+    //let layout = Layout::create_from_template(layout_name, LAYOUT_TEMPLATE)?;
+    println!("Created layout '{}'", layout.name);
+
+    // Open config file for editing
+    if !matches.is_present("no-edit") {
+        open_editor(&layout)?;
+    }
+
+    Ok(())
+}
+
+fn layout_rename(matches: &ArgMatches<'static>) -> Result<()> {
+    // `CURRENT` and `NEW` should not be empty, clap ensures this.
+    let current_layout_name = matches.value_of_os("CURRENT").unwrap();
+    let new_layout_name = matches.value_of_os("NEW").unwrap();
+
+    let current_layout = Layout::open(current_layout_name)?;
+    println!("Renaming layout from '{}' to '{}'",
+             current_layout_name.to_string_lossy(),
+             new_layout_name.to_string_lossy());
+    let new_layout = current_layout.rename(new_layout_name)?;
+
+    // Open editor for new layout if desired
+    if matches.is_present("edit") {
+        open_editor(&new_layout)?;
+    }
+
+    Ok(())
+}
+
 fn get_editor() -> Result<OsString> {
     env::var_os("VISUAL")
         .or_else(|| env::var_os("EDITOR"))
@@ -308,6 +443,7 @@ fn run() -> Result<()> {
         ("delete", Some(sub_matches)) => command_delete(sub_matches),
         ("edit", Some(sub_matches)) => command_edit(sub_matches),
         ("info", Some(sub_matches)) => command_info(sub_matches),
+        ("layout", Some(sub_matches)) => command_layout(sub_matches),
         ("list", Some(sub_matches)) => command_list(sub_matches),
         ("local", Some(sub_matches)) => command_local(sub_matches),
         ("new", Some(sub_matches)) => command_new(sub_matches),
@@ -319,7 +455,7 @@ fn run() -> Result<()> {
             // default, so this is unreachable.
             unreachable!(),
         _ =>
-            // All subcommands are defined above, this is unreachable.
+            // If all subcommands are defined above, this should be unreachable.
             unreachable!(),
     }
 }
