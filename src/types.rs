@@ -35,6 +35,8 @@
 //! working_directory = "/path/to/a/different/working/directory"
 //! ```
 
+use configfiles::ConfigFile;
+use layouts::Layout as ManagedLayout;
 use serde::de;
 use serde::de::{Deserialize, Deserializer};
 use shlex;
@@ -98,6 +100,9 @@ pub struct General {
 pub enum Layout {
     /// The layout is provided directly as a string.
     Contents(String),
+
+    /// The name of a managed layout
+    Managed(String),
 
     /// The layout is provided as a path.
     Path(PathBuf),
@@ -381,6 +386,8 @@ fn deserialize_layout<'de, D>(deserializer: D) -> Result<Layout, D::Error>
         {
             if value.find('{').is_some() {
                 Ok(Layout::Contents(value.into()))
+            } else if ManagedLayout::open(value).is_ok() {
+                Ok(Layout::Managed(value.to_owned()))
             } else {
                 Ok(Layout::Path(tilde(value).into_owned()))
             }

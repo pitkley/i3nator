@@ -14,6 +14,7 @@ extern crate lazy_static;
 extern crate tempdir;
 extern crate tempfile;
 
+use i3nator::configfiles::ConfigFile;
 use i3nator::projects::{self, Project};
 use i3nator::types::*;
 use std::env;
@@ -73,7 +74,7 @@ fn create() {
 }
 
 #[test]
-#[should_panic(expected = "ProjectExists")]
+#[should_panic(expected = "ConfigExists")]
 fn create_exists() {
     with_projects_dir(|projects_dir| {
         let project = Project::create("project-one").unwrap();
@@ -145,7 +146,7 @@ fn open() {
 }
 
 #[test]
-#[should_panic(expected = "UnknownProject")]
+#[should_panic(expected = "UnknownConfig")]
 fn open_unknown_project() {
     with_projects_dir(|_| { Project::open("unknown-project").unwrap(); })
 }
