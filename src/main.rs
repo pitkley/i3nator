@@ -48,9 +48,9 @@ use clap::ArgMatches;
 use errors::*;
 use getch::Getch;
 use i3ipc::I3Connection;
-use i3nator::configfiles::{self, ConfigFile, ConfigFileImpl};
-use i3nator::layouts::{LAYOUTS_PREFIX, Layout};
-use i3nator::projects::{PROJECTS_PREFIX, Project};
+use i3nator::configfiles::ConfigFile;
+use i3nator::layouts::Layout;
+use i3nator::projects::Project;
 use std::ascii::AsciiExt;
 use std::convert::Into;
 use std::env;
@@ -65,17 +65,17 @@ lazy_static! {
     static ref GETCH: Getch = Getch::new().expect("failed to create getch");
 }
 
-fn command_copy<S: AsRef<OsStr> + ?Sized>(matches: &ArgMatches<'static>, prefix: &S) -> Result<()> {
+fn command_copy<C: ConfigFile>(matches: &ArgMatches<'static>) -> Result<()> {
     // `EXISTING` and `NEW` should not be empty, clap ensures this.
     let existing_configfile_name = matches.value_of_os("EXISTING").unwrap();
     let new_configfile_name = matches.value_of_os("NEW").unwrap();
 
-    let existing_configfile = ConfigFileImpl::open(prefix.as_ref(), existing_configfile_name)?;
+    let existing_configfile = C::open(existing_configfile_name)?;
     let new_configfile = existing_configfile.copy(new_configfile_name)?;
 
     println!("Copied existing configfile '{}' to new configfile '{}'",
-             existing_configfile.name,
-             new_configfile.name);
+             existing_configfile.name(),
+             new_configfile.name());
 
     // Open config file for editing
     if !matches.is_present("no-edit") {
@@ -88,25 +88,22 @@ fn command_copy<S: AsRef<OsStr> + ?Sized>(matches: &ArgMatches<'static>, prefix:
     Ok(())
 }
 
-fn command_delete<S: AsRef<OsStr> + ?Sized>(matches: &ArgMatches<'static>,
-                                            prefix: &S)
-                                            -> Result<()> {
+fn command_delete<C: ConfigFile>(matches: &ArgMatches<'static>) -> Result<()> {
     // `NAME`s should not be empty, clap ensures this.
     let configfiles = matches.values_of_os("NAME").unwrap();
 
     for configfile_name in configfiles {
-        ConfigFileImpl::open(prefix.as_ref(), configfile_name)?
-            .delete()?;
+        C::open(configfile_name)?.delete()?;
         println!("Deleted configfile '{}'", configfile_name.to_string_lossy());
     }
 
     Ok(())
 }
 
-fn command_edit<S: AsRef<OsStr> + ?Sized>(matches: &ArgMatches<'static>, prefix: &S) -> Result<()> {
+fn command_edit<C: ConfigFile>(matches: &ArgMatches<'static>) -> Result<()> {
     // `NAME` should not be empty, clap ensures this.
     let configfile_name = matches.value_of_os("NAME").unwrap();
-    let configfile = ConfigFileImpl::open(prefix.as_ref(), configfile_name)?;
+    let configfile = C::open(configfile_name)?;
 
     open_editor(&configfile)?;
 
@@ -118,13 +115,14 @@ fn command_edit<S: AsRef<OsStr> + ?Sized>(matches: &ArgMatches<'static>, prefix:
     Ok(())
 }
 
-fn command_info<S: AsRef<OsStr> + ?Sized>(matches: &ArgMatches<'static>, prefix: &S) -> Result<()> {
+fn command_info<C: ConfigFile>(matches: &ArgMatches<'static>) -> Result<()> {
     // `NAME` should not be empty, clap ensures this.
     let configfile_name = matches.value_of_os("NAME").unwrap();
-    let configfile = ConfigFileImpl::open(prefix.as_ref(), configfile_name)?;
+    let configfile = C::open(configfile_name)?;
 
-    println!("Name: {}", configfile.name);
-    println!("Configuration path: {}", configfile.path.to_string_lossy());
+    println!("Name: {}", configfile.name());
+    println!("Configuration path: {}",
+             configfile.path().to_string_lossy());
     println!("Configuration valid: {}",
              if configfile.verify().is_ok() {
                  "yes"
@@ -137,13 +135,13 @@ fn command_info<S: AsRef<OsStr> + ?Sized>(matches: &ArgMatches<'static>, prefix:
 
 fn command_layout(matches: &ArgMatches<'static>) -> Result<()> {
     match matches.subcommand() {
-        ("copy", Some(sub_matches)) => command_copy(sub_matches, &*LAYOUTS_PREFIX),
-        ("delete", Some(sub_matches)) => command_delete(sub_matches, &*LAYOUTS_PREFIX),
-        ("edit", Some(sub_matches)) => command_edit(sub_matches, &*LAYOUTS_PREFIX),
-        ("info", Some(sub_matches)) => command_info(sub_matches, &*LAYOUTS_PREFIX),
-        ("list", Some(sub_matches)) => command_list(sub_matches, &*LAYOUTS_PREFIX),
+        ("copy", Some(sub_matches)) => command_copy::<Layout>(sub_matches),
+        ("delete", Some(sub_matches)) => command_delete::<Layout>(sub_matches),
+        ("edit", Some(sub_matches)) => command_edit::<Layout>(sub_matches),
+        ("info", Some(sub_matches)) => command_info::<Layout>(sub_matches),
+        ("list", Some(sub_matches)) => command_list::<Layout>(sub_matches),
         ("new", Some(sub_matches)) => layout_new(sub_matches),
-        ("rename", Some(sub_matches)) => command_rename(sub_matches, &*LAYOUTS_PREFIX),
+        ("rename", Some(sub_matches)) => command_rename::<Layout>(sub_matches),
         ("", None) =>
             // No subcommand given. The clap `AppSettings` should be set to output the help by
             // default, so this is unreachable.
@@ -154,15 +152,15 @@ fn command_layout(matches: &ArgMatches<'static>) -> Result<()> {
     }
 }
 
-fn command_list<S: AsRef<OsStr> + ?Sized>(matches: &ArgMatches<'static>, prefix: &S) -> Result<()> {
-    let configfiles = configfiles::list(prefix);
+fn command_list<C: ConfigFile>(matches: &ArgMatches<'static>) -> Result<()> {
+    let configfiles = C::list();
     let quiet = matches.is_present("quiet");
 
     if configfiles.is_empty() {
         Err(ErrorKind::NoConfigExist.into())
     } else {
         if !quiet {
-            println!("i3nator {}:", prefix.as_ref().to_string_lossy());
+            println!("i3nator {}:", C::prefix().to_string_lossy());
         }
         for configfile in configfiles {
             if quiet {
@@ -176,14 +174,12 @@ fn command_list<S: AsRef<OsStr> + ?Sized>(matches: &ArgMatches<'static>, prefix:
     }
 }
 
-fn command_rename<S: AsRef<OsStr> + ?Sized>(matches: &ArgMatches<'static>,
-                                            prefix: &S)
-                                            -> Result<()> {
+fn command_rename<C: ConfigFile>(matches: &ArgMatches<'static>) -> Result<()> {
     // `CURRENT` and `NEW` should not be empty, clap ensures this.
     let current_configfile_name = matches.value_of_os("CURRENT").unwrap();
     let new_configfile_name = matches.value_of_os("NEW").unwrap();
 
-    let current_configfile = ConfigFileImpl::open(prefix.as_ref(), current_configfile_name)?;
+    let current_configfile = C::open(current_configfile_name)?;
     println!("Renaming configfile from '{}' to '{}'",
              current_configfile_name.to_string_lossy(),
              new_configfile_name.to_string_lossy());
@@ -194,31 +190,6 @@ fn command_rename<S: AsRef<OsStr> + ?Sized>(matches: &ArgMatches<'static>,
         open_editor(&new_configfile)?;
         if !matches.is_present("no-verify") {
             verify_configfile(&new_configfile)?;
-        }
-    }
-
-    Ok(())
-}
-
-fn command_verify<S: AsRef<OsStr> + ?Sized>(matches: &ArgMatches<'static>,
-                                            prefix: &S)
-                                            -> Result<()> {
-    // `NAME`s can be empty, if so, use the entire configfile list
-    let configfiles: Vec<OsString> = matches
-        .values_of_os("NAME")
-        .map(|v| v.map(OsStr::to_os_string).collect::<Vec<_>>())
-        .unwrap_or_else(|| configfiles::list(prefix));
-
-    for configfile_name in configfiles {
-        if let Err(e) = Project::open(&configfile_name)?.verify() {
-            println!("Configuration INVALID: '{}'",
-                     configfile_name.to_string_lossy());
-            println!("Error:");
-            println!("    {}", e);
-            println!();
-        } else {
-            println!("Configuration   VALID: '{}'",
-                     configfile_name.to_string_lossy());
         }
     }
 
@@ -268,6 +239,29 @@ fn project_start(matches: &ArgMatches<'static>) -> Result<()> {
         .start(&mut i3,
                matches.value_of_os("working-directory"),
                matches.value_of("workspace"))?;
+
+    Ok(())
+}
+
+fn project_verify(matches: &ArgMatches<'static>) -> Result<()> {
+    // `NAME`s can be empty, if so, use the entire configfile list
+    let configfiles: Vec<OsString> = matches
+        .values_of_os("NAME")
+        .map(|v| v.map(OsStr::to_os_string).collect::<Vec<_>>())
+        .unwrap_or_else(Project::list);
+
+    for configfile_name in configfiles {
+        if let Err(e) = Project::open(&configfile_name)?.verify() {
+            println!("Configuration INVALID: '{}'",
+                     configfile_name.to_string_lossy());
+            println!("Error:");
+            println!("    {}", e);
+            println!();
+        } else {
+            println!("Configuration   VALID: '{}'",
+                     configfile_name.to_string_lossy());
+        }
+    }
 
     Ok(())
 }
@@ -369,17 +363,17 @@ fn run() -> Result<()> {
     let matches = cli::cli().get_matches();
 
     match matches.subcommand() {
-        ("copy", Some(sub_matches)) => command_copy(sub_matches, &*PROJECTS_PREFIX),
-        ("delete", Some(sub_matches)) => command_delete(sub_matches, &*PROJECTS_PREFIX),
-        ("edit", Some(sub_matches)) => command_edit(sub_matches, &*PROJECTS_PREFIX),
-        ("info", Some(sub_matches)) => command_info(sub_matches, &*PROJECTS_PREFIX),
+        ("copy", Some(sub_matches)) => command_copy::<Project>(sub_matches),
+        ("delete", Some(sub_matches)) => command_delete::<Project>(sub_matches),
+        ("edit", Some(sub_matches)) => command_edit::<Project>(sub_matches),
+        ("info", Some(sub_matches)) => command_info::<Project>(sub_matches),
         ("layout", Some(sub_matches)) => command_layout(sub_matches),
-        ("list", Some(sub_matches)) => command_list(sub_matches, &*PROJECTS_PREFIX),
+        ("list", Some(sub_matches)) => command_list::<Project>(sub_matches),
         ("local", Some(sub_matches)) => project_local(sub_matches),
         ("new", Some(sub_matches)) => project_new(sub_matches),
-        ("rename", Some(sub_matches)) => command_rename(sub_matches, &*PROJECTS_PREFIX),
+        ("rename", Some(sub_matches)) => command_rename::<Project>(sub_matches),
         ("start", Some(sub_matches)) => project_start(sub_matches),
-        ("verify", Some(sub_matches)) => command_verify(sub_matches, &*PROJECTS_PREFIX),
+        ("verify", Some(sub_matches)) => project_verify(sub_matches),
         ("", None) =>
             // No subcommand given. The clap `AppSettings` should be set to output the help by
             // default, so this is unreachable.

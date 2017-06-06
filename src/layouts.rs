@@ -15,8 +15,7 @@ use std::ops::Deref;
 use std::path::{Path, PathBuf};
 
 lazy_static! {
-    /// Prefix for sub-directory in XDG configuration directory.
-    pub static ref LAYOUTS_PREFIX: OsString = OsString::from("layouts");
+    static ref LAYOUTS_PREFIX: OsString = OsString::from("layouts");
 }
 
 /// A structure representing a managed i3-layout.
@@ -106,6 +105,10 @@ impl ConfigFile for Layout {
 
     fn path(&self) -> PathBuf {
         self.path.to_owned()
+    }
+
+    fn prefix() -> &'static OsStr {
+        &*LAYOUTS_PREFIX
     }
 }
 

@@ -26,8 +26,7 @@ use types::*;
 use wait_timeout::ChildExt;
 
 lazy_static! {
-    /// Prefix for sub-directory in XDG configuration directory.
-    pub static ref PROJECTS_PREFIX: OsString = OsString::from("projects");
+    static ref PROJECTS_PREFIX: OsString = OsString::from("projects");
 }
 
 /// A structure representing a `i3nator` project.
@@ -298,6 +297,10 @@ impl ConfigFile for Project {
 
     fn path(&self) -> PathBuf {
         self.path.to_owned()
+    }
+
+    fn prefix() -> &'static OsStr {
+        &*PROJECTS_PREFIX
     }
 }
 

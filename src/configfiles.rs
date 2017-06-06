@@ -155,6 +155,9 @@ pub trait ConfigFile: Sized {
     /// Returns the path to the configfile.
     fn path(&self) -> PathBuf;
 
+    /// Return the prefix associated with this type of configfile.
+    fn prefix() -> &'static OsStr;
+
     /// Rename the current configfile.
     ///
     /// # Parameters
@@ -371,6 +374,10 @@ impl ConfigFile for ConfigFileImpl {
 
     fn path(&self) -> PathBuf {
         self.path.to_owned()
+    }
+
+    fn prefix() -> &'static OsStr {
+        OsStr::new("")
     }
 
     fn rename<S: AsRef<OsStr> + ?Sized>(&self, new_name: &S) -> Result<Self> {
