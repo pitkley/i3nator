@@ -26,7 +26,8 @@ use types::*;
 use wait_timeout::ChildExt;
 
 lazy_static! {
-    static ref PROJECTS_PREFIX: OsString = OsString::from("projects");
+    /// Prefix for sub-directory in XDG configuration directory.
+    pub static ref PROJECTS_PREFIX: OsString = OsString::from("projects");
 }
 
 /// A structure representing a `i3nator` project.

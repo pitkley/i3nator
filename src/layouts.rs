@@ -15,7 +15,8 @@ use std::ops::Deref;
 use std::path::{Path, PathBuf};
 
 lazy_static! {
-    static ref LAYOUTS_PREFIX: OsString = OsString::from("layouts");
+    /// Prefix for sub-directory in XDG configuration directory.
+    pub static ref LAYOUTS_PREFIX: OsString = OsString::from("layouts");
 }
 
 /// A structure representing a managed i3-layout.
