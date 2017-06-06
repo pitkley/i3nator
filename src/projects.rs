@@ -8,7 +8,7 @@
 
 //! Module for project handling.
 
-use configfile::{self, ConfigFile};
+use configfiles::{self, ConfigFile};
 use errors::*;
 use i3ipc::I3Connection;
 use layouts::Layout as ManagedLayout;

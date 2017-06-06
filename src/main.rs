@@ -53,7 +53,7 @@ use clap::ArgMatches;
 use errors::*;
 use getch::Getch;
 use i3ipc::I3Connection;
-use i3nator::configfile::ConfigFile;
+use i3nator::configfiles::ConfigFile;
 use i3nator::layouts::{self, Layout};
 use i3nator::projects::{self, Project};
 use std::ascii::AsciiExt;

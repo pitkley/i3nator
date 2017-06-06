@@ -8,7 +8,7 @@
 
 //! Module for layout handling.
 
-use configfile::{self, ConfigFile};
+use configfiles::{self, ConfigFile};
 use errors::*;
 use std::ffi::{OsStr, OsString};
 use std::ops::Deref;

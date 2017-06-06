@@ -212,7 +212,7 @@ extern crate toml;
 extern crate wait_timeout;
 extern crate xdg;
 
-pub mod configfile;
+pub mod configfiles;
 pub mod errors;
 pub mod layouts;
 pub mod projects;
