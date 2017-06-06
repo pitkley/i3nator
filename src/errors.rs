@@ -29,6 +29,16 @@ error_chain! {
     }
 
     errors {
+        /// An error that occurs if a trait-function is called that cannot be implemented.
+        ///
+        /// (This is pretty unclean but is currently required as `ConfigFileImpl` cannot implement
+        /// any of the static functions of the `ConfigFile` trait since it is missing the required
+        /// prefix.)
+        CantBeImplemented(t: String) {
+            description("called function cannot be implemented")
+            display("called function cannot be implemented: '{}'", t)
+        }
+
         /// An error that can occur when splitting a string into a
         /// [`ApplicationCommand`][struct-ApplicationCommand].
         ///

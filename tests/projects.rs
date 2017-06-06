@@ -14,6 +14,7 @@ extern crate lazy_static;
 extern crate tempdir;
 extern crate tempfile;
 
+use i3nator::configfiles::ConfigFile;
 use i3nator::projects::{self, Project};
 use i3nator::types::*;
 use std::env;

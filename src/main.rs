@@ -407,10 +407,10 @@ fn get_editor() -> Result<OsString> {
         .ok_or_else(|| ErrorKind::EditorNotFound.into())
 }
 
-fn open_editor(configfile: &ConfigFile) -> Result<ExitStatus> {
-    println!("Opening your editor to {}", configfile.name);
+fn open_editor<C: ConfigFile>(configfile: &C) -> Result<ExitStatus> {
+    println!("Opening your editor to {}", configfile.name());
     Command::new(get_editor()?)
-        .arg(configfile.path.as_os_str())
+        .arg(configfile.path().as_os_str())
         .status()
         .map_err(|e| e.into())
 }

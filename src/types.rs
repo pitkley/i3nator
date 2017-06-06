@@ -35,6 +35,7 @@
 //! working_directory = "/path/to/a/different/working/directory"
 //! ```
 
+use configfiles::ConfigFile;
 use layouts::Layout as ManagedLayout;
 use serde::de;
 use serde::de::{Deserialize, Deserializer};
