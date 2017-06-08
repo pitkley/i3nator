@@ -310,7 +310,7 @@ fn get_editor() -> Result<OsString> {
 }
 
 fn open_editor<C: ConfigFile>(configfile: &C) -> Result<ExitStatus> {
-    println!("Opening your editor to {}", configfile.name());
+    println!("Opening your editor to edit '{}'", configfile.name());
     Command::new(get_editor()?)
         .arg(configfile.path().as_os_str())
         .status()
