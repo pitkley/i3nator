@@ -8,9 +8,9 @@
 
 //! i3nator is [Tmuxinator][gh-tmuxinator] for the [i3 window manager][i3wm].
 //!
-//! It allows you to manage and restore saved i3 layouts (see [Layout saving in
-//! i3][i3wm-layout-saving]) easily, and extends i3's base functionality by allowing you to start
-//! applications too.
+//! It allows you to manage what are called "projects", which are used to easily restore saved i3
+//! layouts (see [Layout saving in i3][i3wm-layout-saving]) and extending i3's base functionality
+//! by allowing you to automatically start applications too.
 //!
 //! * [Documentation][i3nator-docs]
 //! * [GitHub source repository][i3nator-gh]
@@ -44,7 +44,7 @@
 //!
 //! # Usage
 //!
-//! Following the usage of i3nator as of 1.0.0.
+//! Following the usage of i3nator as of 1.1.0.
 //!
 //! ```text
 //! USAGE:
@@ -58,17 +58,20 @@
 //!     copy [FLAGS] <EXISTING> <NEW>
 //!               Copy an existing project to a new project
 //!
-//!     delete <PROJECT>...
+//!     delete <NAME>...
 //!               Delete existing projects
 //!
-//!     edit [FLAGS] <PROJECT>
+//!     edit [FLAGS] <NAME>
 //!               Open an existing project in your editor
 //!
 //!     help
 //!               Prints this message or the help of the given subcommand(s)
 //!
-//!     info <PROJECT>
+//!     info <NAME>
 //!               Show information for the specified project
+//!
+//!     layout <SUBCOMMAND>
+//!               Manage layouts which can used in projects
 //!
 //!     list [FLAGS]
 //!               List all projects
@@ -76,18 +79,60 @@
 //!     local [OPTIONS]
 //!               Run a project from a local TOML-file
 //!
-//!     new [FLAGS] <PROJECT>
+//!     new [FLAGS] <NAME>
 //!               Create a new project and open it in your editor
 //!
 //!     rename [FLAGS] <CURRENT> <NEW>
 //!               Rename a project
 //!
-//!     start [OPTIONS] <PROJECT>
+//!     start [OPTIONS] <NAME>
 //!               Start a project according to it's configuration
 //!
-//!     verify [PROJECT]...
+//!     verify [NAME]...
 //!               Verify the configuration of the existing projects
 //! ```
+//!
+//! Every command -- except `layout` -- is for managing your projects, i.e. creating, editing,
+//! starting and potentially deleting them.
+//!
+//! `layout` is a bit special, because it is most of the commands used for projects, except for i3
+//! layouts:
+//!
+//! ```text
+//! USAGE:
+//!     i3nator layout <SUBCOMMAND>
+//!
+//! FLAGS:
+//!     -h, --help       Prints help information
+//!
+//! SUBCOMMANDS:
+//!     copy [FLAGS] <EXISTING> <NEW>
+//!               Copy an existing layout to a new layout
+//!
+//!     delete <NAME>...
+//!               Delete existing layouts
+//!
+//!     edit [FLAGS] <NAME>
+//!               Open an existing layout in your editor
+//!
+//!     help
+//!               Prints this message or the help of the given subcommand(s)
+//!
+//!     info <NAME>
+//!               Show information for the specified layout
+//!
+//!     list [FLAGS]
+//!               List all layouts
+//!
+//!     new [FLAGS] <NAME>
+//!               Create a new layout and open it in your editor
+//!
+//!     rename [FLAGS] <CURRENT> <NEW>
+//!               Rename a layout
+//! ```
+//!
+//! These commands allow you to manage [i3 layouts][i3wm-layout-saving] in addition to the actual
+//! projects which will be able to use and reuse them.
 //!
 //! # Examples
 //!
@@ -99,13 +144,20 @@
 //!
 //! 1. Open all applications you want and lay them out on a workspace as desired.
 //!
-//! 2. Save the workspace's layout using [`i3-save-tree`][i3wm-save-tree]:
+//! 2. Save the workspace's layout using [`i3-save-tree`][i3wm-save-tree], feeding the layout
+//!    directly into i3nator's layout management:
 //!
 //!     ```console
-//!     $ i3-save-tree --workspace 1 > mylayout.json
+//!     $ i3-save-tree --workspace 1 | i3nator layout new mylayout
 //!     ```
 //!
-//!     You can also skip the file-redirection and copy the layout into your clipboard.
+//!     If you don't want the layout managed by i3nator, you can alternatively:
+//!     * copy the layout to your clipboard, and insert it directly in your project configuration
+//!       later *or*
+//!     * save it to a file on your disk, and reference this file-path in your configuration later.
+//!
+//!     If you are using i3nator's layout management, the above command should drop you into an
+//!     editor, ready for step 3.
 //!
 //! 3. Modify the saved layout to accurately match created applications. See [Editing layout
 //!    files][i3wm-modify-layout] on how to do this.
@@ -117,7 +169,7 @@
 //!     ```console
 //!     $ i3nator new myproject
 //!     Created project 'myproject'
-//!     Opening your editor to edit project myproject
+//!     Opening your editor to edit 'myproject'
 //!     ```
 //!
 //!     This will open your default editor with a configuration template. If it doesn't, you have to
@@ -131,10 +183,13 @@
 //!    1. Setting the main working directory.
 //!    2. Setting the destination workspace (this is optional, if not specified, the active one
 //!       will be used).
-//!    3. Specifying which layout to use. You can either supply a path to the file containing the
-//!       layout created in step 2, or you can use the `layout` variable to paste the layout from
-//!       step 2 as a multi-line string. At this point you will also be able to modify the layout
-//!       to match applications correctly.
+//!    3. Specifying which layout to use. If you have passed the layout to i3nator in step 2, you
+//!       can simply enter its name here, which in case two was `mylayout`.
+//!
+//!         Alternatively you can either supply a path to the file containing the layout, or you can
+//!         paste the layout from step 2 directly into your project file as a multi-line string. At
+//!         this point you will also be able to modify the layout to match applications correctly.
+//!
 //!    4. Configuring which applications to start and how to start them. This is done by setting
 //!       the `command` to the full command to be used to start the application and optionally
 //!       configuring a different working directory if desired.
@@ -148,7 +203,7 @@
 //!     [general]
 //!     working_directory = "/path/to/my/working/directory"
 //!     workspace = "1"
-//!     layout = "/path/to/my/layout.json"
+//!     layout = "mylayout"
 //!
 //!     [[applications]]
 //!     command = "mycommand --with 'multiple args'"

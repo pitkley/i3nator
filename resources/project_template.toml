@@ -9,11 +9,13 @@ working_directory = "/path/to/my/working/directory"
 # not specified, the active workspace will be used)
 workspace = "1"
 
-# Path to your layout-file
-layout = "/path/to/my/layout.json"
+# Name of the i3nator managed layout
+layout = "mylayout"
 
-# Alternatively, you can include the JSON-contents of the layout directly,
-# using the same configuration key:
+# Alternative 1: path to your layout-file
+# layout = "/path/to/my/layout.json"
+
+# Alternative 2: you can include the JSON-contents of the layout directly
 # layout = """
 # {
 #     ...
