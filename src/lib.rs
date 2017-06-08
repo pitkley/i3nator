@@ -148,7 +148,7 @@
 //!    directly into i3nator's layout management:
 //!
 //!     ```console
-//!     $ i3-save-tree --workspace 1 | i3nator layout new mylayout
+//!     $ i3-save-tree --workspace 1 | i3nator layout new -t - mylayout
 //!     ```
 //!
 //!     If you don't want the layout managed by i3nator, you can alternatively:
