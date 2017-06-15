@@ -240,7 +240,8 @@ pub enum ExecType {
 struct Phantom<T>(PhantomData<T>);
 
 fn deserialize_application_command<'de, D>(deserializer: D) -> Result<ApplicationCommand, D::Error>
-    where D: Deserializer<'de>
+where
+    D: Deserializer<'de>,
 {
     impl<'de> de::Visitor<'de> for Phantom<ApplicationCommand> {
         type Value = ApplicationCommand;
@@ -250,7 +251,8 @@ fn deserialize_application_command<'de, D>(deserializer: D) -> Result<Applicatio
         }
 
         fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
-            where E: de::Error
+        where
+            E: de::Error,
         {
             match shlex::split(value) {
                 Some(mut v) => {
@@ -258,9 +260,9 @@ fn deserialize_application_command<'de, D>(deserializer: D) -> Result<Applicatio
                         Err(de::Error::custom("command can not be empty"))
                     } else {
                         Ok(ApplicationCommand {
-                               program: v.remove(0).to_owned(),
-                               args: v.into_iter().map(str::to_owned).collect::<Vec<_>>(),
-                           })
+                            program: v.remove(0).to_owned(),
+                            args: v.into_iter().map(str::to_owned).collect::<Vec<_>>(),
+                        })
                     }
                 }
                 None => Err(de::Error::custom("command can not be empty")),
@@ -268,7 +270,8 @@ fn deserialize_application_command<'de, D>(deserializer: D) -> Result<Applicatio
         }
 
         fn visit_seq<S>(self, visitor: S) -> Result<Self::Value, S::Error>
-            where S: de::SeqAccess<'de>
+        where
+            S: de::SeqAccess<'de>,
         {
             let mut v: Vec<String> =
                 Deserialize::deserialize(de::value::SeqAccessDeserializer::new(visitor))?;
@@ -276,14 +279,15 @@ fn deserialize_application_command<'de, D>(deserializer: D) -> Result<Applicatio
                 Err(de::Error::custom("command can not be empty"))
             } else {
                 Ok(ApplicationCommand {
-                       program: v.remove(0),
-                       args: v,
-                   })
+                    program: v.remove(0),
+                    args: v,
+                })
             }
         }
 
         fn visit_map<M>(self, visitor: M) -> Result<Self::Value, M::Error>
-            where M: de::MapAccess<'de>
+        where
+            M: de::MapAccess<'de>,
         {
             Deserialize::deserialize(de::value::MapAccessDeserializer::new(visitor))
         }
@@ -293,7 +297,8 @@ fn deserialize_application_command<'de, D>(deserializer: D) -> Result<Applicatio
 }
 
 fn deserialize_duration<'de, D>(deserializer: D) -> Result<Duration, D::Error>
-    where D: Deserializer<'de>
+where
+    D: Deserializer<'de>,
 {
     impl<'de> de::Visitor<'de> for Phantom<Duration> {
         type Value = Duration;
@@ -303,13 +308,15 @@ fn deserialize_duration<'de, D>(deserializer: D) -> Result<Duration, D::Error>
         }
 
         fn visit_i64<E>(self, value: i64) -> Result<Self::Value, E>
-            where E: de::Error
+        where
+            E: de::Error,
         {
             Ok(Duration::from_secs(value as u64))
         }
 
         fn visit_map<M>(self, visitor: M) -> Result<Self::Value, M::Error>
-            where M: de::MapAccess<'de>
+        where
+            M: de::MapAccess<'de>,
         {
             Deserialize::deserialize(de::value::MapAccessDeserializer::new(visitor))
         }
@@ -319,7 +326,8 @@ fn deserialize_duration<'de, D>(deserializer: D) -> Result<Duration, D::Error>
 }
 
 fn deserialize_exec<'de, D>(deserializer: D) -> Result<Exec, D::Error>
-    where D: Deserializer<'de>
+where
+    D: Deserializer<'de>,
 {
     impl<'de> de::Visitor<'de> for Phantom<Exec> {
         type Value = Exec;
@@ -329,17 +337,19 @@ fn deserialize_exec<'de, D>(deserializer: D) -> Result<Exec, D::Error>
         }
 
         fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
-            where E: de::Error
+        where
+            E: de::Error,
         {
             Ok(Exec {
-                   commands: vec![value.to_owned()],
-                   exec_type: default_exec_type(),
-                   timeout: default_timeout(),
-               })
+                commands: vec![value.to_owned()],
+                exec_type: default_exec_type(),
+                timeout: default_timeout(),
+            })
         }
 
         fn visit_seq<S>(self, visitor: S) -> Result<Self::Value, S::Error>
-            where S: de::SeqAccess<'de>
+        where
+            S: de::SeqAccess<'de>,
         {
             let v: Vec<String> =
                 Deserialize::deserialize(de::value::SeqAccessDeserializer::new(visitor))?;
@@ -348,15 +358,16 @@ fn deserialize_exec<'de, D>(deserializer: D) -> Result<Exec, D::Error>
                 Err(de::Error::custom("commands can not be empty"))
             } else {
                 Ok(Exec {
-                       commands: v,
-                       exec_type: default_exec_type(),
-                       timeout: default_timeout(),
-                   })
+                    commands: v,
+                    exec_type: default_exec_type(),
+                    timeout: default_timeout(),
+                })
             }
         }
 
         fn visit_map<M>(self, visitor: M) -> Result<Self::Value, M::Error>
-            where M: de::MapAccess<'de>
+        where
+            M: de::MapAccess<'de>,
         {
             Deserialize::deserialize(de::value::MapAccessDeserializer::new(visitor))
         }
@@ -366,13 +377,15 @@ fn deserialize_exec<'de, D>(deserializer: D) -> Result<Exec, D::Error>
 }
 
 fn deserialize_opt_exec<'de, D>(deserializer: D) -> Result<Option<Exec>, D::Error>
-    where D: Deserializer<'de>
+where
+    D: Deserializer<'de>,
 {
     deserialize_exec(deserializer).map(Some)
 }
 
 fn deserialize_layout<'de, D>(deserializer: D) -> Result<Layout, D::Error>
-    where D: Deserializer<'de>
+where
+    D: Deserializer<'de>,
 {
     impl<'de> de::Visitor<'de> for Phantom<Layout> {
         type Value = Layout;
@@ -382,7 +395,8 @@ fn deserialize_layout<'de, D>(deserializer: D) -> Result<Layout, D::Error>
         }
 
         fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
-            where E: de::Error
+        where
+            E: de::Error,
         {
             if value.find('{').is_some() {
                 Ok(Layout::Contents(value.into()))
@@ -398,14 +412,16 @@ fn deserialize_layout<'de, D>(deserializer: D) -> Result<Layout, D::Error>
 }
 
 fn deserialize_pathbuf_with_tilde<'de, D>(deserializer: D) -> Result<PathBuf, D::Error>
-    where D: Deserializer<'de>
+where
+    D: Deserializer<'de>,
 {
     let pathbuf: PathBuf = Deserialize::deserialize(deserializer)?;
     Ok(tilde(&pathbuf).into_owned())
 }
 
 fn deserialize_opt_pathbuf_with_tilde<'de, D>(deserializer: D) -> Result<Option<PathBuf>, D::Error>
-    where D: Deserializer<'de>
+where
+    D: Deserializer<'de>,
 {
     deserialize_pathbuf_with_tilde(deserializer).map(Some)
 }
@@ -420,9 +436,10 @@ fn deserialize_opt_pathbuf_with_tilde<'de, D>(deserializer: D) -> Result<Option<
 /// Copyright (c) 2016 Vladimir Matveev
 #[doc(hidden)]
 fn tilde_with_context<SI: ?Sized, P, HD>(input: &SI, home_dir: HD) -> Cow<Path>
-    where SI: AsRef<Path>,
-          P: AsRef<Path>,
-          HD: FnOnce() -> Option<P>
+where
+    SI: AsRef<Path>,
+    P: AsRef<Path>,
+    HD: FnOnce() -> Option<P>,
 {
     let input_str = input.as_ref();
     let bytes = input_str.as_os_str().as_bytes();
@@ -449,7 +466,8 @@ fn tilde_with_context<SI: ?Sized, P, HD>(input: &SI, home_dir: HD) -> Cow<Path>
 }
 
 fn tilde<SI: ?Sized>(input: &SI) -> Cow<Path>
-    where SI: AsRef<Path>
+where
+    SI: AsRef<Path>,
 {
     tilde_with_context(input, env::home_dir)
 }

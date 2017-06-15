@@ -27,21 +27,20 @@ fn full_config() {
             workspace: Some("0".to_owned()),
             layout: Layout::Path("/path/to/my/layout.json".into()),
         },
-        applications: vec![Application {
-                               command: ApplicationCommand {
-                                   program: "mycommand".to_owned(),
-                                   args: vec!["--with".to_owned(), "multiple args".to_owned()],
-                               },
-                               working_directory: Some("/path/to/a/different/working/directory"
-                                                           .to_owned()
-                                                           .into()),
-                               exec: Some(Exec {
-                                              commands: vec!["command one".to_owned(),
-                                                             "command two".to_owned()],
-                                              exec_type: ExecType::TextNoReturn,
-                                              timeout: Duration::from_secs(5),
-                                          }),
-                           }],
+        applications: vec![
+            Application {
+                command: ApplicationCommand {
+                    program: "mycommand".to_owned(),
+                    args: vec!["--with".to_owned(), "multiple args".to_owned()],
+                },
+                working_directory: Some("/path/to/a/different/working/directory".to_owned().into()),
+                exec: Some(Exec {
+                    commands: vec!["command one".to_owned(), "command two".to_owned()],
+                    exec_type: ExecType::TextNoReturn,
+                    timeout: Duration::from_secs(5),
+                }),
+            },
+        ],
     };
 
     equivalent! {
@@ -211,9 +210,10 @@ fn duration_map() {
 #[test]
 #[should_panic(expected = "invalid type: string")]
 fn duration_str() {
-    toml::from_str::<Exec>(r#"commands = []
-                              timeout = "10""#)
-            .unwrap();
+    toml::from_str::<Exec>(
+        r#"commands = []
+                              timeout = "10""#,
+    ).unwrap();
 }
 
 #[test]
@@ -273,10 +273,10 @@ fn exec_str() {
         },
         working_directory: None,
         exec: Some(Exec {
-                       commands: vec!["command one".to_owned()],
-                       exec_type: ExecType::Text,
-                       timeout: Duration::from_secs(5),
-                   }),
+            commands: vec!["command one".to_owned()],
+            exec_type: ExecType::Text,
+            timeout: Duration::from_secs(5),
+        }),
     };
 
     equivalent! {
@@ -296,10 +296,10 @@ fn exec_seq() {
         },
         working_directory: None,
         exec: Some(Exec {
-                       commands: vec!["command one".to_owned(), "command two".to_owned()],
-                       exec_type: ExecType::Text,
-                       timeout: Duration::from_secs(5),
-                   }),
+            commands: vec!["command one".to_owned(), "command two".to_owned()],
+            exec_type: ExecType::Text,
+            timeout: Duration::from_secs(5),
+        }),
     };
 
     equivalent! {
