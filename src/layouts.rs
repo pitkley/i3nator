@@ -60,9 +60,11 @@ impl ConfigFile for Layout {
     }
 
     fn create_from_template<S: AsRef<OsStr> + ?Sized>(name: &S, template: &[u8]) -> Result<Self> {
-        let configfile = ConfigFileImpl::create_from_template(LAYOUTS_PREFIX.as_os_str(),
-                                                              name.as_ref(),
-                                                              template)?;
+        let configfile = ConfigFileImpl::create_from_template(
+            LAYOUTS_PREFIX.as_os_str(),
+            name.as_ref(),
+            template,
+        )?;
         Ok(Layout::from_configfile(configfile))
     }
 

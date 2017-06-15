@@ -73,9 +73,11 @@ fn command_copy<C: ConfigFile>(matches: &ArgMatches<'static>) -> Result<()> {
     let existing_configfile = C::open(existing_configfile_name)?;
     let new_configfile = existing_configfile.copy(new_configfile_name)?;
 
-    println!("Copied existing configfile '{}' to new configfile '{}'",
-             existing_configfile.name(),
-             new_configfile.name());
+    println!(
+        "Copied existing configfile '{}' to new configfile '{}'",
+        existing_configfile.name(),
+        new_configfile.name()
+    );
 
     // Open config file for editing
     if !matches.is_present("no-edit") {
@@ -121,14 +123,18 @@ fn command_info<C: ConfigFile>(matches: &ArgMatches<'static>) -> Result<()> {
     let configfile = C::open(configfile_name)?;
 
     println!("Name: {}", configfile.name());
-    println!("Configuration path: {}",
-             configfile.path().to_string_lossy());
-    println!("Configuration valid: {}",
-             if configfile.verify().is_ok() {
-                 "yes"
-             } else {
-                 "NO"
-             });
+    println!(
+        "Configuration path: {}",
+        configfile.path().to_string_lossy()
+    );
+    println!(
+        "Configuration valid: {}",
+        if configfile.verify().is_ok() {
+            "yes"
+        } else {
+            "NO"
+        }
+    );
 
     Ok(())
 }
@@ -180,9 +186,11 @@ fn command_rename<C: ConfigFile>(matches: &ArgMatches<'static>) -> Result<()> {
     let new_configfile_name = matches.value_of_os("NEW").unwrap();
 
     let current_configfile = C::open(current_configfile_name)?;
-    println!("Renaming configfile from '{}' to '{}'",
-             current_configfile_name.to_string_lossy(),
-             new_configfile_name.to_string_lossy());
+    println!(
+        "Renaming configfile from '{}' to '{}'",
+        current_configfile_name.to_string_lossy(),
+        new_configfile_name.to_string_lossy()
+    );
     let new_configfile = current_configfile.rename(new_configfile_name)?;
 
     // Open editor for new configfile if desired
@@ -203,10 +211,11 @@ fn project_local(matches: &ArgMatches<'static>) -> Result<()> {
     let mut i3 = I3Connection::connect()?;
 
     println!("Starting project '{}'", project.name);
-    project
-        .start(&mut i3,
-               matches.value_of_os("working-directory"),
-               matches.value_of("workspace"))?;
+    project.start(
+        &mut i3,
+        matches.value_of_os("working-directory"),
+        matches.value_of("workspace"),
+    )?;
 
     Ok(())
 }
@@ -235,10 +244,11 @@ fn project_start(matches: &ArgMatches<'static>) -> Result<()> {
     let mut i3 = I3Connection::connect()?;
 
     println!("Starting project '{}'", project.name);
-    project
-        .start(&mut i3,
-               matches.value_of_os("working-directory"),
-               matches.value_of("workspace"))?;
+    project.start(
+        &mut i3,
+        matches.value_of_os("working-directory"),
+        matches.value_of("workspace"),
+    )?;
 
     Ok(())
 }
@@ -252,14 +262,18 @@ fn project_verify(matches: &ArgMatches<'static>) -> Result<()> {
 
     for configfile_name in configfiles {
         if let Err(e) = Project::open(&configfile_name)?.verify() {
-            println!("Configuration INVALID: '{}'",
-                     configfile_name.to_string_lossy());
+            println!(
+                "Configuration INVALID: '{}'",
+                configfile_name.to_string_lossy()
+            );
             println!("Error:");
             println!("    {}", e);
             println!();
         } else {
-            println!("Configuration   VALID: '{}'",
-                     configfile_name.to_string_lossy());
+            println!(
+                "Configuration   VALID: '{}'",
+                configfile_name.to_string_lossy()
+            );
         }
     }
 
@@ -327,24 +341,25 @@ fn verify_configfile<C: ConfigFile>(configfile: &C) -> Result<()> {
 
         let mut ch: Option<char>;
         while {
-                  println!("What do you want to do?");
-                  println!("(R)eopen editor, (A)ccept anyway");
+            println!("What do you want to do?");
+            println!("(R)eopen editor, (A)ccept anyway");
 
-                  ch = GETCH
-                      .getch()
-                      .ok()
-                      .map(|byte| byte.to_ascii_lowercase())
-                      .map(|byte| byte as char);
+            ch = GETCH
+                .getch()
+                .ok()
+                .map(|byte| byte.to_ascii_lowercase())
+                .map(|byte| byte as char);
 
-                  if ch.is_none() {
-                      true
-                  } else {
-                      match ch {
-                          Some('a') | Some('r') => false,
-                          _ => true,
-                      }
-                  }
-              } {
+            if ch.is_none() {
+                true
+            } else {
+                match ch {
+                    Some('a') | Some('r') => false,
+                    _ => true,
+                }
+            }
+        }
+        {
             // Ugly do-while syntax:
             //   https://gist.github.com/huonw/8435502
         }
