@@ -56,7 +56,7 @@ use std::convert::Into;
 use std::env;
 use std::ffi::{OsStr, OsString};
 use std::fs::File;
-use std::io::{BufReader, Read, stdin};
+use std::io::{stdin, BufReader, Read};
 use std::process::{Command, ExitStatus};
 
 static PROJECT_TEMPLATE: &'static [u8] = include_bytes!("../resources/project_template.toml");
@@ -358,8 +358,7 @@ fn verify_configfile<C: ConfigFile>(configfile: &C) -> Result<()> {
                     _ => true,
                 }
             }
-        }
-        {
+        } {
             // Ugly do-while syntax:
             //   https://gist.github.com/huonw/8435502
         }

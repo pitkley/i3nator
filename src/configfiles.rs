@@ -226,12 +226,10 @@ impl ConfigFileImpl {
         let path = config_path(prefix, name);
 
         if XDG_DIRS.find_config_file(&path).is_some() {
-            Err(
-                ErrorKind::ConfigExists(
-                    prefix.as_ref().to_string_lossy().into_owned(),
-                    name.as_ref().to_string_lossy().into_owned(),
-                ).into(),
-            )
+            Err(ErrorKind::ConfigExists(
+                prefix.as_ref().to_string_lossy().into_owned(),
+                name.as_ref().to_string_lossy().into_owned(),
+            ).into())
         } else {
             XDG_DIRS
                 .place_config_file(path)
@@ -330,21 +328,17 @@ impl ConfigFile for ConfigFileImpl {
     }
 
     fn create<S: AsRef<OsStr> + ?Sized>(name: &S) -> Result<Self> {
-        Err(
-            ErrorKind::UnknownConfig(
-                "NO PREFIX".to_owned(),
-                name.as_ref().to_string_lossy().into_owned(),
-            ).into(),
-        )
+        Err(ErrorKind::UnknownConfig(
+            "NO PREFIX".to_owned(),
+            name.as_ref().to_string_lossy().into_owned(),
+        ).into())
     }
 
     fn create_from_template<S: AsRef<OsStr> + ?Sized>(name: &S, _template: &[u8]) -> Result<Self> {
-        Err(
-            ErrorKind::UnknownConfig(
-                "NO PREFIX".to_owned(),
-                name.as_ref().to_string_lossy().into_owned(),
-            ).into(),
-        )
+        Err(ErrorKind::UnknownConfig(
+            "NO PREFIX".to_owned(),
+            name.as_ref().to_string_lossy().into_owned(),
+        ).into())
     }
 
     fn delete(&self) -> Result<()> {
@@ -356,9 +350,7 @@ impl ConfigFile for ConfigFileImpl {
         let path = path.as_ref();
 
         if !path.exists() || !path.is_file() {
-            Err(
-                ErrorKind::PathDoesntExist(path.to_string_lossy().into_owned()).into(),
-            )
+            Err(ErrorKind::PathDoesntExist(path.to_string_lossy().into_owned()).into())
         } else {
             Ok(ConfigFileImpl {
                 prefix: "local".to_owned().into(),
@@ -378,12 +370,10 @@ impl ConfigFile for ConfigFileImpl {
     }
 
     fn open<S: AsRef<OsStr> + ?Sized>(name: &S) -> Result<Self> {
-        Err(
-            ErrorKind::UnknownConfig(
-                "NO PREFIX".to_owned(),
-                name.as_ref().to_string_lossy().into_owned(),
-            ).into(),
-        )
+        Err(ErrorKind::UnknownConfig(
+            "NO PREFIX".to_owned(),
+            name.as_ref().to_string_lossy().into_owned(),
+        ).into())
     }
 
     fn path(&self) -> PathBuf {

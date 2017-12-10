@@ -70,9 +70,9 @@ impl Project {
         let mut file = BufReader::new(File::open(&self.path)?);
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
-        toml::from_str::<Config>(&contents).clone().map_err(
-            |e| e.into(),
-        )
+        toml::from_str::<Config>(&contents)
+            .clone()
+            .map_err(|e| e.into())
     }
 
     /// Gets the project's configuration, loading and storing it in the current project instance if
@@ -166,9 +166,9 @@ impl Project {
         };
 
         // Change workspace if provided
-        let workspace = workspace.map(Into::into).or_else(|| {
-            general.workspace.as_ref().cloned()
-        });
+        let workspace = workspace
+            .map(Into::into)
+            .or_else(|| general.workspace.as_ref().cloned());
         if let Some(ref workspace) = workspace {
             i3.command(&format!("workspace {}", workspace))?;
         }
@@ -191,13 +191,10 @@ impl Project {
             // 1. `--working-directory` command-line parameter
             // 2. `working_directory` option in config for application
             // 3. `working_directory` option in the general section of the config
-            let working_directory =
-                working_directory
-                    .map(OsStr::to_os_string)
-                    .or_else(|| {
-                        application.working_directory.as_ref().map(OsString::from)
-                    })
-                    .or_else(|| general.working_directory.as_ref().map(OsString::from));
+            let working_directory = working_directory
+                .map(OsStr::to_os_string)
+                .or_else(|| application.working_directory.as_ref().map(OsString::from))
+                .or_else(|| general.working_directory.as_ref().map(OsString::from));
 
             if let Some(working_directory) = working_directory {
                 cmd.current_dir(working_directory);
@@ -285,9 +282,7 @@ impl ConfigFile for Project {
         // Verify that all paths exist
         for path in paths {
             if !path.exists() {
-                return Err(
-                    ErrorKind::PathDoesntExist(path.to_string_lossy().into_owned()).into(),
-                );
+                return Err(ErrorKind::PathDoesntExist(path.to_string_lossy().into_owned()).into());
             }
         }
 
@@ -384,17 +379,13 @@ fn exec_commands(child: &Child, exec: &Exec) -> Result<()> {
 
     let commands = &exec.commands;
     match exec.exec_type {
-        ExecType::Text => {
-            for command in commands {
-                exec_text(base_parameters, command, timeout)?;
-                exec_keys(base_parameters, &["Return"], timeout)?;
-            }
-        }
-        ExecType::TextNoReturn => {
-            for command in commands {
-                exec_text(base_parameters, command, timeout)?;
-            }
-        }
+        ExecType::Text => for command in commands {
+            exec_text(base_parameters, command, timeout)?;
+            exec_keys(base_parameters, &["Return"], timeout)?;
+        },
+        ExecType::TextNoReturn => for command in commands {
+            exec_text(base_parameters, command, timeout)?;
+        },
         ExecType::Keys => exec_keys(base_parameters, commands.as_slice(), timeout)?,
     }
 
