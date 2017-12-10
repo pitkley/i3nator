@@ -36,14 +36,12 @@ pub fn cli() -> App<'static, 'static> {
         .version(crate_version!())
         .author(crate_authors!())
         .about(crate_description!())
-        .global_settings(
-            &[
-                AppSettings::ColoredHelp,
-                AppSettings::GlobalVersion,
-                AppSettings::InferSubcommands,
-                AppSettings::VersionlessSubcommands,
-            ],
-        )
+        .global_settings(&[
+            AppSettings::ColoredHelp,
+            AppSettings::GlobalVersion,
+            AppSettings::InferSubcommands,
+            AppSettings::VersionlessSubcommands,
+        ])
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .subcommand(
             SubCommand::with_name("copy")
