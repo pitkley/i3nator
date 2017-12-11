@@ -176,9 +176,8 @@ impl Project {
         // Append the layout to the workspace
         i3.command(&format!(
             "append_layout {}",
-            path.to_str().ok_or_else(|| {
-                ErrorKind::InvalidUtF8Path(path.to_string_lossy().into_owned())
-            })?
+            path.to_str()
+                .ok_or_else(|| ErrorKind::InvalidUtF8Path(path.to_string_lossy().into_owned()))?
         ))?;
 
         // Start the applications
