@@ -98,8 +98,8 @@ fn create_exists() {
 fn create_from_template() {
     with_projects_dir(|projects_dir| {
         let template = "this is my template";
-        let project = Project::create_from_template("project-template", template.as_bytes())
-            .unwrap();
+        let project =
+            Project::create_from_template("project-template", template.as_bytes()).unwrap();
 
         assert_eq!(project.name, "project-template");
         assert_eq!(project.path, projects_dir.join("project-template.toml"));
@@ -149,7 +149,9 @@ fn open() {
 #[test]
 #[should_panic(expected = "UnknownConfig")]
 fn open_unknown_project() {
-    with_projects_dir(|_| { Project::open("unknown-project").unwrap(); })
+    with_projects_dir(|_| {
+        Project::open("unknown-project").unwrap();
+    })
 }
 
 #[test]
@@ -160,8 +162,8 @@ fn config() {
 
                           [[applications]]
                           command = "mycommand""#;
-        let mut project = Project::create_from_template("project-template", template.as_bytes())
-            .unwrap();
+        let mut project =
+            Project::create_from_template("project-template", template.as_bytes()).unwrap();
 
         assert_eq!(project.name, "project-template");
         assert_eq!(project.path, projects_dir.join("project-template.toml"));
@@ -194,8 +196,8 @@ fn config() {
 fn config_invalid() {
     with_projects_dir(|projects_dir| {
         let template = r#"invalid template"#;
-        let mut project = Project::create_from_template("project-template", template.as_bytes())
-            .unwrap();
+        let mut project =
+            Project::create_from_template("project-template", template.as_bytes()).unwrap();
 
         assert_eq!(project.name, "project-template");
         assert_eq!(project.path, projects_dir.join("project-template.toml"));
