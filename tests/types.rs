@@ -13,10 +13,10 @@ use i3nator::types::*;
 use std::time::Duration;
 
 macro_rules! equivalent {
-    ( $fragment:expr, $expected:expr; $ty:ty ) => {
+    ($fragment: expr, $expected: expr; $ty: ty) => {
         let actual: $ty = toml::from_str($fragment).unwrap();
         assert_eq!(actual, $expected);
-    }
+    };
 }
 
 #[test]
