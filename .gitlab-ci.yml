@@ -1,20 +1,37 @@
+image: rustlang/rust:nightly
+
+variables:
+    DOCKER_DRIVER: overlay2
+    CROSS_BUILD_IMAGE: "${CI_REGISTRY_IMAGE}/hack/cross:latest"
+
 stages:
+    - prepare
     - build
     - test
 
+build and push cross image:
+    stage: prepare
+    image: docker:latest
+    services:
+        - docker:dind
+    script:
+        - setup_docker
+        - docker login -u gitlab-ci-token -p "$CI_JOB_TOKEN" "$CI_REGISTRY"
+        - 'docker pull "${CROSS_BUILD_IMAGE}" || :'
+        - docker build --pull --cache-from "${CROSS_BUILD_IMAGE}" -t "${CROSS_BUILD_IMAGE}" hack/docker/cross/
+        - docker push "${CROSS_BUILD_IMAGE}"
+
 rustfmt:
     stage: build
-    tags:
-        - docker
-    image: rustlang/rust:nightly
+    except:
+        - master
+        - /^develop\/.*$/
     script:
         - rustup component add rustfmt-preview
-        - cargo fmt -- --write-mode diff
+        - cargo fmt -- --write-mode=diff
 
 build dynamic binary on stable:
     stage: build
-    tags:
-        - docker
     image: rust:latest
     script:
         - cargo build --verbose
@@ -26,8 +43,6 @@ build dynamic binary on stable:
 
 build dynamic binary on nightly:
     stage: build
-    tags:
-        - docker
     image: rustlang/rust:nightly
     script:
         - cargo build --verbose
@@ -40,10 +55,9 @@ build dynamic binary on nightly:
 
 build static binary:
     stage: build
-    tags:
-        - rust-cross
+    image: "${CROSS_BUILD_IMAGE}"
     script:
-        - cross build --target x86_64-unknown-linux-musl --release
+        - cargo build --target x86_64-unknown-linux-musl --release
         - cp target/x86_64-unknown-linux-musl/release/i3nator i3nator
     artifacts:
         name: "$CI_JOB_NAME"
@@ -54,20 +68,16 @@ build static binary:
 
 test dynamic binary on stable:
     stage: test
-    tags:
-        - docker
     image: rust:latest
-    dependencies: []
+    dependencies: [] # do not retrieve artefacts from previous stages
     script:
         - cargo test -- --nocapture
         - cargo test -j1 --features sequential-tests -- --test-threads 1 --nocapture
 
 test dynamic binary on nightly:
     stage: test
-    tags:
-        - docker
     image: rustlang/rust:nightly
-    dependencies: []
+    dependencies: [] # do not retrieve artefacts from previous stages
     script:
         - cargo test -- --nocapture
         - cargo test -j1 --features sequential-tests -- --test-threads 1 --nocapture
@@ -75,9 +85,22 @@ test dynamic binary on nightly:
 
 test static binary:
     stage: test
-    tags:
-        - rust-cross
-    dependencies: []
+    image: "${CROSS_BUILD_IMAGE}"
+    dependencies: [] # do not retrieve artefacts from previous stages
     script:
-        - cross test --target x86_64-unknown-linux-musl -- --nocapture
-        - cross test --target x86_64-unknown-linux-musl -j1 --features sequential-tests -- --test-threads 1 --nocapture
+        - cargo test --target x86_64-unknown-linux-musl -- --nocapture
+        - cargo test --target x86_64-unknown-linux-musl -j1 --features sequential-tests -- --test-threads 1 --nocapture
+
+# -----------------------------------------------------------------------------
+
+.global_functions: &global_functions |
+    function setup_docker() {
+        if ! docker info &>/dev/null; then
+            if [ -z "$DOCKER_HOST" -a "$KUBERNETES_PORT" ]; then
+                export DOCKER_HOST='tcp://localhost:2375'
+            fi
+        fi
+    }
+
+before_script:
+    - *global_functions
