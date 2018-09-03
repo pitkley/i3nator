@@ -40,7 +40,7 @@ to install [`xdotool`][xdotool].
 
 Following the usage of i3nator as of 1.1.0.
 
-```text
+```
 USAGE:
     i3nator <SUBCOMMAND>
 
@@ -92,7 +92,7 @@ starting and potentially deleting them.
 `layout` is a bit special, because it is most of the commands used for projects, except for i3
 layouts:
 
-```text
+```
 USAGE:
     i3nator layout <SUBCOMMAND>
 
