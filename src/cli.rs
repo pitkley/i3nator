@@ -25,8 +25,7 @@ pub fn cli() -> App<'static, 'static> {
         .long_help(
             "Workspace to apply the layout to. This overrides the specified workspace in the \
              projects configuration.",
-        )
-        .short("w")
+        ).short("w")
         .long("workspace")
         .takes_value(true)
         .value_name("WORKSPACE")
@@ -41,8 +40,7 @@ pub fn cli() -> App<'static, 'static> {
             AppSettings::GlobalVersion,
             AppSettings::InferSubcommands,
             AppSettings::VersionlessSubcommands,
-        ])
-        .setting(AppSettings::SubcommandRequiredElseHelp)
+        ]).setting(AppSettings::SubcommandRequiredElseHelp)
         .subcommand(
             SubCommand::with_name("copy")
                 .about("Copy an existing project to a new project")
@@ -50,29 +48,24 @@ pub fn cli() -> App<'static, 'static> {
                     Arg::with_name("EXISTING")
                         .help("Name of the existing project")
                         .required(true),
-                )
-                .arg(
+                ).arg(
                     Arg::with_name("NEW")
                         .help("Name of the new, destination project")
                         .required(true),
-                )
-                .arg(
+                ).arg(
                     Arg::with_name("no-edit")
                         .help("Don't open the new project for editing after copying")
                         .long("no-edit")
                         .required(false),
-                )
-                .arg(
+                ).arg(
                     Arg::with_name("no-verify")
                         .help(
                             "Don't verify the contents of the new project after the editor closes",
-                        )
-                        .long("no-verify")
+                        ).long("no-verify")
                         .required(false)
                         .conflicts_with("no-edit"),
                 ),
-        )
-        .subcommand(
+        ).subcommand(
             SubCommand::with_name("delete")
                 .alias("remove")
                 .about("Delete existing projects")
@@ -82,8 +75,7 @@ pub fn cli() -> App<'static, 'static> {
                         .multiple(true)
                         .required(true),
                 ),
-        )
-        .subcommand(
+        ).subcommand(
             SubCommand::with_name("edit")
                 .alias("open")
                 .about("Open an existing project in your editor")
@@ -91,17 +83,14 @@ pub fn cli() -> App<'static, 'static> {
                     Arg::with_name("NAME")
                         .help("Name of the project to edit")
                         .required(true),
-                )
-                .arg(
+                ).arg(
                     Arg::with_name("no-verify")
                         .help(
                             "Don't verify the contents of the new project after the editor closes",
-                        )
-                        .long("no-verify")
+                        ).long("no-verify")
                         .required(false),
                 ),
-        )
-        .subcommand(
+        ).subcommand(
             SubCommand::with_name("info")
                 .about("Show information for the specified project")
                 .arg(
@@ -109,8 +98,7 @@ pub fn cli() -> App<'static, 'static> {
                         .help("Name of the project to show information for")
                         .required(true),
                 ),
-        )
-        .subcommand(
+        ).subcommand(
             SubCommand::with_name("list")
                 .about("List all projects")
                 .arg(
@@ -121,8 +109,7 @@ pub fn cli() -> App<'static, 'static> {
                         .takes_value(false)
                         .required(false),
                 ),
-        )
-        .subcommand(
+        ).subcommand(
             SubCommand::with_name("local")
                 .about("Run a project from a local TOML-file")
                 .arg(
@@ -132,64 +119,53 @@ pub fn cli() -> App<'static, 'static> {
                         .long("file")
                         .value_name("FILE")
                         .default_value("i3nator.toml"),
-                )
-                .arg(working_directory.clone())
+                ).arg(working_directory.clone())
                 .arg(workspace.clone()),
-        )
-        .subcommand(
+        ).subcommand(
             SubCommand::with_name("new")
                 .about("Create a new project and open it in your editor")
                 .arg(
                     Arg::with_name("NAME")
                         .help("Name of the project to create")
                         .required(true),
-                )
-                .arg(
+                ).arg(
                     Arg::with_name("no-edit")
                         .help("Don't open the new project for editing")
                         .long("no-edit")
                         .required(false),
-                )
-                .arg(
+                ).arg(
                     Arg::with_name("no-verify")
                         .help(
                             "Don't verify the contents of the new project after the editor closes",
-                        )
-                        .long("no-verify")
+                        ).long("no-verify")
                         .required(false)
                         .conflicts_with("no-edit"),
                 ),
-        )
-        .subcommand(
+        ).subcommand(
             SubCommand::with_name("rename")
                 .about("Rename a project")
                 .arg(
                     Arg::with_name("CURRENT")
                         .help("Name of the existing project to rename")
                         .required(true),
-                )
-                .arg(
+                ).arg(
                     Arg::with_name("NEW")
                         .help("New name for the existing project")
                         .required(true),
-                )
-                .arg(
+                ).arg(
                     Arg::with_name("edit")
                         .help("Open the renamed project for editing")
                         .long("edit")
                         .required(false),
-                )
-                .arg(
+                ).arg(
                     Arg::with_name("no-verify")
                         .help(
                             "Don't verify the contents of the new project after the editor closes",
-                        )
-                        .long("no-verify")
+                        ).long("no-verify")
                         .required(false)
                         .requires("edit"),
                 ),
-        )
-        .subcommand(
+        ).subcommand(
             SubCommand::with_name("start")
                 .alias("run")
                 .about("Start a project according to it's configuration")
@@ -197,11 +173,9 @@ pub fn cli() -> App<'static, 'static> {
                     Arg::with_name("NAME")
                         .help("Name of the project to start")
                         .required(true),
-                )
-                .arg(working_directory)
+                ).arg(working_directory)
                 .arg(workspace),
-        )
-        .subcommand(
+        ).subcommand(
             SubCommand::with_name("verify")
                 .about("Verify the configuration of the existing projects")
                 .arg(
@@ -210,12 +184,10 @@ pub fn cli() -> App<'static, 'static> {
                         .long_help(
                             "Name of the projects to verify. If not specified, all projects will \
                              be checked.",
-                        )
-                        .multiple(true)
+                        ).multiple(true)
                         .required(false),
                 ),
-        )
-        .subcommand(cli_layout())
+        ).subcommand(cli_layout())
 }
 
 pub fn cli_layout() -> App<'static, 'static> {
@@ -229,20 +201,17 @@ pub fn cli_layout() -> App<'static, 'static> {
                     Arg::with_name("EXISTING")
                         .help("Name of the existing layout")
                         .required(true),
-                )
-                .arg(
+                ).arg(
                     Arg::with_name("NEW")
                         .help("Name of the new, destination layout")
                         .required(true),
-                )
-                .arg(
+                ).arg(
                     Arg::with_name("no-edit")
                         .help("Don't open the new layout for editing after copying")
                         .long("no-edit")
                         .required(false),
                 ),
-        )
-        .subcommand(
+        ).subcommand(
             SubCommand::with_name("delete")
                 .alias("remove")
                 .about("Delete existing layouts")
@@ -252,8 +221,7 @@ pub fn cli_layout() -> App<'static, 'static> {
                         .multiple(true)
                         .required(true),
                 ),
-        )
-        .subcommand(
+        ).subcommand(
             SubCommand::with_name("edit")
                 .alias("open")
                 .about("Open an existing layout in your editor")
@@ -262,8 +230,7 @@ pub fn cli_layout() -> App<'static, 'static> {
                         .help("Name of the layout to edit")
                         .required(true),
                 ),
-        )
-        .subcommand(
+        ).subcommand(
             SubCommand::with_name("info")
                 .about("Show information for the specified layout")
                 .arg(
@@ -271,8 +238,7 @@ pub fn cli_layout() -> App<'static, 'static> {
                         .help("Name of the layout to show information for")
                         .required(true),
                 ),
-        )
-        .subcommand(
+        ).subcommand(
             SubCommand::with_name("list").about("List all layouts").arg(
                 Arg::with_name("quiet")
                     .help("List one layout per line, no other output")
@@ -281,48 +247,41 @@ pub fn cli_layout() -> App<'static, 'static> {
                     .takes_value(false)
                     .required(false),
             ),
-        )
-        .subcommand(
+        ).subcommand(
             SubCommand::with_name("new")
                 .about("Create a new layout and open it in your editor")
                 .arg(
                     Arg::with_name("NAME")
                         .help("Name of the layout to create")
                         .required(true),
-                )
-                .arg(
+                ).arg(
                     Arg::with_name("no-edit")
                         .help("Don't open the new layout for editing")
                         .long("no-edit")
                         .required(false),
-                )
-                .arg(
+                ).arg(
                     Arg::with_name("template")
                         .help(
                             "Prepopulate the layout from the given path. Use '-' to read from \
                              stdin.",
-                        )
-                        .short("t")
+                        ).short("t")
                         .long("template")
                         .takes_value(true)
                         .value_name("TEMPLATE")
                         .required(false),
                 ),
-        )
-        .subcommand(
+        ).subcommand(
             SubCommand::with_name("rename")
                 .about("Rename a layout")
                 .arg(
                     Arg::with_name("CURRENT")
                         .help("Name of the existing layout to rename")
                         .required(true),
-                )
-                .arg(
+                ).arg(
                     Arg::with_name("NEW")
                         .help("New name for the existing layout")
                         .required(true),
-                )
-                .arg(
+                ).arg(
                     Arg::with_name("edit")
                         .help("Open the renamed layout for editing")
                         .long("edit")

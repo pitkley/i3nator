@@ -176,16 +176,14 @@ fn config() {
                 workspace: None,
                 layout: Layout::Contents("{ ... }".to_owned()),
             },
-            applications: vec![
-                Application {
-                    command: ApplicationCommand {
-                        program: "mycommand".to_owned(),
-                        args: vec![],
-                    },
-                    working_directory: None,
-                    exec: None,
+            applications: vec![Application {
+                command: ApplicationCommand {
+                    program: "mycommand".to_owned(),
+                    args: vec![],
                 },
-            ],
+                working_directory: None,
+                exec: None,
+            }],
         };
 
         assert_eq!(project.config().unwrap(), &expected);

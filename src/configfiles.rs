@@ -237,8 +237,7 @@ impl ConfigFileImpl {
                     prefix: prefix.as_ref().to_owned(),
                     name: name.as_ref().to_string_lossy().into_owned(),
                     path: path,
-                })
-                .map_err(|e| e.into())
+                }).map_err(|e| e.into())
         }
     }
 
@@ -308,8 +307,7 @@ impl ConfigFileImpl {
                 prefix: prefix.as_ref().to_owned(),
                 name: name.to_owned(),
                 path: path,
-            })
-            .ok_or_else(|| {
+            }).ok_or_else(|| {
                 ErrorKind::UnknownConfig(prefix.as_ref().to_string_lossy().into_owned(), name)
                     .into()
             })

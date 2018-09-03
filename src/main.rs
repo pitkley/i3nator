@@ -149,12 +149,16 @@ fn command_layout(matches: &ArgMatches<'static>) -> Result<()> {
         ("new", Some(sub_matches)) => layout_new(sub_matches),
         ("rename", Some(sub_matches)) => command_rename::<Layout>(sub_matches),
         ("", None) =>
-            // No subcommand given. The clap `AppSettings` should be set to output the help by
-            // default, so this is unreachable.
-            unreachable!(),
+        // No subcommand given. The clap `AppSettings` should be set to output the help by
+        // default, so this is unreachable.
+        {
+            unreachable!()
+        }
         _ =>
-            // If all subcommands are defined above, this should be unreachable.
-            unreachable!(),
+        // If all subcommands are defined above, this should be unreachable.
+        {
+            unreachable!()
+        }
     }
 }
 
@@ -389,12 +393,16 @@ fn run() -> Result<()> {
         ("start", Some(sub_matches)) => project_start(sub_matches),
         ("verify", Some(sub_matches)) => project_verify(sub_matches),
         ("", None) =>
-            // No subcommand given. The clap `AppSettings` should be set to output the help by
-            // default, so this is unreachable.
-            unreachable!(),
+        // No subcommand given. The clap `AppSettings` should be set to output the help by
+        // default, so this is unreachable.
+        {
+            unreachable!()
+        }
         _ =>
-            // If all subcommands are defined above, this should be unreachable.
-            unreachable!(),
+        // If all subcommands are defined above, this should be unreachable.
+        {
+            unreachable!()
+        }
     }
 }
 

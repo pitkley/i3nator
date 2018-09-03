@@ -73,7 +73,10 @@ pub struct Config {
 pub struct General {
     /// The working directory defines in which directory-context the applications should be
     /// launched in.
-    #[serde(default, deserialize_with = "deserialize_opt_pathbuf_with_tilde")]
+    #[serde(
+        default,
+        deserialize_with = "deserialize_opt_pathbuf_with_tilde"
+    )]
     pub working_directory: Option<PathBuf>,
 
     /// If the workspace is `Some`, `i3` will be instructed to open the layout on the specified
@@ -127,7 +130,10 @@ pub struct Application {
     /// This overrides [`general.working_directory`][general-working_directory].
     ///
     /// [general-working_directory]: struct.General.html#structfield.working_directory
-    #[serde(default, deserialize_with = "deserialize_opt_pathbuf_with_tilde")]
+    #[serde(
+        default,
+        deserialize_with = "deserialize_opt_pathbuf_with_tilde"
+    )]
     pub working_directory: Option<PathBuf>,
 
     /// Commands to execute or keys to simulate after application startup.
@@ -206,7 +212,10 @@ pub struct Exec {
     ///
     /// In this case, `xdotool` would block indefinitely. This timeout will kill the `xdotool`
     /// process if it does not exit (successfully or unsuccessfully).
-    #[serde(default = "default_timeout", deserialize_with = "deserialize_duration")]
+    #[serde(
+        default = "default_timeout",
+        deserialize_with = "deserialize_duration"
+    )]
     pub timeout: Duration,
 }
 

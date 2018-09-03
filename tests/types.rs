@@ -27,20 +27,18 @@ fn full_config() {
             workspace: Some("0".to_owned()),
             layout: Layout::Path("/path/to/my/layout.json".into()),
         },
-        applications: vec![
-            Application {
-                command: ApplicationCommand {
-                    program: "mycommand".to_owned(),
-                    args: vec!["--with".to_owned(), "multiple args".to_owned()],
-                },
-                working_directory: Some("/path/to/a/different/working/directory".to_owned().into()),
-                exec: Some(Exec {
-                    commands: vec!["command one".to_owned(), "command two".to_owned()],
-                    exec_type: ExecType::TextNoReturn,
-                    timeout: Duration::from_secs(5),
-                }),
+        applications: vec![Application {
+            command: ApplicationCommand {
+                program: "mycommand".to_owned(),
+                args: vec!["--with".to_owned(), "multiple args".to_owned()],
             },
-        ],
+            working_directory: Some("/path/to/a/different/working/directory".to_owned().into()),
+            exec: Some(Exec {
+                commands: vec!["command one".to_owned(), "command two".to_owned()],
+                exec_type: ExecType::TextNoReturn,
+                timeout: Duration::from_secs(5),
+            }),
+        }],
     };
 
     equivalent! {

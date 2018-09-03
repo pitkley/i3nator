@@ -14,8 +14,8 @@ use i3ipc::I3Connection;
 use layouts::Layout as ManagedLayout;
 use std::ffi::{OsStr, OsString};
 use std::fs::File;
-use std::io::BufReader;
 use std::io::prelude::*;
+use std::io::BufReader;
 use std::ops::Deref;
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
@@ -199,7 +199,8 @@ impl Project {
                 cmd.current_dir(working_directory);
             }
 
-            let child = cmd.stdin(Stdio::null())
+            let child = cmd
+                .stdin(Stdio::null())
                 .stdout(Stdio::null())
                 .stderr(Stdio::null())
                 .spawn()?;
