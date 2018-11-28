@@ -29,7 +29,7 @@ serde = "^1.0"
 serde_derive = "^1.0"
 tempfile = "^3.0"
 toml = "^0.4"
-wait-timeout = "^0.1"
+wait-timeout = "^0.2"
 xdg = "^2.1"
 
 [build-dependencies]
