@@ -169,11 +169,11 @@ impl Project {
             .map(Into::into)
             .or_else(|| general.workspace.as_ref().cloned());
         if let Some(ref workspace) = workspace {
-            i3.command(&format!("workspace {}", workspace))?;
+            i3.run_command(&format!("workspace {}", workspace))?;
         }
 
         // Append the layout to the workspace
-        i3.command(&format!("append_layout {}",
+        i3.run_command(&format!("append_layout {}",
                              path.to_str()
                                  .ok_or_else(|| {
                                                  ErrorKind::InvalidUtF8Path(path.to_string_lossy()
