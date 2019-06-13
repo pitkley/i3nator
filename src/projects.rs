@@ -14,8 +14,8 @@ use i3ipc::I3Connection;
 use layouts::Layout as ManagedLayout;
 use std::ffi::{OsStr, OsString};
 use std::fs::File;
-use std::io::BufReader;
 use std::io::prelude::*;
+use std::io::BufReader;
 use std::ops::Deref;
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
@@ -139,11 +139,12 @@ impl Project {
     ///
     /// [xdotool]: https://github.com/jordansissel/xdotool
     /// [xterm-allow-send-events]: https://www.x.org/archive/X11R6.7.0/doc/xterm.1.html#sect6
-    pub fn start(&mut self,
-                 i3: &mut I3Connection,
-                 working_directory: Option<&OsStr>,
-                 workspace: Option<&str>)
-                 -> Result<()> {
+    pub fn start(
+        &mut self,
+        i3: &mut I3Connection,
+        working_directory: Option<&OsStr>,
+        workspace: Option<&str>,
+    ) -> Result<()> {
         let config = self.config()?;
         let general = &config.general;
 
@@ -169,16 +170,16 @@ impl Project {
             .map(Into::into)
             .or_else(|| general.workspace.as_ref().cloned());
         if let Some(ref workspace) = workspace {
-            i3.command(&format!("workspace {}", workspace))?;
+            i3.run_command(&format!("workspace {}", workspace))?;
         }
 
         // Append the layout to the workspace
-        i3.command(&format!("append_layout {}",
-                             path.to_str()
-                                 .ok_or_else(|| {
-                                                 ErrorKind::InvalidUtF8Path(path.to_string_lossy()
-                                                                                .into_owned())
-                                             })?))?;
+        i3.run_command(&format!(
+            "append_layout {}",
+            path.to_str().ok_or_else(|| {
+                ErrorKind::InvalidUtF8Path(path.to_string_lossy().into_owned())
+            })?
+        ))?;
 
         // Start the applications
         let applications = &config.applications;
@@ -190,17 +191,17 @@ impl Project {
             // 1. `--working-directory` command-line parameter
             // 2. `working_directory` option in config for application
             // 3. `working_directory` option in the general section of the config
-            let working_directory =
-                working_directory
-                    .map(OsStr::to_os_string)
-                    .or_else(|| application.working_directory.as_ref().map(OsString::from))
-                    .or_else(|| general.working_directory.as_ref().map(OsString::from));
+            let working_directory = working_directory
+                .map(OsStr::to_os_string)
+                .or_else(|| application.working_directory.as_ref().map(OsString::from))
+                .or_else(|| general.working_directory.as_ref().map(OsString::from));
 
             if let Some(working_directory) = working_directory {
                 cmd.current_dir(working_directory);
             }
 
-            let child = cmd.stdin(Stdio::null())
+            let child = cmd
+                .stdin(Stdio::null())
                 .stdout(Stdio::null())
                 .stderr(Stdio::null())
                 .spawn()?;
@@ -222,9 +223,11 @@ impl ConfigFile for Project {
     }
 
     fn create_from_template<S: AsRef<OsStr> + ?Sized>(name: &S, template: &[u8]) -> Result<Self> {
-        let configfile = ConfigFileImpl::create_from_template(PROJECTS_PREFIX.as_os_str(),
-                                                              name.as_ref(),
-                                                              template)?;
+        let configfile = ConfigFileImpl::create_from_template(
+            PROJECTS_PREFIX.as_os_str(),
+            name.as_ref(),
+            template,
+        )?;
         Ok(Project::from_configfile(configfile))
     }
 
@@ -334,10 +337,11 @@ fn exec_text(base_parameters: &[&str], text: &str, timeout: Duration) -> Result<
     }
 }
 
-fn exec_keys<S: AsRef<OsStr>>(base_parameters: &[&str],
-                              keys: &[S],
-                              timeout: Duration)
-                              -> Result<()> {
+fn exec_keys<S: AsRef<OsStr>>(
+    base_parameters: &[&str],
+    keys: &[S],
+    timeout: Duration,
+) -> Result<()> {
     let args = &[base_parameters, &["key", "--window", "%1"]].concat();
     let mut child = Command::new("xdotool")
         .args(args)
@@ -361,16 +365,18 @@ fn exec_keys<S: AsRef<OsStr>>(base_parameters: &[&str],
 fn exec_commands(child: &Child, exec: &Exec) -> Result<()> {
     let timeout = exec.timeout;
     let pid = child.id().to_string();
-    let base_parameters = &["search",
-                            "--sync",
-                            "--onlyvisible",
-                            "--any",
-                            "--pid",
-                            &pid,
-                            "ignorepattern",
-                            "windowfocus",
-                            "--sync",
-                            "%1"];
+    let base_parameters = &[
+        "search",
+        "--sync",
+        "--onlyvisible",
+        "--any",
+        "--pid",
+        &pid,
+        "ignorepattern",
+        "windowfocus",
+        "--sync",
+        "%1",
+    ];
 
     let commands = &exec.commands;
     match exec.exec_type {

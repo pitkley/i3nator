@@ -106,5 +106,9 @@ pub fn split<'a>(in_str: &'a str) -> Option<Vec<&'a str>> {
     let shl = Shlex::new(in_str);
     let res: Vec<&'a str> = shl.collect();
 
-    if res.is_empty() { None } else { Some(res) }
+    if res.is_empty() {
+        None
+    } else {
+        Some(res)
+    }
 }

@@ -32,7 +32,8 @@ lazy_static! {
 }
 
 fn with_projects_dir<F: FnOnce(&Path) -> ()>(body: F)
-    where F: UnwindSafe
+where
+    F: UnwindSafe,
 {
     // Create the temporary directories if they do not exist
     if !PROJECTS_DIR.exists() {
@@ -56,8 +57,8 @@ fn with_projects_dir<F: FnOnce(&Path) -> ()>(body: F)
 #[test]
 fn empty_list() {
     with_projects_dir(|_| {
-                          assert!(projects::list().is_empty());
-                      })
+        assert!(projects::list().is_empty());
+    })
 }
 
 #[test]
@@ -97,8 +98,8 @@ fn create_exists() {
 fn create_from_template() {
     with_projects_dir(|projects_dir| {
         let template = "this is my template";
-        let project = Project::create_from_template("project-template", template.as_bytes())
-            .unwrap();
+        let project =
+            Project::create_from_template("project-template", template.as_bytes()).unwrap();
 
         assert_eq!(project.name, "project-template");
         assert_eq!(project.path, projects_dir.join("project-template.toml"));
@@ -148,7 +149,9 @@ fn open() {
 #[test]
 #[should_panic(expected = "UnknownConfig")]
 fn open_unknown_project() {
-    with_projects_dir(|_| { Project::open("unknown-project").unwrap(); })
+    with_projects_dir(|_| {
+        Project::open("unknown-project").unwrap();
+    })
 }
 
 #[test]
@@ -159,8 +162,8 @@ fn config() {
 
                           [[applications]]
                           command = "mycommand""#;
-        let mut project = Project::create_from_template("project-template", template.as_bytes())
-            .unwrap();
+        let mut project =
+            Project::create_from_template("project-template", template.as_bytes()).unwrap();
 
         assert_eq!(project.name, "project-template");
         assert_eq!(project.path, projects_dir.join("project-template.toml"));
@@ -174,13 +177,13 @@ fn config() {
                 layout: Layout::Contents("{ ... }".to_owned()),
             },
             applications: vec![Application {
-                                   command: ApplicationCommand {
-                                       program: "mycommand".to_owned(),
-                                       args: vec![],
-                                   },
-                                   working_directory: None,
-                                   exec: None,
-                               }],
+                command: ApplicationCommand {
+                    program: "mycommand".to_owned(),
+                    args: vec![],
+                },
+                working_directory: None,
+                exec: None,
+            }],
         };
 
         assert_eq!(project.config().unwrap(), &expected);
@@ -191,8 +194,8 @@ fn config() {
 fn config_invalid() {
     with_projects_dir(|projects_dir| {
         let template = r#"invalid template"#;
-        let mut project = Project::create_from_template("project-template", template.as_bytes())
-            .unwrap();
+        let mut project =
+            Project::create_from_template("project-template", template.as_bytes()).unwrap();
 
         assert_eq!(project.name, "project-template");
         assert_eq!(project.path, projects_dir.join("project-template.toml"));
@@ -224,13 +227,13 @@ fn copy() {
 #[should_panic(expected = "the source path is not an existing regular file")]
 fn copy_without_file() {
     with_projects_dir(|projects_dir| {
-                          let project = Project::create("project-existing").unwrap();
-                          assert_eq!(project.name, "project-existing");
-                          assert_eq!(project.path, projects_dir.join("project-existing.toml"));
-                          assert!(project.verify().is_err());
+        let project = Project::create("project-existing").unwrap();
+        assert_eq!(project.name, "project-existing");
+        assert_eq!(project.path, projects_dir.join("project-existing.toml"));
+        assert!(project.verify().is_err());
 
-                          project.copy("project-new").unwrap();
-                      })
+        project.copy("project-new").unwrap();
+    })
 }
 
 #[test]
@@ -253,13 +256,13 @@ fn delete() {
 #[should_panic(expected = "No such file or directory")]
 fn delete_without_file() {
     with_projects_dir(|projects_dir| {
-                          let project = Project::create("project-delete").unwrap();
-                          assert_eq!(project.name, "project-delete");
-                          assert_eq!(project.path, projects_dir.join("project-delete.toml"));
-                          assert!(project.verify().is_err());
+        let project = Project::create("project-delete").unwrap();
+        assert_eq!(project.name, "project-delete");
+        assert_eq!(project.path, projects_dir.join("project-delete.toml"));
+        assert!(project.verify().is_err());
 
-                          project.delete().unwrap();
-                      })
+        project.delete().unwrap();
+    })
 }
 
 #[test]
@@ -275,8 +278,10 @@ fn rename() {
 
         let project_new = project.rename("project-rename-new").unwrap();
         assert_eq!(project_new.name, "project-rename-new");
-        assert_eq!(project_new.path,
-                   projects_dir.join("project-rename-new.toml"));
+        assert_eq!(
+            project_new.path,
+            projects_dir.join("project-rename-new.toml")
+        );
         assert!(project_new.verify().is_err());
 
         assert!(!project.path.exists());
