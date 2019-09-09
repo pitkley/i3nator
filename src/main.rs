@@ -62,7 +62,7 @@ use std::process::{Command, ExitStatus};
 static PROJECT_TEMPLATE: &'static [u8] = include_bytes!("../resources/project_template.toml");
 
 lazy_static! {
-    static ref GETCH: Getch = Getch::new().expect("failed to create getch");
+    static ref GETCH: Getch = Getch::new();
 }
 
 fn command_copy<C: ConfigFile>(matches: &ArgMatches<'static>) -> Result<()> {
