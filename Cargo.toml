@@ -20,7 +20,7 @@ include = [
 ]
 
 [dependencies]
-clap = "^2.24"
+clap = "^2.33"
 error-chain = "^0.12"
 getch = "^0.2"
 i3ipc = "^0.10"
@@ -33,7 +33,7 @@ wait-timeout = "^0.2"
 xdg = "^2.1"
 
 [build-dependencies]
-clap = "^2.24"
+clap = "^2.33"
 
 [dev-dependencies]
 tempdir = "^0.3"
