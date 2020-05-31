@@ -1,6 +1,8 @@
 sign-commit = true
 tag-name = "{{version}}"
 
+pre-release-hook = ["hack/cargo-release-hook.sh"]
+
 # Handle new section in CHANGELOG.md
 # 1. Replace the fields in the unreleased header.
 [[pre-release-replacements]]

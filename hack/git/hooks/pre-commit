@@ -1,0 +1,15 @@
+#!/bin/bash
+set -e
+
+exec 2>&1
+
+# Check if code is formatted
+cargo fmt --all -- --check
+
+# Check code
+cargo check --all --all-features
+# Check if all tests compile, but don't run them
+cargo test --all-features --no-run
+# Run non-guarded tests
+cargo test
+
