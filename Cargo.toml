@@ -22,6 +22,7 @@ include = [
 
 [dependencies]
 clap = "^2.33"
+dirs-next = "^1.0"
 error-chain = "^0.12"
 getch = "^0.2"
 i3ipc = "^0.10"
@@ -45,6 +46,3 @@ doc = false
 
 [features]
 sequential-tests = []
-
-[package.metadata.release]
-sign-commit = true
