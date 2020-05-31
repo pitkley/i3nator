@@ -42,16 +42,17 @@ fn full_config() {
     };
 
     equivalent! {
-        r#"[general]
-           working_directory = "/path/to/my/working/directory"
-           workspace = "0"
-           layout = "/path/to/my/layout.json"
+        r#"
+            [general]
+            working_directory = "/path/to/my/working/directory"
+            workspace = "0"
+            layout = "/path/to/my/layout.json"
 
-           [[applications]]
-           command = "mycommand --with 'multiple args'"
-           working_directory = "/path/to/a/different/working/directory"
-           exec = { commands = ["command one", "command two"], exec_type = "text_no_return" }
-           "#,
+            [[applications]]
+            command = "mycommand --with 'multiple args'"
+            working_directory = "/path/to/a/different/working/directory"
+            exec = { commands = ["command one", "command two"], exec_type = "text_no_return" }
+        "#,
         expected;
         Config
     }
@@ -209,8 +210,10 @@ fn duration_map() {
 #[should_panic(expected = "invalid type: string")]
 fn duration_str() {
     toml::from_str::<Exec>(
-        r#"commands = []
-                              timeout = "10""#,
+        r#"
+            commands = []
+            timeout = "10"
+        "#,
     )
     .unwrap();
 }
@@ -239,8 +242,10 @@ fn exec_commands_and_type() {
     };
 
     equivalent! {
-        r#"commands = ["command one", "command two"]
-           exec_type = "text_no_return""#,
+        r#"
+            commands = ["command one", "command two"]
+            exec_type = "text_no_return"
+        "#,
         expected;
         Exec
     }
@@ -255,9 +260,11 @@ fn exec_commands_type_and_timeout() {
     };
 
     equivalent! {
-        r#"commands = ["command one", "command two"]
-           exec_type = "text_no_return"
-           timeout = 10"#,
+        r#"
+            commands = ["command one", "command two"]
+            exec_type = "text_no_return"
+            timeout = 10
+        "#,
         expected;
         Exec
     }
@@ -279,8 +286,10 @@ fn exec_str() {
     };
 
     equivalent! {
-        r#"command = "-"
-           exec = "command one""#,
+        r#"
+            command = "-"
+            exec = "command one"
+        "#,
         expected;
         Application
     }
@@ -302,8 +311,10 @@ fn exec_seq() {
     };
 
     equivalent! {
-        r#"command = "-"
-           exec = ["command one", "command two"]"#,
+        r#"
+            command = "-"
+            exec = ["command one", "command two"]
+        "#,
         expected;
         Application
     }
