@@ -35,20 +35,22 @@
 //! working_directory = "/path/to/a/different/working/directory"
 //! ```
 
-use configfiles::ConfigFile;
-use layouts::Layout as ManagedLayout;
-use serde::de;
-use serde::de::{Deserialize, Deserializer};
-use shlex;
-use std::borrow::Cow;
-use std::env;
-use std::ffi::{OsStr, OsString};
-use std::fmt;
-use std::marker::PhantomData;
+use crate::{configfiles::ConfigFile, layouts::Layout as ManagedLayout, shlex};
+use serde::{
+    de::{self, Deserializer},
+    Deserialize,
+};
 #[cfg(unix)]
 use std::os::unix::ffi::OsStrExt;
-use std::path::{Path, PathBuf};
-use std::time::Duration;
+use std::{
+    borrow::Cow,
+    env,
+    ffi::{OsStr, OsString},
+    fmt,
+    marker::PhantomData,
+    path::{Path, PathBuf},
+    time::Duration,
+};
 
 /// This is the parent type defining the complete project configuration used by i3nator.
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -274,7 +276,7 @@ where
             S: de::SeqAccess<'de>,
         {
             let mut v: Vec<String> =
-                Deserialize::deserialize(de::value::SeqAccessDeserializer::new(visitor))?;
+                de::Deserialize::deserialize(de::value::SeqAccessDeserializer::new(visitor))?;
             if v.is_empty() {
                 Err(de::Error::custom("command can not be empty"))
             } else {
@@ -289,7 +291,7 @@ where
         where
             M: de::MapAccess<'de>,
         {
-            Deserialize::deserialize(de::value::MapAccessDeserializer::new(visitor))
+            de::Deserialize::deserialize(de::value::MapAccessDeserializer::new(visitor))
         }
     }
 
@@ -318,7 +320,7 @@ where
         where
             M: de::MapAccess<'de>,
         {
-            Deserialize::deserialize(de::value::MapAccessDeserializer::new(visitor))
+            de::Deserialize::deserialize(de::value::MapAccessDeserializer::new(visitor))
         }
     }
 
@@ -352,7 +354,7 @@ where
             S: de::SeqAccess<'de>,
         {
             let v: Vec<String> =
-                Deserialize::deserialize(de::value::SeqAccessDeserializer::new(visitor))?;
+                de::Deserialize::deserialize(de::value::SeqAccessDeserializer::new(visitor))?;
 
             if v.is_empty() {
                 Err(de::Error::custom("commands can not be empty"))
@@ -369,7 +371,7 @@ where
         where
             M: de::MapAccess<'de>,
         {
-            Deserialize::deserialize(de::value::MapAccessDeserializer::new(visitor))
+            de::Deserialize::deserialize(de::value::MapAccessDeserializer::new(visitor))
         }
     }
 
@@ -415,7 +417,7 @@ fn deserialize_pathbuf_with_tilde<'de, D>(deserializer: D) -> Result<PathBuf, D:
 where
     D: Deserializer<'de>,
 {
-    let pathbuf: PathBuf = Deserialize::deserialize(deserializer)?;
+    let pathbuf: PathBuf = de::Deserialize::deserialize(deserializer)?;
     Ok(tilde(&pathbuf).into_owned())
 }
 

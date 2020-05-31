@@ -6,9 +6,8 @@
 // option. This file may not be copied, modified or distributed
 // except according to those terms.
 
-use errors::*;
-use std::str;
-use std::str::Bytes;
+use crate::errors::*;
+use std::str::{self, Bytes};
 
 // Implementation based in parts on:
 //  https://github.com/comex/rust-shlex/blob/95ef6961a2500d89bc065b2873ca3e77850539e3/src/lib.rs

@@ -6,9 +6,6 @@
 // option. This file may not be copied, modified or distributed
 // except according to those terms.
 
-extern crate i3nator;
-extern crate toml;
-
 use i3nator::types::*;
 use std::time::Duration;
 

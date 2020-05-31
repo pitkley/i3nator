@@ -6,19 +6,10 @@
 // option. This file may not be copied, modified or distributed
 // except according to those terms.
 
-#[macro_use]
-extern crate clap;
-#[macro_use]
-extern crate error_chain;
-extern crate getch;
-extern crate i3ipc;
-extern crate i3nator;
-#[macro_use]
-extern crate lazy_static;
-extern crate tempfile;
-
 mod cli;
 mod errors {
+    use error_chain::error_chain;
+
     error_chain! {
         foreign_links {
             I3EstablishError(::i3ipc::EstablishError);
@@ -44,19 +35,21 @@ mod errors {
     }
 }
 
+use crate::errors::*;
 use clap::ArgMatches;
-use errors::*;
+use error_chain::quick_main;
 use getch::Getch;
 use i3ipc::I3Connection;
-use i3nator::configfiles::ConfigFile;
-use i3nator::layouts::Layout;
-use i3nator::projects::Project;
-use std::convert::Into;
-use std::env;
-use std::ffi::{OsStr, OsString};
-use std::fs::File;
-use std::io::{stdin, BufReader, Read};
-use std::process::{Command, ExitStatus};
+use i3nator::{configfiles::ConfigFile, layouts::Layout, projects::Project};
+use lazy_static::lazy_static;
+use std::{
+    convert::Into,
+    env,
+    ffi::{OsStr, OsString},
+    fs::File,
+    io::{stdin, BufReader, Read},
+    process::{Command, ExitStatus},
+};
 
 static PROJECT_TEMPLATE: &[u8] = include_bytes!("../resources/project_template.toml");
 

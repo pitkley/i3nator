@@ -8,11 +8,16 @@
 
 //! Module for layout handling.
 
-use configfiles::{self, ConfigFile, ConfigFileImpl};
-use errors::*;
-use std::ffi::{OsStr, OsString};
-use std::ops::Deref;
-use std::path::{Path, PathBuf};
+use crate::{
+    configfiles::{self, ConfigFile, ConfigFileImpl},
+    errors::*,
+};
+use lazy_static::lazy_static;
+use std::{
+    ffi::{OsStr, OsString},
+    ops::Deref,
+    path::{Path, PathBuf},
+};
 
 lazy_static! {
     static ref LAYOUTS_PREFIX: OsString = OsString::from("layouts");

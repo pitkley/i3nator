@@ -10,6 +10,8 @@
 //!
 //! [error-chain]: https://crates.io/crates/error-chain
 
+use error_chain::error_chain;
+
 error_chain! {
     foreign_links {
         I3EstablishError(::i3ipc::EstablishError)

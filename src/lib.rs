@@ -30,19 +30,6 @@
 #![recursion_limit = "1024"] // `error_chain!` can recurse deeply
 #![deny(missing_docs)]
 
-#[macro_use]
-extern crate error_chain;
-extern crate i3ipc;
-#[macro_use]
-extern crate lazy_static;
-extern crate serde;
-#[macro_use]
-extern crate serde_derive;
-extern crate tempfile;
-extern crate toml;
-extern crate wait_timeout;
-extern crate xdg;
-
 pub mod configfiles;
 pub mod errors;
 pub mod layouts;
