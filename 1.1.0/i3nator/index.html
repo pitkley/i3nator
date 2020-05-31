@@ -1,0 +1,221 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `i3nator` crate."><meta name="keywords" content="rust, rustlang, rust-lang, i3nator"><title>i3nator - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="../favicon.ico"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../i3nator/index.html'><div class='logo-container'><img src='../rust-logo.png' alt='logo'></div></a><p class='location'>Crate i3nator</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all i3nator's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'i3nator', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/i3nator/lib.rs.html#9-275' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>i3nator</a></span></h1><div class='docblock'><p>i3nator is <a href="https://github.com/tmuxinator/tmuxinator">Tmuxinator</a> for the <a href="https://i3wm.org/">i3 window manager</a>.</p>
+<p>It allows you to manage what are called &quot;projects&quot;, which are used to easily restore saved i3
+layouts (see <a href="https://i3wm.org/docs/layout-saving.html">Layout saving in i3</a>) and extending i3's base functionality
+by allowing you to automatically start applications too.</p>
+<ul>
+<li><a href="https://docs.rs/i3nator">Documentation</a></li>
+<li><a href="https://github.com/pitkley/i3nator">GitHub source repository</a></li>
+<li><a href="https://github.com/pitkley/i3nator/tree/master/examples">Example configurations</a></li>
+</ul>
+<h1 id="installation" class="section-header"><a href="#installation">Installation</a></h1>
+<p>You have multiple options to install i3nator:</p>
+<ol>
+<li>
+<p>If you have a recent Rust with Cargo installed, you can install <code>i3nator</code> directly from
+crates.io:</p>
+<pre><code class="language-console">$ cargo install i3nator
+</code></pre>
+</li>
+<li>
+<p>Alternatively, you can download the supplied static binary from the <a href="https://github.com/pitkley/i3nator/releases">release
+page</a>, this should work without any additional dependencies.</p>
+</li>
+<li>
+<p>Another option is to install from directly from source (this again requires a recent Rust
+installation):</p>
+<pre><code class="language-console">$ git clone https://github.com/pitkley/i3nator.git
+$ cd i3nator
+$ cargo install
+</code></pre>
+</li>
+</ol>
+<p><strong>Note:</strong> If you want to be able to use the automatic command execution feature, you will need
+to install <a href="https://github.com/jordansissel/xdotool"><code>xdotool</code></a>.</p>
+<h1 id="usage" class="section-header"><a href="#usage">Usage</a></h1>
+<p>Following the usage of i3nator as of 1.1.0.</p>
+<pre><code class="language-text">USAGE:
+    i3nator &lt;SUBCOMMAND&gt;
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+SUBCOMMANDS:
+    copy [FLAGS] &lt;EXISTING&gt; &lt;NEW&gt;
+              Copy an existing project to a new project
+
+    delete &lt;NAME&gt;...
+              Delete existing projects
+
+    edit [FLAGS] &lt;NAME&gt;
+              Open an existing project in your editor
+
+    help
+              Prints this message or the help of the given subcommand(s)
+
+    info &lt;NAME&gt;
+              Show information for the specified project
+
+    layout &lt;SUBCOMMAND&gt;
+              Manage layouts which can used in projects
+
+    list [FLAGS]
+              List all projects
+
+    local [OPTIONS]
+              Run a project from a local TOML-file
+
+    new [FLAGS] &lt;NAME&gt;
+              Create a new project and open it in your editor
+
+    rename [FLAGS] &lt;CURRENT&gt; &lt;NEW&gt;
+              Rename a project
+
+    start [OPTIONS] &lt;NAME&gt;
+              Start a project according to it's configuration
+
+    verify [NAME]...
+              Verify the configuration of the existing projects
+</code></pre>
+<p>Every command -- except <code>layout</code> -- is for managing your projects, i.e. creating, editing,
+starting and potentially deleting them.</p>
+<p><code>layout</code> is a bit special, because it is most of the commands used for projects, except for i3
+layouts:</p>
+<pre><code class="language-text">USAGE:
+    i3nator layout &lt;SUBCOMMAND&gt;
+
+FLAGS:
+    -h, --help       Prints help information
+
+SUBCOMMANDS:
+    copy [FLAGS] &lt;EXISTING&gt; &lt;NEW&gt;
+              Copy an existing layout to a new layout
+
+    delete &lt;NAME&gt;...
+              Delete existing layouts
+
+    edit [FLAGS] &lt;NAME&gt;
+              Open an existing layout in your editor
+
+    help
+              Prints this message or the help of the given subcommand(s)
+
+    info &lt;NAME&gt;
+              Show information for the specified layout
+
+    list [FLAGS]
+              List all layouts
+
+    new [FLAGS] &lt;NAME&gt;
+              Create a new layout and open it in your editor
+
+    rename [FLAGS] &lt;CURRENT&gt; &lt;NEW&gt;
+              Rename a layout
+</code></pre>
+<p>These commands allow you to manage <a href="https://i3wm.org/docs/layout-saving.html">i3 layouts</a> in addition to the actual
+projects which will be able to use and reuse them.</p>
+<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<p>(See <a href="https://github.com/pitkley/i3nator/tree/master/examples">here</a> for additional examples. See also the <a href="https://docs.rs/i3nator/*/i3nator/types/struct.Config.html"><code>types::Config</code> API
+documentation</a> for detailed documentation on the configuration
+parameters.)</p>
+<h2 id="full-workflow" class="section-header"><a href="#full-workflow">Full workflow</a></h2>
+<ol>
+<li>
+<p>Open all applications you want and lay them out on a workspace as desired.</p>
+</li>
+<li>
+<p>Save the workspace's layout using <a href="https://i3wm.org/docs/layout-saving.html#_saving_the_layout"><code>i3-save-tree</code></a>, feeding the layout
+directly into i3nator's layout management:</p>
+<pre><code class="language-console">$ i3-save-tree --workspace 1 | i3nator layout new mylayout
+</code></pre>
+<p>If you don't want the layout managed by i3nator, you can alternatively:</p>
+<ul>
+<li>copy the layout to your clipboard, and insert it directly in your project configuration
+later <em>or</em></li>
+<li>save it to a file on your disk, and reference this file-path in your configuration later.</li>
+</ul>
+<p>If you are using i3nator's layout management, the above command should drop you into an
+editor, ready for step 3.</p>
+</li>
+<li>
+<p>Modify the saved layout to accurately match created applications. See <a href="https://i3wm.org/docs/layout-saving.html#_editing_layout_files">Editing layout
+files</a> on how to do this.</p>
+<p>If you copied the layout to your clipboard, you will be able to do this in step 5.</p>
+</li>
+<li>
+<p>Create a new project:</p>
+<pre><code class="language-console">$ i3nator new myproject
+Created project 'myproject'
+Opening your editor to edit 'myproject'
+</code></pre>
+<p>This will open your default editor with a configuration template. If it doesn't, you have to
+specify either the <code>$VISUAL</code> or the <code>$EDITOR</code> environment variable.</p>
+<p>You can also simply edit the configuration file directly. Use <code>i3nator info &lt;PROJECT&gt;</code> to
+retreive its path.</p>
+</li>
+<li>
+<p>Modify the template to fit your needs. This includes:</p>
+<ol>
+<li>
+<p>Setting the main working directory.</p>
+</li>
+<li>
+<p>Setting the destination workspace (this is optional, if not specified, the active one
+will be used).</p>
+</li>
+<li>
+<p>Specifying which layout to use. If you have passed the layout to i3nator in step 2, you
+can simply enter its name here, which in case two was <code>mylayout</code>.</p>
+<p>Alternatively you can either supply a path to the file containing the layout, or you can
+paste the layout from step 2 directly into your project file as a multi-line string. At
+this point you will also be able to modify the layout to match applications correctly.</p>
+</li>
+<li>
+<p>Configuring which applications to start and how to start them. This is done by setting
+the <code>command</code> to the full command to be used to start the application and optionally
+configuring a different working directory if desired.</p>
+<p>If you want to execute additional commands or keypresses in the started applications,
+you can also define <code>exec</code>.</p>
+</li>
+</ol>
+<p>The resulting configuration could look something like this:</p>
+<pre><code class="language-toml">[general]
+working_directory = &quot;/path/to/my/working/directory&quot;
+workspace = &quot;1&quot;
+layout = &quot;mylayout&quot;
+
+[[applications]]
+command = &quot;mycommand --with 'multiple args'&quot;
+exec = [&quot;command one&quot;, &quot;command two&quot;]
+</code></pre>
+</li>
+<li>
+<p>Save and close your editor. This will automatically verify the created configuration. If
+there is an issue it will tell you what failed and allow you to reedit the file directly or
+ignore the error and exit.</p>
+</li>
+</ol>
+<p>With these prerequisites fulfilled, you are now able to start a configuration which appends
+your layout to a specified workspace and starts the configured applications:</p>
+<pre><code class="language-console">$ i3nator start myproject
+</code></pre>
+<h1 id="license" class="section-header"><a href="#license">License</a></h1>
+<p>i3nator is licensed under either of</p>
+<ul>
+<li>Apache License, Version 2.0, (<a href="LICENSE-APACHE">LICENSE-APACHE</a> or
+http://www.apache.org/licenses/LICENSE-2.0)</li>
+<li>MIT license (<a href="LICENSE-MIT">LICENSE-MIT</a> or
+http://opensource.org/licenses/MIT)</li>
+</ul>
+<p>at your option.</p>
+<h3 id="contribution" class="section-header"><a href="#contribution">Contribution</a></h3>
+<p>Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in i3nator by you, as defined in the Apache-2.0 license, shall be
+dual licensed as above, without any additional terms or conditions.</p>
+</div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+<table><tr class='module-item'><td><a class="mod" href="configfiles/index.html" title='i3nator::configfiles mod'>configfiles</a></td><td class='docblock-short'><p>Module consolidating common functionality between projects and layouts.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="errors/index.html" title='i3nator::errors mod'>errors</a></td><td class='docblock-short'><p>Errors, using <a href="https://crates.io/crates/error-chain"><code>error-chain</code></a>.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="layouts/index.html" title='i3nator::layouts mod'>layouts</a></td><td class='docblock-short'><p>Module for layout handling.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="projects/index.html" title='i3nator::projects mod'>projects</a></td><td class='docblock-short'><p>Module for project handling.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="types/index.html" title='i3nator::types mod'>types</a></td><td class='docblock-short'><p>The types in this module make up the structure of the project configuration files.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../";window.currentCrate = "i3nator";</script><script src="../aliases.js"></script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>
