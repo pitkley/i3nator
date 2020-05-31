@@ -224,7 +224,7 @@ fn copy() {
 }
 
 #[test]
-#[should_panic(expected = "the source path is not an existing regular file")]
+#[should_panic(expected = "No such file or directory")]
 fn copy_without_file() {
     with_projects_dir(|projects_dir| {
         let project = Project::create("project-existing").unwrap();

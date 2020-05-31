@@ -469,5 +469,6 @@ fn tilde<SI: ?Sized>(input: &SI) -> Cow<Path>
 where
     SI: AsRef<Path>,
 {
+    #[allow(deprecated)]
     tilde_with_context(input, env::home_dir)
 }

@@ -59,9 +59,9 @@ impl Project {
         let path = configfile.path.clone();
 
         Project {
-            configfile: configfile,
-            name: name,
-            path: path,
+            configfile,
+            name,
+            path,
             config: None,
         }
     }
@@ -70,9 +70,7 @@ impl Project {
         let mut file = BufReader::new(File::open(&self.path)?);
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
-        toml::from_str::<Config>(&contents)
-            .clone()
-            .map_err(|e| e.into())
+        toml::from_str::<Config>(&contents).map_err(|e| e.into())
     }
 
     /// Gets the project's configuration, loading and storing it in the current project instance if

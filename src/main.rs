@@ -51,7 +51,6 @@ use i3ipc::I3Connection;
 use i3nator::configfiles::ConfigFile;
 use i3nator::layouts::Layout;
 use i3nator::projects::Project;
-use std::ascii::AsciiExt;
 use std::convert::Into;
 use std::env;
 use std::ffi::{OsStr, OsString};
@@ -59,7 +58,7 @@ use std::fs::File;
 use std::io::{stdin, BufReader, Read};
 use std::process::{Command, ExitStatus};
 
-static PROJECT_TEMPLATE: &'static [u8] = include_bytes!("../resources/project_template.toml");
+static PROJECT_TEMPLATE: &[u8] = include_bytes!("../resources/project_template.toml");
 
 lazy_static! {
     static ref GETCH: Getch = Getch::new();
@@ -295,7 +294,7 @@ fn layout_new(matches: &ArgMatches<'static>) -> Result<()> {
 
         // Open appropriate reader
         let stdin_;
-        let reader: Box<Read> = if template == "-" {
+        let reader: Box<dyn Read> = if template == "-" {
             stdin_ = stdin();
             Box::new(stdin_.lock())
         } else {

@@ -46,9 +46,9 @@ impl Layout {
         let path = configfile.path.clone();
 
         Layout {
-            configfile: configfile,
-            name: name,
-            path: path,
+            configfile,
+            name,
+            path,
         }
     }
 }
