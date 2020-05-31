@@ -91,13 +91,13 @@ jobs:
               $ cargo install --force i3nator
               ```
 
-              In case you want to install this specific version, you can specify the `--vers` argument:
+              In case you want to install this specific version, you can specify the `--version` argument:
 
               ```console
-              $ cargo install --force --vers ${{ steps.tag.outputs.value }} i3nator
+              $ cargo install --force --version ${{ steps.tag.outputs.value }} i3nator
               ```
 
-          3. Another option is to install from directly from source (this again requires at least Rust 1.38.0):
+          3. Another option is to install from directly from source (this requires at least Rust 1.38.0):
 
               ```console
               $ git clone https://github.com/pitkley/i3nator.git
@@ -116,7 +116,7 @@ jobs:
       with:
         upload_url: ${{ steps.prepare-release.outputs.upload_url }}
         asset_path: target/release/i3nator
-        asset_name: i3nator-x86_64-unknown-linux-musl
+        asset_name: i3nator
         asset_content_type: application/octet-stream
     - name: Upload static i3nator binary checksum
       uses: actions/upload-release-asset@v1
@@ -125,5 +125,5 @@ jobs:
       with:
         upload_url: ${{ steps.prepare-release.outputs.upload_url }}
         asset_path: target/release/i3nator.sha256
-        asset_name: i3nator-x86_64-unknown-linux-musl.sha256
+        asset_name: i3nator.sha256
         asset_content_type: application/octet-stream

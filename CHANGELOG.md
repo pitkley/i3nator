@@ -8,7 +8,7 @@
 
     (Please note that this does not affect how or where you can run the pre-built binary.)
 
-<sub>Internal changes: dependency updates.</sub>
+<sub>Internal changes: dependency updates, move CI to GitHub Actions.</sub>
 
 ## 1.1.0 (2017-06-08)
 
