@@ -393,6 +393,9 @@
 <span id="393">393</span>
 <span id="394">394</span>
 <span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright Pit Kleyersburg &lt;pitkley@googlemail.com&gt;</span>
 <span class="comment">//</span>
@@ -404,21 +407,24 @@
 
 <span class="doccomment">//! Module for project handling.</span>
 
-<span class="kw">use</span> <span class="ident">configfiles</span>::{<span class="self">self</span>, <span class="ident">ConfigFile</span>, <span class="ident">ConfigFileImpl</span>};
-<span class="kw">use</span> <span class="ident">errors</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">configfiles</span>::{<span class="self">self</span>, <span class="ident">ConfigFile</span>, <span class="ident">ConfigFileImpl</span>},
+    <span class="ident">errors</span>::<span class="kw-2">*</span>,
+    <span class="ident">layouts</span>::<span class="ident">Layout</span> <span class="kw">as</span> <span class="ident">ManagedLayout</span>,
+    <span class="ident">types</span>::<span class="kw-2">*</span>,
+};
 <span class="kw">use</span> <span class="ident">i3ipc</span>::<span class="ident">I3Connection</span>;
-<span class="kw">use</span> <span class="ident">layouts</span>::<span class="ident">Layout</span> <span class="kw">as</span> <span class="ident">ManagedLayout</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::{<span class="ident">OsStr</span>, <span class="ident">OsString</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fs</span>::<span class="ident">File</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">BufReader</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::<span class="ident">Deref</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">process</span>::{<span class="ident">Child</span>, <span class="ident">Command</span>, <span class="ident">Stdio</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>;
+<span class="kw">use</span> <span class="ident">lazy_static</span>::<span class="ident">lazy_static</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{
+    <span class="ident">ffi</span>::{<span class="ident">OsStr</span>, <span class="ident">OsString</span>},
+    <span class="ident">fs</span>::<span class="ident">File</span>,
+    <span class="ident">io</span>::{<span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">BufReader</span>},
+    <span class="ident">ops</span>::<span class="ident">Deref</span>,
+    <span class="ident">path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>},
+    <span class="ident">process</span>::{<span class="ident">Child</span>, <span class="ident">Command</span>, <span class="ident">Stdio</span>},
+    <span class="ident">time</span>::<span class="ident">Duration</span>,
+};
 <span class="kw">use</span> <span class="ident">tempfile</span>::<span class="ident">NamedTempFile</span>;
-<span class="kw">use</span> <span class="ident">toml</span>;
-<span class="kw">use</span> <span class="ident">types</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">wait_timeout</span>::<span class="ident">ChildExt</span>;
 
 <span class="macro">lazy_static</span><span class="macro">!</span> {

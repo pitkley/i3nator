@@ -123,6 +123,11 @@
 <span id="123">123</span>
 <span id="124">124</span>
 <span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright Pit Kleyersburg &lt;pitkley@googlemail.com&gt;</span>
 <span class="comment">//</span>
@@ -134,11 +139,16 @@
 
 <span class="doccomment">//! Module for layout handling.</span>
 
-<span class="kw">use</span> <span class="ident">configfiles</span>::{<span class="self">self</span>, <span class="ident">ConfigFile</span>, <span class="ident">ConfigFileImpl</span>};
-<span class="kw">use</span> <span class="ident">errors</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::{<span class="ident">OsStr</span>, <span class="ident">OsString</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::<span class="ident">Deref</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">configfiles</span>::{<span class="self">self</span>, <span class="ident">ConfigFile</span>, <span class="ident">ConfigFileImpl</span>},
+    <span class="ident">errors</span>::<span class="kw-2">*</span>,
+};
+<span class="kw">use</span> <span class="ident">lazy_static</span>::<span class="ident">lazy_static</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{
+    <span class="ident">ffi</span>::{<span class="ident">OsStr</span>, <span class="ident">OsString</span>},
+    <span class="ident">ops</span>::<span class="ident">Deref</span>,
+    <span class="ident">path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>},
+};
 
 <span class="macro">lazy_static</span><span class="macro">!</span> {
     <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">LAYOUTS_PREFIX</span>: <span class="ident">OsString</span> <span class="op">=</span> <span class="ident">OsString</span>::<span class="ident">from</span>(<span class="string">&quot;layouts&quot;</span>);

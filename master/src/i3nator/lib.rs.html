@@ -36,19 +36,6 @@
 <span id="36">36</span>
 <span id="37">37</span>
 <span id="38">38</span>
-<span id="39">39</span>
-<span id="40">40</span>
-<span id="41">41</span>
-<span id="42">42</span>
-<span id="43">43</span>
-<span id="44">44</span>
-<span id="45">45</span>
-<span id="46">46</span>
-<span id="47">47</span>
-<span id="48">48</span>
-<span id="49">49</span>
-<span id="50">50</span>
-<span id="51">51</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright Pit Kleyersburg &lt;pitkley@googlemail.com&gt;</span>
 <span class="comment">//</span>
@@ -81,19 +68,6 @@
 
 <span class="attribute">#![<span class="ident">recursion_limit</span> <span class="op">=</span> <span class="string">&quot;1024&quot;</span>]</span> <span class="comment">// `error_chain!` can recurse deeply</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
-
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">error_chain</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">i3ipc</span>;
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">lazy_static</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde</span>;
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde_derive</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">tempfile</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">toml</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">wait_timeout</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">xdg</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">configfiles</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">errors</span>;

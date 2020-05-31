@@ -472,6 +472,8 @@
 <span id="472">472</span>
 <span id="473">473</span>
 <span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright Pit Kleyersburg &lt;pitkley@googlemail.com&gt;</span>
 <span class="comment">//</span>
@@ -510,20 +512,22 @@
 <span class="doccomment">//! working_directory = &quot;/path/to/a/different/working/directory&quot;</span>
 <span class="doccomment">//! ```</span>
 
-<span class="kw">use</span> <span class="ident">configfiles</span>::<span class="ident">ConfigFile</span>;
-<span class="kw">use</span> <span class="ident">layouts</span>::<span class="ident">Layout</span> <span class="kw">as</span> <span class="ident">ManagedLayout</span>;
-<span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">de</span>;
-<span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>};
-<span class="kw">use</span> <span class="ident">shlex</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">env</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::{<span class="ident">OsStr</span>, <span class="ident">OsString</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">configfiles</span>::<span class="ident">ConfigFile</span>, <span class="ident">layouts</span>::<span class="ident">Layout</span> <span class="kw">as</span> <span class="ident">ManagedLayout</span>, <span class="ident">shlex</span>};
+<span class="kw">use</span> <span class="ident">serde</span>::{
+    <span class="ident">de</span>::{<span class="self">self</span>, <span class="ident">Deserializer</span>},
+    <span class="ident">Deserialize</span>,
+};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">unix</span>::<span class="ident">ffi</span>::<span class="ident">OsStrExt</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{
+    <span class="ident">borrow</span>::<span class="ident">Cow</span>,
+    <span class="ident">env</span>,
+    <span class="ident">ffi</span>::{<span class="ident">OsStr</span>, <span class="ident">OsString</span>},
+    <span class="ident">fmt</span>,
+    <span class="ident">marker</span>::<span class="ident">PhantomData</span>,
+    <span class="ident">path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>},
+    <span class="ident">time</span>::<span class="ident">Duration</span>,
+};
 
 <span class="doccomment">/// This is the parent type defining the complete project configuration used by i3nator.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
@@ -749,7 +753,7 @@
             <span class="ident">S</span>: <span class="ident">de</span>::<span class="ident">SeqAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span>
-                <span class="ident">Deserialize</span>::<span class="ident">deserialize</span>(<span class="ident">de</span>::<span class="ident">value</span>::<span class="ident">SeqAccessDeserializer</span>::<span class="ident">new</span>(<span class="ident">visitor</span>))<span class="question-mark">?</span>;
+                <span class="ident">de</span>::<span class="ident">Deserialize</span>::<span class="ident">deserialize</span>(<span class="ident">de</span>::<span class="ident">value</span>::<span class="ident">SeqAccessDeserializer</span>::<span class="ident">new</span>(<span class="ident">visitor</span>))<span class="question-mark">?</span>;
             <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_empty</span>() {
                 <span class="prelude-val">Err</span>(<span class="ident">de</span>::<span class="ident">Error</span>::<span class="ident">custom</span>(<span class="string">&quot;command can not be empty&quot;</span>))
             } <span class="kw">else</span> {
@@ -764,7 +768,7 @@
         <span class="kw">where</span>
             <span class="ident">M</span>: <span class="ident">de</span>::<span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
         {
-            <span class="ident">Deserialize</span>::<span class="ident">deserialize</span>(<span class="ident">de</span>::<span class="ident">value</span>::<span class="ident">MapAccessDeserializer</span>::<span class="ident">new</span>(<span class="ident">visitor</span>))
+            <span class="ident">de</span>::<span class="ident">Deserialize</span>::<span class="ident">deserialize</span>(<span class="ident">de</span>::<span class="ident">value</span>::<span class="ident">MapAccessDeserializer</span>::<span class="ident">new</span>(<span class="ident">visitor</span>))
         }
     }
 
@@ -793,7 +797,7 @@
         <span class="kw">where</span>
             <span class="ident">M</span>: <span class="ident">de</span>::<span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
         {
-            <span class="ident">Deserialize</span>::<span class="ident">deserialize</span>(<span class="ident">de</span>::<span class="ident">value</span>::<span class="ident">MapAccessDeserializer</span>::<span class="ident">new</span>(<span class="ident">visitor</span>))
+            <span class="ident">de</span>::<span class="ident">Deserialize</span>::<span class="ident">deserialize</span>(<span class="ident">de</span>::<span class="ident">value</span>::<span class="ident">MapAccessDeserializer</span>::<span class="ident">new</span>(<span class="ident">visitor</span>))
         }
     }
 
@@ -827,7 +831,7 @@
             <span class="ident">S</span>: <span class="ident">de</span>::<span class="ident">SeqAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
         {
             <span class="kw">let</span> <span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span>
-                <span class="ident">Deserialize</span>::<span class="ident">deserialize</span>(<span class="ident">de</span>::<span class="ident">value</span>::<span class="ident">SeqAccessDeserializer</span>::<span class="ident">new</span>(<span class="ident">visitor</span>))<span class="question-mark">?</span>;
+                <span class="ident">de</span>::<span class="ident">Deserialize</span>::<span class="ident">deserialize</span>(<span class="ident">de</span>::<span class="ident">value</span>::<span class="ident">SeqAccessDeserializer</span>::<span class="ident">new</span>(<span class="ident">visitor</span>))<span class="question-mark">?</span>;
 
             <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_empty</span>() {
                 <span class="prelude-val">Err</span>(<span class="ident">de</span>::<span class="ident">Error</span>::<span class="ident">custom</span>(<span class="string">&quot;commands can not be empty&quot;</span>))
@@ -844,7 +848,7 @@
         <span class="kw">where</span>
             <span class="ident">M</span>: <span class="ident">de</span>::<span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
         {
-            <span class="ident">Deserialize</span>::<span class="ident">deserialize</span>(<span class="ident">de</span>::<span class="ident">value</span>::<span class="ident">MapAccessDeserializer</span>::<span class="ident">new</span>(<span class="ident">visitor</span>))
+            <span class="ident">de</span>::<span class="ident">Deserialize</span>::<span class="ident">deserialize</span>(<span class="ident">de</span>::<span class="ident">value</span>::<span class="ident">MapAccessDeserializer</span>::<span class="ident">new</span>(<span class="ident">visitor</span>))
         }
     }
 
@@ -890,7 +894,7 @@
 <span class="kw">where</span>
     <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
 {
-    <span class="kw">let</span> <span class="ident">pathbuf</span>: <span class="ident">PathBuf</span> <span class="op">=</span> <span class="ident">Deserialize</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">pathbuf</span>: <span class="ident">PathBuf</span> <span class="op">=</span> <span class="ident">de</span>::<span class="ident">Deserialize</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">tilde</span>(<span class="kw-2">&amp;</span><span class="ident">pathbuf</span>).<span class="ident">into_owned</span>())
 }
 

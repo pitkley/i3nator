@@ -111,7 +111,6 @@
 <span id="111">111</span>
 <span id="112">112</span>
 <span id="113">113</span>
-<span id="114">114</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright Pit Kleyersburg &lt;pitkley@googlemail.com&gt;</span>
 <span class="comment">//</span>
@@ -121,9 +120,8 @@
 <span class="comment">// option. This file may not be copied, modified or distributed</span>
 <span class="comment">// except according to those terms.</span>
 
-<span class="kw">use</span> <span class="ident">errors</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::<span class="ident">Bytes</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">errors</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::{<span class="self">self</span>, <span class="ident">Bytes</span>};
 
 <span class="comment">// Implementation based in parts on:</span>
 <span class="comment">//  https://github.com/comex/rust-shlex/blob/95ef6961a2500d89bc065b2873ca3e77850539e3/src/lib.rs</span>
