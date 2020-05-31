@@ -44,7 +44,6 @@ use serde::{
 use std::os::unix::ffi::OsStrExt;
 use std::{
     borrow::Cow,
-    env,
     ffi::{OsStr, OsString},
     fmt,
     marker::PhantomData,
@@ -471,6 +470,5 @@ fn tilde<SI: ?Sized>(input: &SI) -> Cow<Path>
 where
     SI: AsRef<Path>,
 {
-    #[allow(deprecated)]
-    tilde_with_context(input, env::home_dir)
+    tilde_with_context(input, dirs_next::home_dir)
 }
