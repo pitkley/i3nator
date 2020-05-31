@@ -1,4 +1,4 @@
-// Copyright 2017 Pit Kleyersburg <pitkley@googlemail.com>
+// Copyright Pit Kleyersburg <pitkley@googlemail.com>
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 // http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -59,9 +59,9 @@ impl Project {
         let path = configfile.path.clone();
 
         Project {
-            configfile: configfile,
-            name: name,
-            path: path,
+            configfile,
+            name,
+            path,
             config: None,
         }
     }
@@ -70,9 +70,7 @@ impl Project {
         let mut file = BufReader::new(File::open(&self.path)?);
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
-        toml::from_str::<Config>(&contents)
-            .clone()
-            .map_err(|e| e.into())
+        toml::from_str::<Config>(&contents).map_err(|e| e.into())
     }
 
     /// Gets the project's configuration, loading and storing it in the current project instance if
@@ -176,9 +174,8 @@ impl Project {
         // Append the layout to the workspace
         i3.run_command(&format!(
             "append_layout {}",
-            path.to_str().ok_or_else(|| {
-                ErrorKind::InvalidUtF8Path(path.to_string_lossy().into_owned())
-            })?
+            path.to_str()
+                .ok_or_else(|| ErrorKind::InvalidUtF8Path(path.to_string_lossy().into_owned()))?
         ))?;
 
         // Start the applications

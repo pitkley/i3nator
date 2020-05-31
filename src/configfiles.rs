@@ -1,4 +1,4 @@
-// Copyright 2017 Pit Kleyersburg <pitkley@googlemail.com>
+// Copyright Pit Kleyersburg <pitkley@googlemail.com>
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 // http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -237,7 +237,7 @@ impl ConfigFileImpl {
                 .map(|path| ConfigFileImpl {
                     prefix: prefix.as_ref().to_owned(),
                     name: name.as_ref().to_string_lossy().into_owned(),
-                    path: path,
+                    path,
                 })
                 .map_err(|e| e.into())
         }
@@ -308,7 +308,7 @@ impl ConfigFileImpl {
             .map(|path| ConfigFileImpl {
                 prefix: prefix.as_ref().to_owned(),
                 name: name.to_owned(),
-                path: path,
+                path,
             })
             .ok_or_else(|| {
                 ErrorKind::UnknownConfig(prefix.as_ref().to_string_lossy().into_owned(), name)

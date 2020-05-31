@@ -1,4 +1,4 @@
-// Copyright 2017 Pit Kleyersburg <pitkley@googlemail.com>
+// Copyright Pit Kleyersburg <pitkley@googlemail.com>
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 // http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -469,5 +469,6 @@ fn tilde<SI: ?Sized>(input: &SI) -> Cow<Path>
 where
     SI: AsRef<Path>,
 {
+    #[allow(deprecated)]
     tilde_with_context(input, env::home_dir)
 }

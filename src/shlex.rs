@@ -1,4 +1,4 @@
-// Copyright 2017 Pit Kleyersburg <pitkley@googlemail.com>
+// Copyright Pit Kleyersburg <pitkley@googlemail.com>
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 // http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -25,7 +25,7 @@ struct Shlex<'a> {
 impl<'a> Shlex<'a> {
     pub fn new(in_str: &'a str) -> Shlex<'a> {
         Shlex {
-            in_str: in_str,
+            in_str,
             in_bytes: in_str.bytes(),
             offset: 0,
         }

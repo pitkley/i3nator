@@ -1,4 +1,4 @@
-// Copyright 2017 Pit Kleyersburg <pitkley@googlemail.com>
+// Copyright Pit Kleyersburg <pitkley@googlemail.com>
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 // http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -224,7 +224,7 @@ fn copy() {
 }
 
 #[test]
-#[should_panic(expected = "the source path is not an existing regular file")]
+#[should_panic(expected = "No such file or directory")]
 fn copy_without_file() {
     with_projects_dir(|projects_dir| {
         let project = Project::create("project-existing").unwrap();

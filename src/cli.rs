@@ -1,4 +1,4 @@
-// Copyright 2017 Pit Kleyersburg <pitkley@googlemail.com>
+// Copyright Pit Kleyersburg <pitkley@googlemail.com>
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 // http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -12,8 +12,8 @@ pub fn cli() -> App<'static, 'static> {
     let working_directory = Arg::with_name("working-directory")
         .help("Directory used as context for starting the applications")
         .long_help(
-            "Directory used as context for starting the applications. This overrides any \
-             specified working-directory in the projects configuration.",
+            "Directory used as context for starting the applications. This overrides any specified \
+             working-directory in the projects configuration.",
         )
         .short("d")
         .long("working-directory")

@@ -40,6 +40,7 @@ to install [`xdotool`][xdotool].
 
 Following the usage of i3nator as of 1.1.0.
 
+<!-- usage-main -->
 ```text
 USAGE:
     i3nator <SUBCOMMAND>
@@ -85,6 +86,7 @@ SUBCOMMANDS:
     verify [NAME]...
               Verify the configuration of the existing projects
 ```
+<!-- /usage-main -->
 
 Every command -- except `layout` -- is for managing your projects, i.e. creating, editing,
 starting and potentially deleting them.
@@ -92,6 +94,7 @@ starting and potentially deleting them.
 `layout` is a bit special, because it is most of the commands used for projects, except for i3
 layouts:
 
+<!-- usage-layout -->
 ```text
 USAGE:
     i3nator layout <SUBCOMMAND>
@@ -124,6 +127,7 @@ SUBCOMMANDS:
     rename [FLAGS] <CURRENT> <NEW>
               Rename a layout
 ```
+<!-- /usage-layout -->
 
 These commands allow you to manage [i3 layouts][i3wm-layout-saving] in addition to the actual
 projects which will be able to use and reuse them.
