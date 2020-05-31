@@ -190,7 +190,7 @@ dependencies = [
 
 [[package]]
 name = "i3nator"
-version = "1.1.1-pre"
+version = "1.2.0-pre"
 dependencies = [
  "clap 2.33.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "dirs-next 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
