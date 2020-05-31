@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["list","Get a list of all layout names."]],"struct":[["Layout","A structure representing a managed i3-layout."]]});
