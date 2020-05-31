@@ -8,13 +8,14 @@
 
 //! Module consolidating common functionality between projects and layouts.
 
-use errors::*;
-use std::ffi::{OsStr, OsString};
-use std::fs;
-use std::fs::File;
-use std::io::prelude::*;
-use std::path::{Path, PathBuf};
-use xdg;
+use crate::errors::*;
+use lazy_static::lazy_static;
+use std::{
+    ffi::{OsStr, OsString},
+    fs::{self, File},
+    io::prelude::*,
+    path::{Path, PathBuf},
+};
 
 lazy_static! {
     static ref XDG_DIRS: xdg::BaseDirectories =

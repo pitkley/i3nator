@@ -6,7 +6,9 @@
 // option. This file may not be copied, modified or distributed
 // except according to those terms.
 
-use clap::{App, AppSettings, Arg, SubCommand};
+use clap::{
+    crate_authors, crate_description, crate_name, crate_version, App, AppSettings, Arg, SubCommand,
+};
 
 pub fn cli() -> App<'static, 'static> {
     let working_directory = Arg::with_name("working-directory")

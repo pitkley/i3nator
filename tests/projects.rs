@@ -8,21 +8,20 @@
 
 #![cfg(feature = "sequential-tests")]
 
-extern crate i3nator;
-#[macro_use]
-extern crate lazy_static;
-extern crate tempdir;
-extern crate tempfile;
-
-use i3nator::configfiles::ConfigFile;
-use i3nator::projects::{self, Project};
-use i3nator::types::*;
-use std::env;
-use std::ffi::OsString;
-use std::fs::{self, File};
-use std::io::prelude::*;
-use std::panic::{self, UnwindSafe};
-use std::path::{Path, PathBuf};
+use i3nator::{
+    configfiles::ConfigFile,
+    projects::{self, Project},
+    types::*,
+};
+use lazy_static::lazy_static;
+use std::{
+    env,
+    ffi::OsString,
+    fs::{self, File},
+    io::prelude::*,
+    panic::{self, UnwindSafe},
+    path::{Path, PathBuf},
+};
 use tempdir::TempDir;
 use tempfile::NamedTempFile;
 

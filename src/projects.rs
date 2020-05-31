@@ -8,21 +8,24 @@
 
 //! Module for project handling.
 
-use configfiles::{self, ConfigFile, ConfigFileImpl};
-use errors::*;
+use crate::{
+    configfiles::{self, ConfigFile, ConfigFileImpl},
+    errors::*,
+    layouts::Layout as ManagedLayout,
+    types::*,
+};
 use i3ipc::I3Connection;
-use layouts::Layout as ManagedLayout;
-use std::ffi::{OsStr, OsString};
-use std::fs::File;
-use std::io::prelude::*;
-use std::io::BufReader;
-use std::ops::Deref;
-use std::path::{Path, PathBuf};
-use std::process::{Child, Command, Stdio};
-use std::time::Duration;
+use lazy_static::lazy_static;
+use std::{
+    ffi::{OsStr, OsString},
+    fs::File,
+    io::{prelude::*, BufReader},
+    ops::Deref,
+    path::{Path, PathBuf},
+    process::{Child, Command, Stdio},
+    time::Duration,
+};
 use tempfile::NamedTempFile;
-use toml;
-use types::*;
 use wait_timeout::ChildExt;
 
 lazy_static! {
