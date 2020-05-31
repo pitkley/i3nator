@@ -472,8 +472,6 @@
 <span id="472">472</span>
 <span id="473">473</span>
 <span id="474">474</span>
-<span id="475">475</span>
-<span id="476">476</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright Pit Kleyersburg &lt;pitkley@googlemail.com&gt;</span>
 <span class="comment">//</span>
@@ -521,7 +519,6 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">unix</span>::<span class="ident">ffi</span>::<span class="ident">OsStrExt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow</span>::<span class="ident">Cow</span>,
-    <span class="ident">env</span>,
     <span class="ident">ffi</span>::{<span class="ident">OsStr</span>, <span class="ident">OsString</span>},
     <span class="ident">fmt</span>,
     <span class="ident">marker</span>::<span class="ident">PhantomData</span>,
@@ -948,8 +945,7 @@
 <span class="kw">where</span>
     <span class="ident">SI</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span>,
 {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-    <span class="ident">tilde_with_context</span>(<span class="ident">input</span>, <span class="ident">env</span>::<span class="ident">home_dir</span>)
+    <span class="ident">tilde_with_context</span>(<span class="ident">input</span>, <span class="ident">dirs_next</span>::<span class="ident">home_dir</span>)
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "i3nator";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
