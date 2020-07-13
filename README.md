@@ -42,6 +42,10 @@ Following the usage of i3nator as of 1.1.0.
 
 <!-- usage-main -->
 ```text
+i3nator 1.2.0
+Pit Kleyersburg <pitkley@googlemail.com>
+i3nator is Tmuxinator for the i3 window manager
+
 USAGE:
     i3nator <SUBCOMMAND>
 
@@ -50,41 +54,18 @@ FLAGS:
     -V, --version    Prints version information
 
 SUBCOMMANDS:
-    copy [FLAGS] <EXISTING> <NEW>
-              Copy an existing project to a new project
-
-    delete <NAME>...
-              Delete existing projects
-
-    edit [FLAGS] <NAME>
-              Open an existing project in your editor
-
-    help
-              Prints this message or the help of the given subcommand(s)
-
-    info <NAME>
-              Show information for the specified project
-
-    layout <SUBCOMMAND>
-              Manage layouts which can used in projects
-
-    list [FLAGS]
-              List all projects
-
-    local [OPTIONS]
-              Run a project from a local TOML-file
-
-    new [FLAGS] <NAME>
-              Create a new project and open it in your editor
-
-    rename [FLAGS] <CURRENT> <NEW>
-              Rename a project
-
-    start [OPTIONS] <NAME>
-              Start a project according to it's configuration
-
-    verify [NAME]...
-              Verify the configuration of the existing projects
+    copy      Copy an existing project to a new project
+    delete    Delete existing projects
+    edit      Open an existing project in your editor
+    help      Prints this message or the help of the given subcommand(s)
+    info      Show information for the specified project
+    layout    Manage layouts which can used in projects
+    list      List all projects
+    local     Run a project from a local TOML-file
+    new       Create a new project and open it in your editor
+    rename    Rename a project
+    start     Start a project according to it's configuration
+    verify    Verify the configuration of the existing projects
 ```
 <!-- /usage-main -->
 
@@ -96,36 +77,24 @@ layouts:
 
 <!-- usage-layout -->
 ```text
+i3nator-layout 1.2.0
+Manage layouts which can used in projects
+
 USAGE:
     i3nator layout <SUBCOMMAND>
 
 FLAGS:
-    -h, --help       Prints help information
+    -h, --help    Prints help information
 
 SUBCOMMANDS:
-    copy [FLAGS] <EXISTING> <NEW>
-              Copy an existing layout to a new layout
-
-    delete <NAME>...
-              Delete existing layouts
-
-    edit [FLAGS] <NAME>
-              Open an existing layout in your editor
-
-    help
-              Prints this message or the help of the given subcommand(s)
-
-    info <NAME>
-              Show information for the specified layout
-
-    list [FLAGS]
-              List all layouts
-
-    new [FLAGS] <NAME>
-              Create a new layout and open it in your editor
-
-    rename [FLAGS] <CURRENT> <NEW>
-              Rename a layout
+    copy      Copy an existing layout to a new layout
+    delete    Delete existing layouts
+    edit      Open an existing layout in your editor
+    help      Prints this message or the help of the given subcommand(s)
+    info      Show information for the specified layout
+    list      List all layouts
+    new       Create a new layout and open it in your editor
+    rename    Rename a layout
 ```
 <!-- /usage-layout -->
 
