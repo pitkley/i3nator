@@ -21,6 +21,9 @@ include = [
     "LICENSE-*",
 ]
 
+[badges]
+maintenance = { status = "actively-developed" }
+
 [dependencies]
 clap = "^2.33"
 dirs-next = "^1.0"
