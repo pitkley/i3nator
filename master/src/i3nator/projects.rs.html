@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/projects.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>projects.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../i3nator/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/projects.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>projects.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../i3nator/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -450,13 +451,13 @@
 <span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">Project</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">ConfigFileImpl</span>;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">ConfigFileImpl</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">ConfigFileImpl</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">configfile</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Project</span> {
-    <span class="kw">fn</span> <span class="ident">from_configfile</span>(<span class="ident">configfile</span>: <span class="ident">ConfigFileImpl</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from_configfile</span>(<span class="ident">configfile</span>: <span class="ident">ConfigFileImpl</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">configfile</span>.<span class="ident">name</span>.<span class="ident">to_owned</span>();
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">configfile</span>.<span class="ident">path</span>.<span class="ident">clone</span>();
 
@@ -468,7 +469,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Config</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Config</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">BufReader</span>::<span class="ident">new</span>(<span class="ident">File</span>::<span class="ident">open</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>)<span class="question-mark">?</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">contents</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">new</span>();
         <span class="ident">file</span>.<span class="ident">read_to_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">contents</span>)<span class="question-mark">?</span>;
@@ -491,7 +492,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [struct-Config]: ../types/struct.Config.html</span>
     <span class="doccomment">/// [fn-Project-verify]: #method.verify</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">config</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Config</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">config</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Config</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">is_none</span>() {
             <span class="self">self</span>.<span class="ident">config</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">load</span>()<span class="question-mark">?</span>);
         }
@@ -544,7 +545,7 @@
         <span class="ident">i3</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I3Connection</span>,
         <span class="ident">working_directory</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">OsStr</span><span class="op">&gt;</span>,
         <span class="ident">workspace</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">config</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">general</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">config</span>.<span class="ident">general</span>;
 
@@ -552,23 +553,23 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tempfile</span>;
         <span class="kw">let</span> <span class="ident">managed_layout_path</span>;
         <span class="kw">let</span> <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">general</span>.<span class="ident">layout</span> {
-            <span class="ident">Layout</span>::<span class="ident">Contents</span>(<span class="kw-2">ref</span> <span class="ident">contents</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Layout</span>::<span class="ident">Contents</span>(<span class="kw-2">ref</span> <span class="ident">contents</span>) <span class="op">=&gt;</span> {
                 <span class="ident">tempfile</span> <span class="op">=</span> <span class="ident">NamedTempFile</span>::<span class="ident">new</span>()<span class="question-mark">?</span>;
                 <span class="ident">tempfile</span>.<span class="ident">write_all</span>(<span class="ident">contents</span>.<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
                 <span class="ident">tempfile</span>.<span class="ident">flush</span>()<span class="question-mark">?</span>;
                 <span class="ident">tempfile</span>.<span class="ident">path</span>()
             }
-            <span class="ident">Layout</span>::<span class="ident">Managed</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Layout</span>::<span class="ident">Managed</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=&gt;</span> {
                 <span class="ident">managed_layout_path</span> <span class="op">=</span> <span class="ident">ManagedLayout</span>::<span class="ident">open</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>)<span class="question-mark">?</span>.<span class="ident">path</span>;
                 <span class="kw-2">&amp;</span><span class="ident">managed_layout_path</span>
             }
-            <span class="ident">Layout</span>::<span class="ident">Path</span>(<span class="kw-2">ref</span> <span class="ident">path</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">path</span>,
+            <span class="ident">Layout</span>::<span class="ident">Path</span>(<span class="kw-2">ref</span> <span class="ident">path</span>) <span class="op">=&gt;</span> <span class="ident">path</span>,
         };
 
         <span class="comment">// Change workspace if provided</span>
         <span class="kw">let</span> <span class="ident">workspace</span> <span class="op">=</span> <span class="ident">workspace</span>
             .<span class="ident">map</span>(<span class="ident">Into</span>::<span class="ident">into</span>)
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">general</span>.<span class="ident">workspace</span>.<span class="ident">as_ref</span>().<span class="ident">cloned</span>());
+            .<span class="ident">or_else</span>(<span class="op">||</span> <span class="ident">general</span>.<span class="ident">workspace</span>.<span class="ident">as_ref</span>().<span class="ident">cloned</span>());
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">workspace</span>) <span class="op">=</span> <span class="ident">workspace</span> {
             <span class="ident">i3</span>.<span class="ident">run_command</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;workspace {}&quot;</span>, <span class="ident">workspace</span>))<span class="question-mark">?</span>;
         }
@@ -577,7 +578,7 @@
         <span class="ident">i3</span>.<span class="ident">run_command</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(
             <span class="string">&quot;append_layout {}&quot;</span>,
             <span class="ident">path</span>.<span class="ident">to_str</span>()
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ErrorKind</span>::<span class="ident">InvalidUtF8Path</span>(<span class="ident">path</span>.<span class="ident">to_string_lossy</span>().<span class="ident">into_owned</span>()))<span class="question-mark">?</span>
+                .<span class="ident">ok_or_else</span>(<span class="op">||</span> <span class="ident">ErrorKind</span>::<span class="ident">InvalidUtF8Path</span>(<span class="ident">path</span>.<span class="ident">to_string_lossy</span>().<span class="ident">into_owned</span>()))<span class="question-mark">?</span>
         ))<span class="question-mark">?</span>;
 
         <span class="comment">// Start the applications</span>
@@ -592,8 +593,8 @@
             <span class="comment">// 3. `working_directory` option in the general section of the config</span>
             <span class="kw">let</span> <span class="ident">working_directory</span> <span class="op">=</span> <span class="ident">working_directory</span>
                 .<span class="ident">map</span>(<span class="ident">OsStr</span>::<span class="ident">to_os_string</span>)
-                .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">application</span>.<span class="ident">working_directory</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">OsString</span>::<span class="ident">from</span>))
-                .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">general</span>.<span class="ident">working_directory</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">OsString</span>::<span class="ident">from</span>));
+                .<span class="ident">or_else</span>(<span class="op">||</span> <span class="ident">application</span>.<span class="ident">working_directory</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">OsString</span>::<span class="ident">from</span>))
+                .<span class="ident">or_else</span>(<span class="op">||</span> <span class="ident">general</span>.<span class="ident">working_directory</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">OsString</span>::<span class="ident">from</span>));
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">working_directory</span>) <span class="op">=</span> <span class="ident">working_directory</span> {
                 <span class="ident">cmd</span>.<span class="ident">current_dir</span>(<span class="ident">working_directory</span>);
@@ -616,12 +617,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ConfigFile</span> <span class="kw">for</span> <span class="ident">Project</span> {
-    <span class="kw">fn</span> <span class="ident">create</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">OsStr</span><span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">create</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">OsStr</span><span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">configfile</span> <span class="op">=</span> <span class="ident">ConfigFileImpl</span>::<span class="ident">create</span>(<span class="ident">PROJECTS_PREFIX</span>.<span class="ident">as_os_str</span>(), <span class="ident">name</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">Project</span>::<span class="ident">from_configfile</span>(<span class="ident">configfile</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">create_from_template</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">OsStr</span><span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>, <span class="ident">template</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">create_from_template</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">OsStr</span><span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>, <span class="ident">template</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">configfile</span> <span class="op">=</span> <span class="ident">ConfigFileImpl</span>::<span class="ident">create_from_template</span>(
             <span class="ident">PROJECTS_PREFIX</span>.<span class="ident">as_os_str</span>(),
             <span class="ident">name</span>.<span class="ident">as_ref</span>(),
@@ -630,32 +631,32 @@
         <span class="prelude-val">Ok</span>(<span class="ident">Project</span>::<span class="ident">from_configfile</span>(<span class="ident">configfile</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">from_path</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_path</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">P</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">configfile</span> <span class="op">=</span> <span class="ident">ConfigFileImpl</span>::<span class="ident">from_path</span>(<span class="ident">path</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">Project</span>::<span class="ident">from_configfile</span>(<span class="ident">configfile</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">open</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">OsStr</span><span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">open</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">OsStr</span><span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">configfile</span> <span class="op">=</span> <span class="ident">ConfigFileImpl</span>::<span class="ident">open</span>(<span class="ident">PROJECTS_PREFIX</span>.<span class="ident">as_os_str</span>(), <span class="ident">name</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">Project</span>::<span class="ident">from_configfile</span>(<span class="ident">configfile</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">copy</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">OsStr</span><span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">new_name</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">copy</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">OsStr</span><span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">new_name</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">configfile</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">configfile</span>.<span class="ident">copy</span>(<span class="ident">new_name</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">Project</span>::<span class="ident">from_configfile</span>(<span class="ident">configfile</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">configfile</span>.<span class="ident">delete</span>()<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">rename</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">OsStr</span><span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">new_name</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">rename</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">OsStr</span><span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">new_name</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">configfile</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">configfile</span>.<span class="ident">rename</span>(<span class="ident">new_name</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">Project</span>::<span class="ident">from_configfile</span>(<span class="ident">configfile</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">verify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">verify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">// Verify configuration can be loaded</span>
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">load</span>()<span class="question-mark">?</span>;
 
@@ -666,11 +667,11 @@
         }
 
         <span class="kw">match</span> <span class="ident">config</span>.<span class="ident">general</span>.<span class="ident">layout</span> {
-            <span class="ident">Layout</span>::<span class="ident">Contents</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="ident">Layout</span>::<span class="ident">Managed</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Layout</span>::<span class="ident">Contents</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> (),
+            <span class="ident">Layout</span>::<span class="ident">Managed</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=&gt;</span> {
                 <span class="ident">ManagedLayout</span>::<span class="ident">open</span>(<span class="ident">name</span>)<span class="question-mark">?</span>;
             }
-            <span class="ident">Layout</span>::<span class="ident">Path</span>(<span class="kw-2">ref</span> <span class="ident">path</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">paths</span>.<span class="ident">push</span>(<span class="ident">path</span>),
+            <span class="ident">Layout</span>::<span class="ident">Path</span>(<span class="kw-2">ref</span> <span class="ident">path</span>) <span class="op">=&gt;</span> <span class="ident">paths</span>.<span class="ident">push</span>(<span class="ident">path</span>),
         }
 
         <span class="kw">for</span> <span class="ident">application</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">config</span>.<span class="ident">applications</span> {
@@ -689,19 +690,19 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">list</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">list</span>() <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span> {
         <span class="ident">configfiles</span>::<span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">PROJECTS_PREFIX</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">to_owned</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PathBuf</span> {
+    <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">PathBuf</span> {
         <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">to_owned</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">prefix</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">OsStr</span> {
+    <span class="kw">fn</span> <span class="ident">prefix</span>() <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">OsStr</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">PROJECTS_PREFIX</span>
     }
 }
@@ -712,11 +713,11 @@
 <span class="doccomment">/// and return a list of their names for use with e.g. [`Project::open`][fn-Project-open].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [fn-Project-open]: struct.Project.html#method.open</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>() <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span> {
     <span class="ident">configfiles</span>::<span class="ident">list</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">PROJECTS_PREFIX</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">exec_text</span>(<span class="ident">base_parameters</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>], <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">exec_text</span>(<span class="ident">base_parameters</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>], <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">base_parameters</span>, <span class="kw-2">&amp;</span>[<span class="string">&quot;type&quot;</span>, <span class="string">&quot;--window&quot;</span>, <span class="string">&quot;%1&quot;</span>, <span class="ident">text</span>]].<span class="ident">concat</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">child</span> <span class="op">=</span> <span class="ident">Command</span>::<span class="ident">new</span>(<span class="string">&quot;xdotool&quot;</span>)
         .<span class="ident">args</span>(<span class="ident">args</span>)
@@ -736,11 +737,11 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">exec_keys</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">OsStr</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+<span class="kw">fn</span> <span class="ident">exec_keys</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">OsStr</span><span class="op">&gt;&gt;</span>(
     <span class="ident">base_parameters</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>],
     <span class="ident">keys</span>: <span class="kw-2">&amp;</span>[<span class="ident">S</span>],
     <span class="ident">timeout</span>: <span class="ident">Duration</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">base_parameters</span>, <span class="kw-2">&amp;</span>[<span class="string">&quot;key&quot;</span>, <span class="string">&quot;--window&quot;</span>, <span class="string">&quot;%1&quot;</span>]].<span class="ident">concat</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">child</span> <span class="op">=</span> <span class="ident">Command</span>::<span class="ident">new</span>(<span class="string">&quot;xdotool&quot;</span>)
         .<span class="ident">args</span>(<span class="ident">args</span>)
@@ -761,7 +762,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">exec_commands</span>(<span class="ident">child</span>: <span class="kw-2">&amp;</span><span class="ident">Child</span>, <span class="ident">exec</span>: <span class="kw-2">&amp;</span><span class="ident">Exec</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">exec_commands</span>(<span class="ident">child</span>: <span class="kw-2">&amp;</span><span class="ident">Child</span>, <span class="ident">exec</span>: <span class="kw-2">&amp;</span><span class="ident">Exec</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="ident">exec</span>.<span class="ident">timeout</span>;
     <span class="kw">let</span> <span class="ident">pid</span> <span class="op">=</span> <span class="ident">child</span>.<span class="ident">id</span>().<span class="ident">to_string</span>();
     <span class="kw">let</span> <span class="ident">base_parameters</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[
@@ -779,18 +780,18 @@
 
     <span class="kw">let</span> <span class="ident">commands</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">exec</span>.<span class="ident">commands</span>;
     <span class="kw">match</span> <span class="ident">exec</span>.<span class="ident">exec_type</span> {
-        <span class="ident">ExecType</span>::<span class="ident">Text</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ExecType</span>::<span class="ident">Text</span> <span class="op">=&gt;</span> {
             <span class="kw">for</span> <span class="ident">command</span> <span class="kw">in</span> <span class="ident">commands</span> {
                 <span class="ident">exec_text</span>(<span class="ident">base_parameters</span>, <span class="ident">command</span>, <span class="ident">timeout</span>)<span class="question-mark">?</span>;
                 <span class="ident">exec_keys</span>(<span class="ident">base_parameters</span>, <span class="kw-2">&amp;</span>[<span class="string">&quot;Return&quot;</span>], <span class="ident">timeout</span>)<span class="question-mark">?</span>;
             }
         }
-        <span class="ident">ExecType</span>::<span class="ident">TextNoReturn</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ExecType</span>::<span class="ident">TextNoReturn</span> <span class="op">=&gt;</span> {
             <span class="kw">for</span> <span class="ident">command</span> <span class="kw">in</span> <span class="ident">commands</span> {
                 <span class="ident">exec_text</span>(<span class="ident">base_parameters</span>, <span class="ident">command</span>, <span class="ident">timeout</span>)<span class="question-mark">?</span>;
             }
         }
-        <span class="ident">ExecType</span>::<span class="ident">Keys</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">exec_keys</span>(<span class="ident">base_parameters</span>, <span class="ident">commands</span>.<span class="ident">as_slice</span>(), <span class="ident">timeout</span>)<span class="question-mark">?</span>,
+        <span class="ident">ExecType</span>::<span class="ident">Keys</span> <span class="op">=&gt;</span> <span class="ident">exec_keys</span>(<span class="ident">base_parameters</span>, <span class="ident">commands</span>.<span class="ident">as_slice</span>(), <span class="ident">timeout</span>)<span class="question-mark">?</span>,
     }
 
     <span class="prelude-val">Ok</span>(())
