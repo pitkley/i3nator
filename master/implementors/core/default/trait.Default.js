@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["i3nator"] = [{"text":"impl Default for ApplicationCommand","synthetic":false,"types":[]}];
+implementors["i3nator"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/default/trait.Default.html\" title=\"trait core::default::Default\">Default</a> for <a class=\"struct\" href=\"i3nator/types/struct.ApplicationCommand.html\" title=\"struct i3nator::types::ApplicationCommand\">ApplicationCommand</a>","synthetic":false,"types":["i3nator::types::ApplicationCommand"]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
