@@ -38,8 +38,6 @@ to install [`xdotool`][xdotool].
 
 ## Usage
 
-Following the usage of i3nator as of 1.1.0.
-
 <!-- usage-main -->
 ```text
 i3nator 1.2.0
