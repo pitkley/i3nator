@@ -6,19 +6,22 @@
 // option. This file may not be copied, modified or distributed
 // except according to those terms.
 
-use clap::Shell;
-use std::env;
+use clap::{crate_name, CommandFactory};
+use clap_complete::{generate_to, shells};
+use std::{env, io::Error};
 
 include!("src/cli.rs");
 
-fn main() {
+fn main() -> Result<(), Error> {
     let outdir = match env::var_os("OUT_DIR") {
-        None => return,
+        None => return Ok(()),
         Some(outdir) => outdir,
     };
 
-    let mut app = cli();
-    app.gen_completions(crate_name!(), Shell::Bash, outdir.clone());
-    app.gen_completions(crate_name!(), Shell::Zsh, outdir.clone());
-    app.gen_completions(crate_name!(), Shell::Fish, outdir);
+    let mut cmd = Cli::command();
+    generate_to(shells::Bash, &mut cmd, crate_name!(), outdir.clone())?;
+    generate_to(shells::Zsh, &mut cmd, crate_name!(), outdir.clone())?;
+    generate_to(shells::Fish, &mut cmd, crate_name!(), outdir.clone())?;
+
+    Ok(())
 }

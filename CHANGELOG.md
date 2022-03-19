@@ -4,6 +4,8 @@
 
 ## Unreleased
 
+<sub>Internal changes: dependency updates.</sub>
+
 ## 1.2.0 (2020-07-13)
 
 * Compatibility: the minimum supported Rust version is now 1.38.0, you will not be able to compile i3nator with older versions.
