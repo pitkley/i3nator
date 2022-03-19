@@ -925,7 +925,7 @@
         <span class="kw">if</span> <span class="ident">input_after_tilde</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">input_after_tilde</span>[<span class="number">0</span>] <span class="op">==</span> <span class="string">b&#39;/&#39;</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">hd</span>) <span class="op">=</span> <span class="ident">home_dir</span>() {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">OsString::new</span>();
-                <span class="ident">s</span>.<span class="ident">push</span>(<span class="ident">hd</span>.<span class="ident">as_ref</span>().<span class="ident">to_path_buf</span>());
+                <span class="ident">s</span>.<span class="ident">push</span>(<span class="ident">hd</span>.<span class="ident">as_ref</span>());
                 <span class="ident">s</span>.<span class="ident">push</span>(<span class="ident">OsStr::from_bytes</span>(<span class="ident">input_after_tilde</span>));
                 <span class="ident">PathBuf::from</span>(<span class="ident">s</span>).<span class="ident">into</span>()
             } <span class="kw">else</span> {

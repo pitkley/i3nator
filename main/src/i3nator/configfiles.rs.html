@@ -426,8 +426,6 @@
 <span id="424">424</span>
 <span id="425">425</span>
 <span id="426">426</span>
-<span id="427">427</span>
-<span id="428">428</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright Pit Kleyersburg &lt;pitkley@googlemail.com&gt;</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -850,9 +848,7 @@
     <span class="ident">files</span>.<span class="ident">sort</span>();
     <span class="ident">files</span>
         .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">file</span><span class="op">|</span> <span class="ident">file</span>.<span class="ident">file_stem</span>())
-        .<span class="ident">filter</span>(<span class="ident">Option::is_some</span>)
-        .<span class="ident">map</span>(<span class="ident">Option::unwrap</span>)
+        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">file</span><span class="op">|</span> <span class="ident">file</span>.<span class="ident">file_stem</span>())
         .<span class="ident">map</span>(<span class="ident">OsStr::to_os_string</span>)
         .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
 }

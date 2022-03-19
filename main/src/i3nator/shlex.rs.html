@@ -170,9 +170,9 @@
             }
         }
 
-        <span class="ident">str::from_utf8</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">in_str</span>.<span class="ident">as_bytes</span>()[<span class="ident">start_offset</span>..<span class="self">self</span>.<span class="ident">offset</span> <span class="op">-</span> <span class="number">1</span>])
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>.<span class="ident">trim_matches</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\&#39;&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;&quot;&#39;</span>)))
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(
+            (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">in_str</span>[<span class="ident">start_offset</span>..<span class="self">self</span>.<span class="ident">offset</span> <span class="op">-</span> <span class="number">1</span>]).<span class="ident">trim_matches</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\&#39;&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;&quot;&#39;</span>),
+        ))
     }
 
     <span class="kw">fn</span> <span class="ident">parse_double</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
