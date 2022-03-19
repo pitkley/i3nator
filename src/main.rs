@@ -349,10 +349,7 @@ fn verify_configfile<C: ConfigFile>(configfile: &C) -> Result<()> {
             if ch.is_none() {
                 true
             } else {
-                match ch {
-                    Some('a') | Some('r') => false,
-                    _ => true,
-                }
+                !matches!(ch, Some('a') | Some('r'))
             }
         } {
             // Ugly do-while syntax:

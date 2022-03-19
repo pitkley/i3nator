@@ -449,7 +449,7 @@ where
         if input_after_tilde.is_empty() || input_after_tilde[0] == b'/' {
             if let Some(hd) = home_dir() {
                 let mut s = OsString::new();
-                s.push(hd.as_ref().to_path_buf());
+                s.push(hd.as_ref());
                 s.push(OsStr::from_bytes(input_after_tilde));
                 PathBuf::from(s).into()
             } else {

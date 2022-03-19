@@ -420,9 +420,7 @@ pub fn list<S: AsRef<OsStr> + ?Sized>(prefix: &S) -> Vec<OsString> {
     files.sort();
     files
         .iter()
-        .map(|file| file.file_stem())
-        .filter(Option::is_some)
-        .map(Option::unwrap)
+        .filter_map(|file| file.file_stem())
         .map(OsStr::to_os_string)
         .collect::<Vec<_>>()
 }

@@ -55,9 +55,9 @@ impl<'a> Shlex<'a> {
             }
         }
 
-        str::from_utf8(&self.in_str.as_bytes()[start_offset..self.offset - 1])
-            .map(|s| Some(s.trim_matches(|c| c == '\'' || c == '"')))
-            .map_err(|e| e.into())
+        Ok(Some(
+            (&self.in_str[start_offset..self.offset - 1]).trim_matches(|c| c == '\'' || c == '"'),
+        ))
     }
 
     fn parse_double(&mut self) -> Result<()> {
