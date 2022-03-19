@@ -208,7 +208,7 @@ dual licensed as above, without any additional terms or conditions.
 [gh-tmuxinator]: https://github.com/tmuxinator/tmuxinator
 [i3nator-docs]: https://docs.rs/i3nator
 [i3nator-docs-types-Config]: https://docs.rs/i3nator/*/i3nator/types/struct.Config.html
-[i3nator-examples]: https://github.com/pitkley/i3nator/tree/master/examples
+[i3nator-examples]: https://github.com/pitkley/i3nator/tree/main/examples
 [i3nator-gh]: https://github.com/pitkley/i3nator
 [i3nator-releases]: https://github.com/pitkley/i3nator/releases
 [i3wm]: https://i3wm.org/
