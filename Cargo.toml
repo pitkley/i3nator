@@ -32,7 +32,7 @@ getch = "^0.3"
 i3ipc = "^0.10"
 lazy_static = "^1.4"
 serde = { version = "^1.0", features = ["derive"] }
-tempfile = "^3.1"
+tempfile = "^3.3"
 toml = "^0.5"
 wait-timeout = "^0.2"
 xdg = "^2.4"
