@@ -51,7 +51,7 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         profile: minimal
-        toolchain: 1.38.0
+        toolchain: stable
         override: true
         components: clippy
 
@@ -81,7 +81,7 @@ jobs:
         - stable
         - beta
         - # MSRV
-          1.38.0
+          1.56.1
         target:
         - ""
         continue-on-error:

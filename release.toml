@@ -1,4 +1,5 @@
 sign-commit = true
+sign-tag = true
 tag-name = "{{version}}"
 
 pre-release-hook = ["hack/cargo-release-hook.sh"]

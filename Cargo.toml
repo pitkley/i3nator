@@ -1,7 +1,7 @@
 [package]
 name = "i3nator"
-version = "1.2.1-alpha.0"
-edition = "2018"
+version = "1.3.0-alpha.0"
+edition = "2021"
 authors = ["Pit Kleyersburg <pitkley@googlemail.com>"]
 license = "MIT/Apache-2.0"
 description = "i3nator is Tmuxinator for the i3 window manager"
@@ -11,8 +11,6 @@ readme = "README.md"
 
 categories = ["command-line-interface", "command-line-utilities", "gui"]
 keywords = ["cli", "i3", "unix", "xdg"]
-
-build = "build.rs"
 
 include = [
     "**/*.rs",
@@ -25,23 +23,21 @@ include = [
 maintenance = { status = "actively-developed" }
 
 [dependencies]
-clap = "^2.33"
-dirs-next = "^2.0"
-error-chain = "^0.12"
-getch = "^0.2"
-i3ipc = "^0.10"
-lazy_static = "^1.4"
-serde = { version = "^1.0", features = ["derive"] }
-tempfile = "^3.1"
-toml = "^0.5"
-wait-timeout = "^0.2"
-xdg = "^2.4"
-
-[build-dependencies]
-clap = "^2.33"
+clap = { version = "3.1.6", features = ["cargo", "derive"] }
+clap_complete = "3.1.1"
+dirs-next = "2.0.0"
+error-chain = "0.12.4"
+getch = "0.3.1"
+i3ipc = "0.10.1"
+lazy_static = "1.4.0"
+serde = { version = "1.0.136", features = ["derive"] }
+tempfile = "3.3.0"
+toml = "0.5.8"
+wait-timeout = "0.2.0"
+xdg = "2.4.1"
 
 [dev-dependencies]
-tempdir = "^0.3"
+tempdir = "0.3.7"
 
 [[bin]]
 name = "i3nator"

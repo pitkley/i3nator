@@ -38,8 +38,6 @@ to install [`xdotool`][xdotool].
 
 ## Usage
 
-Following the usage of i3nator as of 1.1.0.
-
 <!-- usage-main -->
 ```text
 i3nator 1.2.0
@@ -187,6 +185,18 @@ your layout to a specified workspace and starts the configured applications:
 ```console
 $ i3nator start myproject
 ```
+
+## <a name="versionbumppolicy"></a> Version bump policy
+
+In general, the versioning scheme follows the semantic versioning guidelines:
+
+* The patch version is bumped when backwards compatible fixes are made (this includes updates to dependencies).
+* The minor version is bumped when new features are introduced, but backwards compatibility is retained.
+* The major version is bumped when a backwards incompatible change was made.
+
+Special case:
+
+* A bump in the minimum supported Rust version (MSRV), which is currently 1.54.0, will be done in patch version updates (i.e. they do not require a major or minor version bump).
 
 ## License
 
