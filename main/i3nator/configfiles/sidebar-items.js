@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["list","Get a list of all configfile names for a given prefix."]],"struct":[["ConfigFileImpl","Helping type to consolidate common functionality between projects and layouts."]],"trait":[["ConfigFile","Helping type to consolidate common functionality between projects and layouts."]]});
