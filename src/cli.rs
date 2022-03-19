@@ -33,7 +33,31 @@ pub(crate) struct Cli {
 /// Main level subcommands
 #[derive(Subcommand)]
 pub(crate) enum Commands {
-    // TODO: Project commands, maybe move to nested subcommand
+    /// Manage projects
+    #[clap(subcommand)]
+    Project(ProjectCommands),
+    /// Manage projects
+    #[clap(flatten)]
+    FlattenedProject(ProjectCommands),
+    /// Manage layouts which can be used in projects
+    #[clap(subcommand)]
+    Layout(LayoutCommands),
+    /// Generate shell completions for i3nator
+    GenerateShellCompletions {
+        /// Shell to generate the completions for
+        #[clap(long = "shell", arg_enum)]
+        generator: Shell,
+        /// Path to save the completions into.
+        ///
+        /// If the directory in question does not exist, it will not be created. Don't specify this parameter if you
+        /// want to output the completions to stdout.
+        output_path: Option<OsString>,
+    },
+}
+
+/// Project-specific subcommands
+#[derive(Subcommand)]
+pub(crate) enum ProjectCommands {
     /// Copy an existing project to a new project
     Copy {
         /// Name of the existing project
@@ -129,20 +153,6 @@ pub(crate) enum Commands {
         ///
         /// If not specified, all projects will be checked.
         names: Vec<String>,
-    },
-    /// Manage layouts which can be used in projects
-    #[clap(subcommand)]
-    Layout(LayoutCommands),
-    /// Generate shell completions for i3nator
-    GenerateShellCompletions {
-        /// Shell to generate the completions for
-        #[clap(long = "shell", arg_enum)]
-        generator: Shell,
-        /// Path to save the completions into.
-        ///
-        /// If the directory in question does not exist, it will not be created. Don't specify this parameter if you
-        /// want to output the completions to stdout.
-        output_path: Option<OsString>,
     },
 }
 

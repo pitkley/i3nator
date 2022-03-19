@@ -335,38 +335,43 @@ fn verify_configfile<C: ConfigFile>(configfile: &C) -> Result<()> {
 fn run() -> Result<()> {
     let clap = cli::Cli::parse();
     match &clap.command {
-        cli::Commands::Copy {
-            existing,
-            new,
-            no_edit,
-            no_verify,
-        } => command_copy::<Project>(existing, new, *no_edit, *no_verify),
-        cli::Commands::Delete { names } => command_delete::<Project, _>(&names[..]),
-        cli::Commands::Edit { name, no_verify } => command_edit::<Project>(name, *no_verify),
-        cli::Commands::Info { name } => command_info::<Project>(name),
-        cli::Commands::List { quiet } => command_list::<Project>(*quiet),
-        cli::Commands::Local {
-            file,
-            working_directory,
-            workspace,
-        } => project_local(file, working_directory.as_deref(), workspace.as_deref()),
-        cli::Commands::New {
-            name,
-            no_edit,
-            no_verify,
-        } => project_new(name, *no_edit, *no_verify),
-        cli::Commands::Rename {
-            existing,
-            new,
-            edit,
-            no_verify,
-        } => command_rename::<Project>(existing, new, *edit, *no_verify),
-        cli::Commands::Start {
-            name,
-            working_directory,
-            workspace,
-        } => project_start(name, working_directory.as_deref(), workspace.as_deref()),
-        cli::Commands::Verify { names } => project_verify(&names[..]),
+        cli::Commands::Project(project_commands)
+        | cli::Commands::FlattenedProject(project_commands) => match project_commands {
+            cli::ProjectCommands::Copy {
+                existing,
+                new,
+                no_edit,
+                no_verify,
+            } => command_copy::<Project>(existing, new, *no_edit, *no_verify),
+            cli::ProjectCommands::Delete { names } => command_delete::<Project, _>(&names[..]),
+            cli::ProjectCommands::Edit { name, no_verify } => {
+                command_edit::<Project>(name, *no_verify)
+            }
+            cli::ProjectCommands::Info { name } => command_info::<Project>(name),
+            cli::ProjectCommands::List { quiet } => command_list::<Project>(*quiet),
+            cli::ProjectCommands::Local {
+                file,
+                working_directory,
+                workspace,
+            } => project_local(file, working_directory.as_deref(), workspace.as_deref()),
+            cli::ProjectCommands::New {
+                name,
+                no_edit,
+                no_verify,
+            } => project_new(name, *no_edit, *no_verify),
+            cli::ProjectCommands::Rename {
+                existing,
+                new,
+                edit,
+                no_verify,
+            } => command_rename::<Project>(existing, new, *edit, *no_verify),
+            cli::ProjectCommands::Start {
+                name,
+                working_directory,
+                workspace,
+            } => project_start(name, working_directory.as_deref(), workspace.as_deref()),
+            cli::ProjectCommands::Verify { names } => project_verify(&names[..]),
+        },
         cli::Commands::Layout(layout_commands) => match layout_commands {
             cli::LayoutCommands::Copy {
                 existing,

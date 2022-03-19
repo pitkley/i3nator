@@ -4,6 +4,11 @@
 
 ## Unreleased
 
+* You can now interact with projects through the `i3nator project` subcommand.
+
+    The commands available are identical to the "root"-commands, e.g. instead of `i3nator copy` you can now use `i3nator project copy`.
+    Both styles of invocation are fully supported, you can decide which fits you better!
+
 * Compatibility: the minimum supported Rust version is now 1.56.1, you will not be able to compile i3nator with older versions.
 
     (Please note that this does not affect how or where you can run the pre-built binary.)
