@@ -388,6 +388,10 @@ fn run() -> Result<()> {
                 edit,
             } => command_rename::<Layout>(existing, new, *edit, false),
         },
+        cli::Commands::GenerateShellCompletions {
+            generator,
+            output_path,
+        } => cli::generate_completions(*generator, output_path.as_deref()).map_err(|e| e.into()),
     }
 }
 

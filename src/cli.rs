@@ -10,8 +10,11 @@
 
 //! CLI module
 
-use clap::{crate_authors, crate_description, crate_version, Parser, Subcommand};
-use std::ffi::OsString;
+use clap::{
+    crate_authors, crate_description, crate_name, crate_version, CommandFactory, Parser, Subcommand,
+};
+use clap_complete::Shell;
+use std::{ffi::OsString, io};
 
 /// Main CLI entry type
 #[derive(Parser)]
@@ -75,7 +78,8 @@ pub(crate) enum Commands {
         /// File to load the project from
         #[clap(short = 'f', long = "file", default_value = "i3nator.toml")]
         file: OsString,
-        /// Directory used as context for starting the applications. This overrides any specified working-directory in the project's configuration.
+        /// Directory used as context for starting the applications. This overrides any specified working-directory in
+        /// the project's configuration.
         #[clap(short = 'd', long = "working-directory", value_name = "PATH")]
         working_directory: Option<OsString>,
         /// Workspace to apply the layout to. This overrides the specified workspace in the project's configuration.
@@ -111,7 +115,8 @@ pub(crate) enum Commands {
     Start {
         /// Name of the project to start
         name: OsString,
-        /// Directory used as context for starting the applications. This overrides any specified working-directory in the project's configuration.
+        /// Directory used as context for starting the applications. This overrides any specified working-directory in
+        /// the project's configuration.
         #[clap(short = 'd', long = "working-directory", value_name = "PATH")]
         working_directory: Option<OsString>,
         /// Workspace to apply the layout to. This overrides the specified workspace in the project's configuration.
@@ -128,6 +133,17 @@ pub(crate) enum Commands {
     /// Manage layouts which can be used in projects
     #[clap(subcommand)]
     Layout(LayoutCommands),
+    /// Generate shell completions for i3nator
+    GenerateShellCompletions {
+        /// Shell to generate the completions for
+        #[clap(long = "shell", arg_enum)]
+        generator: Shell,
+        /// Path to save the completions into.
+        ///
+        /// If the directory in question does not exist, it will not be created. Don't specify this parameter if you
+        /// want to output the completions to stdout.
+        output_path: Option<OsString>,
+    },
 }
 
 /// Layout-specific subcommands
@@ -187,4 +203,20 @@ pub(crate) enum LayoutCommands {
         #[clap(long = "edit")]
         edit: bool,
     },
+}
+
+/// Generate shell completions
+pub(crate) fn generate_completions<S: Into<OsString>>(
+    generator: Shell,
+    output_path: Option<S>,
+) -> Result<(), io::Error> {
+    let mut cmd = Cli::command();
+
+    if let Some(output_path) = output_path {
+        clap_complete::generate_to(generator, &mut cmd, crate_name!(), output_path)?;
+    } else {
+        clap_complete::generate(generator, &mut cmd, crate_name!(), &mut io::stdout());
+    }
+
+    Ok(())
 }

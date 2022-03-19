@@ -12,8 +12,6 @@ readme = "README.md"
 categories = ["command-line-interface", "command-line-utilities", "gui"]
 keywords = ["cli", "i3", "unix", "xdg"]
 
-build = "build.rs"
-
 include = [
     "**/*.rs",
     "resources/**/*",
@@ -26,6 +24,7 @@ maintenance = { status = "actively-developed" }
 
 [dependencies]
 clap = { version = "3.1.6", features = ["cargo", "derive"] }
+clap_complete = "3.1.1"
 dirs-next = "2.0.0"
 error-chain = "0.12.4"
 getch = "0.3.1"
@@ -36,10 +35,6 @@ tempfile = "3.3.0"
 toml = "0.5.8"
 wait-timeout = "0.2.0"
 xdg = "2.4.1"
-
-[build-dependencies]
-clap = { version = "3.1.6", features = ["cargo", "derive"] }
-clap_complete = "3.1.1"
 
 [dev-dependencies]
 tempdir = "0.3.7"
