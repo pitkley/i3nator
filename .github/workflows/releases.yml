@@ -91,7 +91,7 @@ jobs:
 
           1. Download the static binary from this release. This will work without any additional dependencies.
 
-          2. If you have at least Rust 1.38.0 with Cargo installed, you can install i3nator directly from crates.io:
+          2. If you have at least Rust 1.56.1 with Cargo installed, you can install i3nator directly from crates.io:
 
               ```console
               $ cargo install i3nator
@@ -109,7 +109,7 @@ jobs:
               $ cargo install --force --version ${{ steps.tag.outputs.value }} i3nator
               ```
 
-          3. Another option is to install from directly from source (this requires at least Rust 1.38.0):
+          3. Another option is to install from directly from source (this requires at least Rust 1.56.1):
 
               ```console
               $ git clone https://github.com/pitkley/i3nator.git
