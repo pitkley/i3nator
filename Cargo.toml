@@ -31,7 +31,7 @@ getch = "0.3.1"
 i3ipc = "0.10.1"
 lazy_static = "1.4.0"
 serde = { version = "1.0.140", features = ["derive"] }
-tempfile = "3.3.0"
+tempfile = "3.4.0"
 toml = "0.5.9"
 wait-timeout = "0.2.0"
 xdg = "2.4.1"
